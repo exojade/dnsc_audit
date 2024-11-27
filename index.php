@@ -33,6 +33,12 @@
 				else:
 				if($request == 'index' || $request == '/' || $request== "")
 				require 'public/dashboard_system/main.php';
+
+				else if ($request == 'users')
+					require 'public/users_system/users.php';
+				else if ($request == 'area')
+					require 'public/area_system/area.php';
+
 			
 
 

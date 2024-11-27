@@ -1,9 +1,6 @@
-<script src="AdminLTE_new/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- <script src="AdminLTE_new/dist/js/demo.js"></script> -->
-<script src="AdminLTE_new/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script src="<?= asset("AdminLTE_new/plugins/bootstrap/js/bootstrap.bundle.min.js"); ?>"></script>
+<script src="<?= asset("AdminLTE_new/plugins/sweetalert2/sweetalert2.min.js");?>"></script>
 <script>
-
-  
 $(document).on('submit', '.generic_form_trigger', function(e) {
     e.preventDefault(); // Prevent the default form submission
 
@@ -61,7 +58,7 @@ $(document).on('submit', '.generic_form_trigger', function(e) {
       animate__faster
     `
   },
-              imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false });
+              imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif");?>', showConfirmButton: false });
             $.ajax({
                 type: 'post',
                 url: url,
@@ -491,7 +488,7 @@ $('.generic_form_pdf_dropping').submit(function(e) {
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
     </div>
-    <strong>Copyright &copy; <?php echo(date("Y")); ?> Animal Health Disease Monitoring Online Checkup Services
+    <strong>Copyright &copy; <?php echo(date("Y")); ?> DNSC Audit
   </footer>
     <aside class="control-sidebar control-sidebar-dark">
   </aside>

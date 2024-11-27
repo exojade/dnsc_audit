@@ -5,32 +5,25 @@
 
         if($_POST["action"] == "register"):
             // dump($_POST);
-            dump(generate_uuid());
-
-
-
-
-
+            // dump();
         $rows = query("SELECT * FROM users WHERE username = ?", $_POST["email_address"]);
         if (count($rows) == 1)
         {
             $row = $rows[0];
 			if($row["verified"] == ""){
-
-                $otp = query("select ");
-
-
+                $otp = query("select * from otps where user_id = ?", $row["id"]);
+                $otp = $otp[0];
 				$res_arr = [
 					"result" => "success",
 					"title" => "Success",
 					"message" => "Success",
-					"link" => "verify/?id=".$row["user_id"],
+					"link" => "verify/".$row["code"],
 					];
 					echo json_encode($res_arr); exit();
-				
-
 			}
 			else{
+
+                // $the_otp = generate_uuid();
 				$res_arr = [
 					"result" => "failed",
 					"title" => "Success",
@@ -40,14 +33,19 @@
 					echo json_encode($res_arr); exit();
 			}
 		}
-		else {
-			$user_id = create_uuid("USR");
+		else { 
+        // $user_id = create_uuid("USR");   
+            // dump($_FILES);
+            
 			if (query("insert INTO users 
-						(user_id, username, password, role, fullname, status, otp) 
-                    VALUES(?,?,?,?,?,?,?)", 
-                    $user_id, $_POST["email_address"], crypt('!1234#', '') , 'APPLICANT',
-					$_POST["firstname"] . " " . $_POST["lastname"],
-					"fill_otp", "!1234#") === false)
+						(
+                            firstname, middlename, surname, suffix, username,
+                            password, created_at, updated_at
+                            ) 
+                    VALUES(?,?,?,?,?,?,?,?)", 
+                    $_POST["firstname"], $_POST["middlename"], $_POST["lastname"] , $_POST["suffix"],
+					$_POST["email_address"], password_hash($_POST["password"], PASSWORD_DEFAULT), date("Y-m-d H:i:s"),
+					date("Y-m-d H:i:s")) === false)
                     {
                         $res_arr = [
                             "result" => "failed",
@@ -58,28 +56,84 @@
                             echo json_encode($res_arr); exit();
                     }
 
-            if (query("insert INTO scholars 
-                    (scholar_id, firstname, middlename, lastname, birthdate, current_status) 
-                VALUES(?,?,?,?,?,'APPLICANT')", 
-                $user_id, $_POST["firstname"], $_POST["middlename"] , $_POST["lastname"],
-                $_POST["birthdate"]) === false)
-                {
-                    $res_arr = [
-                        "result" => "failed",
-                        "title" => "Failed",
-                        "message" => "Failed on saving deduction table",
-                        "link" => "loans_management?action=list",
-                        ];
-                        echo json_encode($res_arr); exit();
+
+                $user_id = query("SELECT LAST_INSERT_ID() AS id");
+                $user_id = $user_id[0]["id"];
+                $target_pdf = "uploads/";
+                $target = "";
+                if($_FILES["profileImage"]["size"] != 0){
+                    $path_parts = pathinfo($_FILES["profileImage"]["name"]);
+                    $extension = $path_parts['extension'];
+                    $target = $target_pdf . $user_id . "." . $extension;
+                        if(!move_uploaded_file($_FILES['profileImage']['tmp_name'], $target)){
+                            echo("FAMILY Do not have upload files");
+                            exit();
+                        }
+                    query("update users set img = ? where id = ?", $target, $user_id);
                 }
-            
-                $res_arr = [
-                    "result" => "success",
-                    "title" => "Success",
-                    "message" => "Success",
-                    "link" => "otp?id=".$user_id,
-                    ];
-                    echo json_encode($res_arr); exit();
+
+                $the_otp = generate_uuid();
+                if (query("insert INTO otps 
+						(user_id, code, created, expiration) 
+                    VALUES(?,?,?,?)", 
+                    $user_id, $the_otp, time(), time()+300) === false)
+                    {
+                        $res_arr = [
+                            "result" => "failed",
+                            "title" => "Failed",
+                            "message" => "Failed on saving deduction table",
+                            "link" => "loans_management?action=list",
+                            ];
+                            echo json_encode($res_arr); exit();
+                    }
+
+                    $message = "<html><body>";
+                    $message .= "<a href='".base_url() . "/verify" . "/" . $the_otp."'>".base_url() . "/verify" . "/" . $the_otp . "</a>";
+                    $message .= "</body></html>";
+						$mail = new PHPMailer();
+						try {
+							$mail->isSMTP();
+							$mail->SMTPAuth = true;
+							$mail->SMTPSecure = "ssl";
+							$mail->Host = "smtp.gmail.com";
+							$mail->Port = "465";
+							$mail->isHTML();
+							$mail->Username = "bosspanabo2020@gmail.com";
+							$mail->Password = "uxjwfplwregzmccz";
+							$mail->SetFrom("no-reply@panabocity.gov.ph");
+							$mail->Subject = "Verify Account";
+							$mail->Body = $message;
+							$mail->AddAddress($_POST["email_address"]);
+							$mail->Send();
+                            $res_arr = [
+                                "result" => "success",
+                                "title" => "Success",
+                                "message" => "Account successfully registered. Check your email to verify the account first!",
+                                "link" => base_url()."/"."login",
+                                ];
+                                echo json_encode($res_arr); exit();
+								} catch (phpmailerException $e) {
+									$res_arr = [
+										"result" => "success",
+										"title" => "Success",
+										"message" => $e->errorMessage(),
+										"link" => "refresh",
+										// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+										];
+										echo json_encode($res_arr); exit();
+								} catch (Exception $e) {
+			
+									$res_arr = [
+										"result" => "success",
+										"title" => "Success",
+										"message" => $e->getMessage(),
+										"link" => "refresh",
+										// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+										];
+										echo json_encode($res_arr); exit();
+								}
+
+              
 		}  
 
     endif;

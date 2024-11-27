@@ -3,12 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PET SYSTEM</title>
+  <title>DNSC Audit</title>
 
-  <?php
-  $siteOptions = query("select * from siteoptions");
-  $siteOptions = $siteOptions[0];
-  ?>
+
 
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> -->
   <link rel="stylesheet" href="<?= asset("AdminLTE_new/plugins/fontawesome-free/css/all.min.css"); ?>">
@@ -16,9 +13,8 @@
   <link rel="stylesheet" href="<?= asset("AdminLTE_new/dist/css/adminlte.min.css"); ?>">
   <link rel="stylesheet" href="<?= asset("AdminLTE_new/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"); ?>">
   <link rel="stylesheet" href="<?= asset("resources/animate.css"); ?>" />
-  <link rel="icon" href="<?php echo($siteOptions["mainLogo"]); ?>">
+  <link rel="icon" href="<?= asset("resources/dnsc-logo.png"); ?>">
 </head>
-
 <style>
 @keyframes inside-out {
     0% {
@@ -49,7 +45,8 @@
   } 
   .navbar-light{
     border-bottom: none !important;
-    background-color: #fff !important;
+    background-color: #204E42 !important;
+    color: #FFC107;
   }
   .color-red{
     color:red;
@@ -87,19 +84,9 @@
      
       <!-- Notifications Dropdown Menu -->
 
-      <?php if($_SESSION["dnsc_audit"]["role"] == "admin"): ?>
-      <li class="nav-item">
-        <a class="nav-link"  href="settings">
-          <i class="text-primary fas fa-cog" title="Settings"></i>
-        </a>
-      </li>
-      <?php endif; ?>
-
-
-
       <li class="nav-item">
         <a class="nav-link"  href="logout">
-          <i class="text-danger fas fa-sign-out-alt" title="Logout System"></i>
+          <i class="text-warning fas fa-sign-out-alt" title="Logout System"></i>
         </a>
         <!-- <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <span class="dropdown-item dropdown-header">15 Notifications</span>

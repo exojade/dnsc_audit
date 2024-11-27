@@ -4,9 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DNSC Audit System</title>
-  <?php $siteOptions = query("select * from siteoptions"); 
-      $siteOptions = $siteOptions[0];
-  ?>
+
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="<?= asset("AdminLTE_new/plugins/fontawesome-free/css/all.min.css") ?>">
@@ -90,7 +88,7 @@
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body card-body">
-    <h2 class="login-box-msg text-center text-success"><b>Verify</b></h2>
+    <h2 class="login-box-msg text-center text-success"><b>Register</b></h2>
 
     <form class="generic_form_trigger" id="registerForm" data-url="register" autocomplete="off" >
       <input type="hidden" name="action" value="register">
@@ -152,7 +150,7 @@
                     <label for="exampleInputFile">Profile Image <span class="text-danger">*</span></label>
                     <div class="input-group">
                       <div class="custom-file">
-                        <input required accept="image/*"  name="proofPayment" type="file" class="custom-file-input" id="exampleInputFile">
+                        <input required accept="image/*"  name="profileImage" type="file" class="custom-file-input" id="exampleInputFile">
                         <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                       </div>
                    
