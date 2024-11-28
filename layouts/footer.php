@@ -488,7 +488,7 @@ $('.generic_form_pdf_dropping').submit(function(e) {
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
     </div>
-    <strong>Copyright &copy; <?php echo(date("Y")); ?> DNSC Audit
+    <strong>Copyright &copy; <?php echo(date("Y")); ?> Quality Management System . ISO- International Standardization Organization
   </footer>
     <aside class="control-sidebar control-sidebar-dark">
   </aside>

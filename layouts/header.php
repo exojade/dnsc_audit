@@ -60,12 +60,12 @@
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><span class="text-warning"><i class="fas fa-bars"></i></span></a>
       </li>
     </ul>
 
     <h5 style="
-    padding: .5rem 1rem !important; margin: 0 !important;">Welcome <?php echo($_SESSION["dnsc_audit"]["fullname"]); ?></h5>
+    padding: .5rem 1rem !important; margin: 0 !important;"><span class="text-white"><?php echo($_SESSION["dnsc_audit"]["fullname"]); ?> | </span> <?php echo($_SESSION["dnsc_audit"]["role_name"]); ?></h5>
     <!-- <ul class="navbar-nav ml-auto">
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">

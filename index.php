@@ -39,6 +39,9 @@
 				else if ($request == 'area')
 					require 'public/area_system/area.php';
 
+				else if ($request == 'auditPlan')
+					require 'public/auditPlan_system/auditPlan.php';
+
 			
 
 

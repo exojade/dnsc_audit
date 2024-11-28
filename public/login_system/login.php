@@ -3,7 +3,9 @@ require("includes/google_class.php");
     if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
 		// dump($_POST);
-        $rows = query("SELECT * FROM users WHERE username = ?", $_POST["username"]);
+        $rows = query("SELECT u.*,role_name FROM users u
+						left join roles r on r.id = u.role_id
+						 WHERE username = ?", $_POST["username"]);
         if (count($rows) == 1)
         {
             $row = $rows[0];
@@ -22,6 +24,7 @@ require("includes/google_class.php");
 					"userid" => $row["id"],
 					"uname" => $row["username"],
 					"role" => $row["role_id"],
+					"role_name" => $row["role_name"],
 					"fullname" => $row["firstname"] . " " . $row["middlename"] . " " . $row["surname"],
 					"profile_image" =>  $row["img"],
 					"application" => "dnsc_audit"

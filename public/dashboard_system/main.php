@@ -45,7 +45,7 @@
 				render("public/dashboard_system/dashboard_admin.php",[]);
 				break;
 			case 4:
-				render("public/dashboard_system/dashboard_admin.php",[]);
+				render("public/dashboard_system/dashboard_leadAuditor.php",[]);
 				break;
 			case 5:
 				render("public/dashboard_system/dashboard_admin.php",[]);

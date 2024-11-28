@@ -2,7 +2,7 @@
     if($_SERVER["REQUEST_METHOD"] === "POST") {
 
 		
-		if($_POST["action"] == "usersList"):
+		if($_POST["action"] == "auditPlanList"):
 				// dump($_REQUEST);
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
@@ -14,11 +14,11 @@
 	
 				$where = " where 1=1";
 
-				if(isset($_REQUEST["role"])):
-					if($_REQUEST["role"] != ""):
-						$where .= " and u.role_id = '".$_REQUEST["role"]."'";
-					endif;
-				endif;
+				// if(isset($_REQUEST["role"])):
+				// 	if($_REQUEST["role"] != ""):
+				// 		$where .= " and u.role_id = '".$_REQUEST["role"]."'";
+				// 	endif;
+				// endif;
 
 
 
@@ -31,11 +31,9 @@
 
 				if($search != ""):
 				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
-				$baseQuery = "select u.*,r.role_name from users u 
-							left join roles r on r.id = u.role_id" . $where;
+				$baseQuery = "select * from audit_plans" . $where;
 				else:
-					$baseQuery = "select u.*,r.role_name from users u 
-							left join roles r on r.id = u.role_id" . $where;
+					$baseQuery = "select * from audit_plans" . $where;
 				endif;
 
 				$data = query($baseQuery . $limitString . " " . $offsetString);
@@ -45,8 +43,7 @@
 
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '<a href="#" data-toggle="modal" data-target="#medicalRecordModal" data-id="'.$row["id"].'" class="btn btn-block btn-sm btn-success">Update</a>';
-					$data[$i]["fullname"] = $row["surname"] .", " . $row["firstname"] . " " . $row["middlename"];
+					$data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["id"].'" class="btn btn-block btn-sm btn-success">Details</a>';
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -65,8 +62,17 @@
 	else {
 
 
-			$users = query("select * from users");
-			render("public/users_system/users_list.php",[
-			]);
+			// $users = query("select * from users");
+			if(!isset($_GET["action"])):
+				render("public/auditPlan_system/auditPlanList.php",[
+				]);
+			else:
+				if($_GET["action"] == "create"):
+					render("public/auditPlan_system/createAuditPlan.php",[
+					]);
+				endif;
+
+			endif;
+			
 	}
 ?>

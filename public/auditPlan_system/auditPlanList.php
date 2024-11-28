@@ -10,7 +10,10 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Users</h1>
+            <h1>Audit Plan List</h1>
+          </div>
+          <div class="col-sm-6">
+            <a href="auditPlan?action=create" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>Create Audit Plan</a>
           </div>
       
         </div>
@@ -28,7 +31,7 @@
             <!-- Default box -->
             <div class="card">
               <div class="card-header">
-                <div class="row">
+                <!-- <div class="row">
                   <div class="col-4">
                   <div class="form-group">
                   <label>Role List</label>
@@ -42,7 +45,7 @@
 
                 </div>
                   </div>
-                </div>
+                </div> -->
                 
               </div>
               <!-- /.card-header -->
@@ -51,9 +54,9 @@
                   <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Fullname</th>
-                    <th>Username</th>
-                    <th>Role</th>
+                    <th>Audit Plan</th>
+                    <th>Year</th>
+                    <th>Status</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -131,17 +134,17 @@ var datatable =
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'users',
+                    'url':'auditPlan',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "usersList";
+                        data.action = "auditPlanList";
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
-                    { data: 'fullname', "orderable": false  },
-                    { data: 'username', "orderable": false  },
-                    { data: 'role_name', "orderable": false  },
+                    { data: 'type', "orderable": false  },
+                    { data: 'year', "orderable": false  },
+                    { data: 'status', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
