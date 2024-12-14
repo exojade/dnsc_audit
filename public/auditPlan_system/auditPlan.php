@@ -43,7 +43,7 @@
 
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["id"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+					$data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -53,6 +53,37 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+
+		elseif($_POST["action"] == "newPlan"):
+			// dump($_POST);
+
+			if (query("insert INTO audit_plans 
+						(
+                            type, introduction, audit_objectives, reference_standard,
+                            audit_methodologies, year, status
+                            ) 
+                    VALUES(?,?,?,?,?,?,?)", 
+                    $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
+					$_POST["audit_methodologies"], $_POST["year"], "ONGOING") === false)
+                    {
+                        $res_arr = [
+                            "result" => "failed",
+                            "title" => "Failed",
+                            "message" => "Failed on saving deduction table",
+                            "link" => "loans_management?action=list",
+                            ];
+                            echo json_encode($res_arr); exit();
+                    }
+
+
+					$res_arr = [
+						"result" => "success",
+						"title" => "Success",
+						"message" => "Audit plan created successfully!",
+						"link" => "refresh",
+						// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+						];
+						echo json_encode($res_arr); exit();
 
 
 			
@@ -69,6 +100,9 @@
 			else:
 				if($_GET["action"] == "create"):
 					render("public/auditPlan_system/createAuditPlan.php",[
+					]);
+				elseif($_GET["action"] == "details"):
+					render("public/auditPlan_system/auditPlanDetails.php",[
 					]);
 				endif;
 
