@@ -36,6 +36,9 @@
 
 				else if ($request == 'users')
 					require 'public/users_system/users.php';
+
+				else if ($request == 'position')
+					require 'public/position_system/position.php';
 				else if ($request == 'area')
 					require 'public/area_system/area.php';
 
