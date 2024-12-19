@@ -8,79 +8,118 @@
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>New Audit Plan</h1>
-          </div>
-       
-      
-        </div>
-      </div><!-- /.container-fluid -->
+
     </section>
 
     <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
 
-          <div class="card card-success">
-          <div class="card-header">
-            <h3 class="card-title">Audit Plan Form</h3>
+
+    <section class="content">
+    <div class="modal fade" id="modalAddTeam">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-primary">
+              <h3 class="modal-title text-center">Add Team</h3>
           </div>
-          <!-- /.card-header -->
-          <div class="card-body">
-            <form class="generic_form_trigger" data-url="auditPlan">
-              <input type="hidden" name="action" value="newPlan">
-            <div class="row">
-              <div class="col-md-8">
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                <input type="hidden" name="action" value="addTeam">
+                <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
-                  <label>Type</label>
-                  <select required class="form-control" name="type" style="width: 100%;">
-                    <option selected value="" disabled>Please select type of Audit Plan</option>
-                    <option class="1st Internal Quality Audit">1st Internal Quality Audit</option>
-                    <option class="2nd Internal Quality Audit">2nd Internal Quality Audit</option>
+                  <label>Team #</label>
+                  <input type="number" required class="form-control" name="teamNumber" placeholder="Enter Team Number">
+                </div>
+                <div class="form-group">
+                  <label>Team Leader</label>
+                  <select class="form-control" name="team_leader" id="teamLeaderSelect" required style="width: 100%;">
+                    <option value=""></option>
+                    <?php foreach($auditors as $row): ?>
+                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["surname"] . ", " . $row["firstname"]); ?></option>
+                    <?php endforeach; ?>
                   </select>
                 </div>
-              </div>
-              <!-- /.col -->
-              <div class="col-md-4">
                 <div class="form-group">
-                  <label>Year</label>
-                  <input required type="text" name="year" class="form-control" placeholder="Enter Year">
+                  <label>Members</label>
+                  <select class="form-control" name="team_members[]" multiple id="teamMembersSelect" required style="width: 100%;">
+                    <?php foreach($auditors as $row): ?>
+                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["surname"] . ", " . $row["firstname"]); ?></option>
+                    <?php endforeach; ?>
+                  </select>
                 </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+
+                
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+      <div class="container-fluid">
+        <div class="row">
+
+
+        <div class="col-3">
+
+
+        <div class="alert alert-warning alert-dismissible">
+          <h5><i class="icon fas fa-exclamation-triangle"></i>   <?php echo($auditPlan["status"]); ?></h5>
+        </div>
+
+
+        
+        <div class="card card-success card-outline">
+              <div class="card-body box-profile">
+                <h3 class="profile-username text-center"><?php echo($auditPlan["type"]); ?></h3>
+                <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
+                <hr>
+                <a href="#" class="btn btn-warning btn-block"><b>Update Status</b></a>
+                <a href="#" class="btn btn-success btn-block"><b>Print Audit Plan</b></a>
               </div>
             </div>
 
-            <label>Introduction</label>
-              <textarea name="introduction" required class="summernote">
-            </textarea>
-
-            <label>Audit Objectives</label>
-              <textarea name="audit_objectives" required class="summernote">
-            </textarea>
-
-            <label>Reference Standard</label>
-              <textarea name="reference_standard" required class="summernote">
-            </textarea>
-
-            <label>Audit Methodologies</label>
-              <textarea name="audit_methodologies" required class="summernote">
-            </textarea>
-
-
-
-
-          
-          </div>
-          <div class="card-footer">
-              <button class="btn btn-success"><i class="fa fa-save mr-3"></i>Save</button>
-          </div>
-        </form>
         </div>
-   
-          </div>
+        <div class="col-9">
+        <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#audit_plan" data-toggle="tab">Audit Plan Info</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#teams" data-toggle="tab">Teams</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#audit_reports" data-toggle="tab">Audit Reports</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body" style="max-height:65vh !important; overflow-y: auto;">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="audit_plan">
+                  </div>
+                  <div class="tab-pane" id="timeline">
+                  </div>
+                  <div class="tab-pane" id="teams">
+
+                  <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success">ADD TEAM</a>
+                  <hr>
+                  <table class="table table-bordered" id="teamDatatable">
+                    <thead>
+                      <th>Team #</th>
+                      <th>Members</th>
+                    </thead>
+                  </table>
+
+
+                  </div>
+                  <div class="tab-pane" id="audit_reports">
+                  </div>
+                </div>
+            </div>
         </div>
       </div>
     </section>
@@ -103,7 +142,16 @@
 <script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
 <script>
 
-$('.summernote').summernote()
+$('#teamLeaderSelect').select2(
+  {
+  placeholder: "Search Team Leader",
+}
+);
+$('#teamMembersSelect').select2({
+  placeholder: "Search Team Members",
+});
+
+
 
 
     $('#medicalRecordModal').on('show.bs.modal', function (e) {
@@ -124,8 +172,8 @@ $('.summernote').summernote()
      });
 
 
-var datatable = 
-            $('#ajax_datatable').DataTable({
+var teamDatatable = 
+            $('#teamDatatable').DataTable({
                 "searching": true,
                 "pageLength": 10,
                 language: {
@@ -141,14 +189,12 @@ var datatable =
                     'url':'auditPlan',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "auditPlanList";
+                        data.action = "teamDatatable";
                      }
                 },
                 'columns': [
-                    { data: 'action', "orderable": false },
-                    { data: 'type', "orderable": false  },
-                    { data: 'year', "orderable": false  },
-                    { data: 'status', "orderable": false  },
+                    { data: 'team_number', "orderable": false },
+                    { data: 'team_members', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

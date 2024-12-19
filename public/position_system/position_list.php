@@ -13,7 +13,7 @@
             <h1>Position</h1>
           </div>
           <div class="col-sm-6">
-              <a data-toggle="modal" data-target="#addPositionModal" class="btn btn-primary float-right">Add Position</a>
+              <a data-toggle="modal" data-target="#modalAddPosition" class="btn btn-primary float-right">Add Position</a>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -21,6 +21,74 @@
 
     <!-- Main content -->
     <section class="content">
+
+    <?php
+    $process = query("SELECT 
+    child.id AS child_id,
+    child.area_name AS child_area,
+    parent.area_name AS parent_area,
+    grandparent.area_name AS grandparent_area,
+    child.area_description,
+    child.type
+FROM 
+    areas AS child
+LEFT JOIN 
+    areas AS parent 
+ON 
+    child.parent_area = parent.id
+LEFT JOIN 
+    areas AS grandparent 
+ON 
+    parent.parent_area = grandparent.id
+WHERE 
+    child.type = 'process'
+    order by child_area asc
+    ");
+
+    // dump($process);
+
+    ?>
+
+
+    <div class="modal fade" id="modalAddPosition">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-primary">
+              <h3 class="modal-title text-center">Add Position</h3>
+          </div>
+          <div class="modal-body">
+
+              <form class="generic_form_trigger" data-url="position">
+                <input type="hidden" name="action" value="addPosition">
+
+                <div class="form-group">
+                  <label>Position Name</label>
+                  <input type="text" required class="form-control" name="positionName" placeholder="Enter Position Name">
+                </div>
+
+                <div class="form-group">
+                  <label>Process</label>
+                  <select class="form-control" name="process_id" required>
+                    <option value="" selected disabeld>Please select process</option>
+                    <?php foreach($process as $row): ?>
+                      <option value="<?php echo($row["child_id"]); ?>"><?php echo($row["grandparent_area"] ." > ".$row["parent_area"]." > ".$row["child_area"]); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+
+
+
+
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+
+
+              </form>
+
+                
+          </div>
+        </div>
+      </div>
+    </div>
 
 
 
@@ -34,9 +102,9 @@
                   <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Fullname</th>
-                    <th>Username</th>
-                    <th>Role</th>
+                    <th>Position</th>
+                    <th>Area</th>
+                    <th>Status</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -106,9 +174,9 @@ var datatable =
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
-                    { data: 'fullname', "orderable": false  },
-                    { data: 'username', "orderable": false  },
-                    { data: 'role_name', "orderable": false  },
+                    { data: 'position_name', "orderable": false  },
+                    { data: 'area_name', "orderable": false  },
+                    { data: 'active_status', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

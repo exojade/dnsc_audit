@@ -85,6 +85,49 @@
 						];
 						echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "addTeam"):
+			// dump($_POST);
+			$auditors = "'" . implode("','", $_POST["team_members"]) . "'";
+			$checkExistingAuditors = query("select * from audit_plan_team_members where audit_plan = ?
+			and id in (".$auditors.")", $_POST["audit_plan_id"]);
+
+			if(!empty($checkExistingAuditors)):
+				$res_arr = [
+					"result" => "failed",
+					"title" => "Failed",
+					"message" => "Team Member already added on this Audit Plan!",
+					"link" => "refresh",
+					// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+					];
+					echo json_encode($res_arr); exit();
+			endif;
+
+			$at = create_trackid("AT");
+			dump($at);
+			if (query("insert INTO audit_plans 
+						(
+                            type, introduction, audit_objectives, reference_standard,
+                            audit_methodologies, year, status
+                            ) 
+                    VALUES(?,?,?,?,?,?,?)", 
+                    $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
+					$_POST["audit_methodologies"], $_POST["year"], "ONGOING") === false)
+                    {
+                        $res_arr = [
+                            "result" => "failed",
+                            "title" => "Failed",
+                            "message" => "Failed on saving deduction table",
+                            "link" => "loans_management?action=list",
+                            ];
+                            echo json_encode($res_arr); exit();
+                    }
+
+
+
+
+
+
+
 
 			
 		endif;
@@ -102,8 +145,16 @@
 					render("public/auditPlan_system/createAuditPlan.php",[
 					]);
 				elseif($_GET["action"] == "details"):
-					render("public/auditPlan_system/auditPlanDetails.php",[
-					]);
+
+					$auditPlan = query("select * from audit_plans where audit_plan = ?", $_GET["id"]);
+					$auditPlan = $auditPlan[0];
+
+					$auditors = query("select * from users where role_id = 3");
+					render("public/auditPlan_system/auditPlanDetails.php",
+						[
+							"auditPlan" => $auditPlan,
+							"auditors" => $auditors,
+						]);
 				endif;
 
 			endif;
