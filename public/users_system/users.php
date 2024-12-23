@@ -45,7 +45,7 @@
 
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '<a href="#" data-toggle="modal" data-target="#medicalRecordModal" data-id="'.$row["id"].'" class="btn btn-block btn-sm btn-success">Update</a>';
+					$data[$i]["action"] = '<a href="users?action=profile&id='.$row["id"].'" class="btn btn-block btn-success btn-sm">Visit</a>';
 					$data[$i]["fullname"] = $row["surname"] .", " . $row["firstname"] . " " . $row["middlename"];
 					$i++;
 				endforeach;
@@ -64,9 +64,22 @@
     }
 	else {
 
+			if(!isset($_GET["action"])):
+				$users = query("select * from users");
+				render("public/users_system/users_list.php",[
+				]);
+			else:
+				if($_GET["action"] == "profile"):
+					$user = query("select * from users where id = ?", $_GET["id"]);
+					$user = $user[0];
+					$position = query("select * from user_position where user_id = ?", $_GET["id"]);
+					render("public/users_system/user_profile.php",[
+						"user" => $user,
+						"position" => $position,
+					]);
+				endif;
+			endif;
 
-			$users = query("select * from users");
-			render("public/users_system/users_list.php",[
-			]);
+			
 	}
 ?>

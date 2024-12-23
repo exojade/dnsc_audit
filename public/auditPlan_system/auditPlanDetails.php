@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
 <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
 <link rel="stylesheet" href="AdminLTE_new/plugins/summernote/summernote-bs4.min.css">
+<link rel="stylesheet" href="AdminLTE_new/plugins/toastr/toastr.min.css">
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -18,7 +19,7 @@
     <div class="modal fade" id="modalAddTeam">
       <div class="modal-dialog ">
         <div class="modal-content ">
-          <div class="modal-header bg-primary">
+          <div class="modal-header bg-success">
               <h3 class="modal-title text-center">Add Team</h3>
           </div>
           <div class="modal-body">
@@ -55,12 +56,23 @@
       </div>
     </div>
 
-
-
-
-
-
-
+    <div class="modal fade" id="modalUpdateInfo">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Audit Plan Information</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                  <input type="hidden" name="action" value="updateAuditPlanInfo">
+                  <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
+                  <div class="fetched-data"></div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
       <div class="container-fluid">
@@ -92,22 +104,73 @@
               <div class="card-header p-2">
                 <ul class="nav nav-pills">
                   <li class="nav-item"><a class="nav-link active" href="#audit_plan" data-toggle="tab">Audit Plan Info</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                   <li class="nav-item"><a class="nav-link" href="#teams" data-toggle="tab">Teams</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                   <li class="nav-item"><a class="nav-link" href="#audit_reports" data-toggle="tab">Audit Reports</a></li>
                 </ul>
               </div><!-- /.card-header -->
               <div class="card-body" style="max-height:65vh !important; overflow-y: auto;">
                 <div class="tab-content">
                   <div class="active tab-pane" id="audit_plan">
+
+                  <a href="#" data-toggle="modal" data-audit_plan="<?php echo($_GET["id"]); ?>" data-target="#modalUpdateInfo" class="btn btn-warning">UPDATE</a>
+                  <hr>
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Introduction</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["introduction"]); ?>
+                    </div>
+                  </div>
+
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Audit Objectives</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["audit_objectives"]); ?>
+                    </div>
+                  </div>
+
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Reference Standard</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["reference_standard"]); ?>
+                    </div>
+                  </div>
+                  
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Audit Methodologies</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["audit_methodologies"]); ?>
+                    </div>
+                  </div>
+
+
                   </div>
                   <div class="tab-pane" id="timeline">
+                    <table class="table table-bordered" id="timelineDatatable" width="100%">
+                      <thead>
+                        <th>Time</th>
+                        <th>Audit Area</th>
+                        <th>Criteria / Clauses</th>
+                        <th>Auditors</th>
+                        <th>Area/Function/Auditee</th>
+                      </thead>
+                    </table>
                   </div>
                   <div class="tab-pane" id="teams">
 
                   <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success">ADD TEAM</a>
                   <hr>
-                  <table class="table table-bordered" id="teamDatatable">
+                  <table class="table table-bordered" id="teamDatatable" width="100%">
                     <thead>
                       <th>Team #</th>
                       <th>Members</th>
@@ -140,6 +203,8 @@
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.print.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
+<script src="AdminLTE_new/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="resources/vue.js"></script>
 <script>
 
 $('#teamLeaderSelect').select2(
@@ -151,30 +216,9 @@ $('#teamMembersSelect').select2({
   placeholder: "Search Team Members",
 });
 
-
-
-
-    $('#medicalRecordModal').on('show.bs.modal', function (e) {
-        var rowid = $(e.relatedTarget).data('id');
-        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
-        $.ajax({
-            type : 'post',
-            url : 'medical', //Here you will fetch records 
-            data: {
-                checkupId: rowid, action: "medicalRecordModal"
-            },
-            success : function(data){
-                $('#medicalRecordModal .fetched-data').html(data);
-                Swal.close();
-                // $(".select2").select2();//Show fetched data from database
-            }
-        });
-     });
-
-
 var teamDatatable = 
             $('#teamDatatable').DataTable({
-                "searching": true,
+                "searching": false,
                 "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"
@@ -189,7 +233,8 @@ var teamDatatable =
                     'url':'auditPlan',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "teamDatatable";
+                        data.action = "teamDatatable",
+                        data.audit_plan = "<?php echo($_GET["id"]); ?>"
                      }
                 },
                 'columns': [
@@ -221,16 +266,35 @@ var teamDatatable =
                 }
             });
 
-
-
-
   $('.selectFilter').on('change', function() {
     // alert("change");
             var roleSelect = $('#roleSelect').val();
             datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
   });
 
+  $('#modalUpdateInfo').on('show.bs.modal', function (e) {
+        var audit_plan = $(e.relatedTarget).data('audit_plan');
+        $.ajax({
+            type : 'post',
+            url : 'auditPlan', //Here you will fetch records 
+            data: {
+                audit_plan: audit_plan, 
+                action: "modalUpdateInfo",
+
+            },
+            success : function(data){
+                $('#modalUpdateInfo .fetched-data').html(data);
+                $('.summernote').summernote()
+                // $("#salary_select").select2();
+            }
+        });
+
+
+        
+     });
 </script>
+
+
 
 
   <?php require("layouts/footer.php") ?>
