@@ -57,6 +57,21 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "addPosition"):
+			// dump($_POST);
+
+
+			query("insert INTO user_position (user_id, position, area_id, active_status) 
+			VALUES(?,?,?,?)", 
+			$_POST["user_id"],$_POST["positionName"] , $_POST["process_id"], "active");
+			
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Success on Adding Position",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
 
 			
 		endif;
@@ -70,9 +85,12 @@
 				]);
 			else:
 				if($_GET["action"] == "profile"):
-					$user = query("select * from users where id = ?", $_GET["id"]);
+					$user = query("select concat(surname, ', ', firstname) as fullname, u.* from users u where id = ?", $_GET["id"]);
 					$user = $user[0];
-					$position = query("select * from user_position where user_id = ?", $_GET["id"]);
+					$position = query("select up.*, a.* from user_position up
+										left join areas a
+										on a.id = up.area_id
+										 where up.user_id = ?", $_GET["id"]);
 					render("public/users_system/user_profile.php",[
 						"user" => $user,
 						"position" => $position,

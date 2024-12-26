@@ -12,6 +12,31 @@
 
     </section>
 
+    <?php
+    $process = query("SELECT 
+    child.id AS child_id,
+    child.area_name AS child_area,
+    parent.area_name AS parent_area,
+    grandparent.area_name AS grandparent_area,
+    child.area_description,
+    child.type
+    FROM 
+        areas AS child
+    LEFT JOIN 
+        areas AS parent 
+    ON 
+        child.parent_area = parent.id
+    LEFT JOIN 
+        areas AS grandparent 
+    ON 
+        parent.parent_area = grandparent.id
+    WHERE 
+        child.type = 'process'
+        order by child_area asc
+    ");
+    
+    ?>
+
     <!-- Main content -->
 
 
@@ -49,8 +74,32 @@
                 </div>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
               </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                
+    <div class="modal fade" id="modalAddSchedule">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Add Audit Schedule</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                <input type="hidden" name="action" value="addTeam">
+                <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                    <label>Process Area</label>
+                    <select class="form-control" id="processSelect" name="process_id" required style="width: 100%;">
+                      <option value="" selected disabled>Please select process</option>
+                      <?php foreach($process as $row): ?>
+                        <option value="<?php echo($row["child_id"]); ?>"><?php echo($row["grandparent_area"] ." > ".$row["parent_area"]." > ".$row["child_area"]); ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
           </div>
         </div>
       </div>
@@ -74,21 +123,13 @@
       </div>
     </div>
 
-
       <div class="container-fluid">
         <div class="row">
-
-
-        <div class="col-3">
-
-
-        <div class="alert alert-warning alert-dismissible">
-          <h5><i class="icon fas fa-exclamation-triangle"></i>   <?php echo($auditPlan["status"]); ?></h5>
-        </div>
-
-
-        
-        <div class="card card-success card-outline">
+          <div class="col-3">
+            <div class="alert alert-warning alert-dismissible">
+              <h5><i class="icon fas fa-exclamation-triangle"></i>   <?php echo($auditPlan["status"]); ?></h5>
+            </div>
+            <div class="card card-success card-outline">
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center"><?php echo($auditPlan["type"]); ?></h3>
                 <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
@@ -97,7 +138,6 @@
                 <a href="#" class="btn btn-success btn-block"><b>Print Audit Plan</b></a>
               </div>
             </div>
-
         </div>
         <div class="col-9">
         <div class="card">
@@ -113,7 +153,7 @@
                 <div class="tab-content">
                   <div class="active tab-pane" id="audit_plan">
 
-                  <a href="#" data-toggle="modal" data-audit_plan="<?php echo($_GET["id"]); ?>" data-target="#modalUpdateInfo" class="btn btn-warning">UPDATE</a>
+                  <a href="#" data-toggle="modal" data-audit_plan="<?php echo($_GET["id"]); ?>" data-target="#modalUpdateInfo" class="btn btn-warning btn-sm">UPDATE</a>
                   <hr>
                   <div class="card">
                     <div class="card-header">
@@ -156,6 +196,8 @@
 
                   </div>
                   <div class="tab-pane" id="timeline">
+                    <a href="#" data-toggle="modal" data-target="#modalAddSchedule" class="btn btn-success btn-sm">Add Audit Schedule</a>
+                    <hr>
                     <table class="table table-bordered" id="timelineDatatable" width="100%">
                       <thead>
                         <th>Time</th>
@@ -168,7 +210,7 @@
                   </div>
                   <div class="tab-pane" id="teams">
 
-                  <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success">ADD TEAM</a>
+                  <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success btn-sm">ADD TEAM</a>
                   <hr>
                   <table class="table table-bordered" id="teamDatatable" width="100%">
                     <thead>
@@ -216,6 +258,11 @@ $('#teamMembersSelect').select2({
   placeholder: "Search Team Members",
 });
 
+$('#processSelect').select2({
+  placeholder: "Search for Process Area",
+});
+
+
 var teamDatatable = 
             $('#teamDatatable').DataTable({
                 "searching": false,
@@ -239,6 +286,62 @@ var teamDatatable =
                 },
                 'columns': [
                     { data: 'team_number', "orderable": false },
+                    { data: 'team_members', "orderable": false  },
+                ],
+                "footerCallback": function (row, data, start, end, display) {
+                    // var api = this.api(), data;
+                    
+
+                    // Remove the formatting to get integer data for summation
+                    // var intVal = function (i) {
+                    //     return typeof i === 'string' ?
+                    //         i.replace(/[\$,]/g, '') * 1 :
+                    //         typeof i === 'number' ?
+                    //             i : 0;
+                    // };
+
+                    // // Total over all pages
+                    // received = api
+                    //     .column(5)
+                    //     .data()
+                    //     .reduce(function (a, b) {
+                    //         return intVal(a) + intVal(b);
+                    //     }, 0);
+                    //     console.log(received);
+
+                    // $('#currentTotal').html('$ ' + received.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                }
+            });
+
+
+
+
+            var timelineDatatable = 
+            $('#timelineDatatable').DataTable({
+                "searching": false,
+                "pageLength": 10,
+                language: {
+                    searchPlaceholder: "Search Name"
+                },
+                "bLengthChange": true,
+                "ordering": false,
+                'processing': true,
+                'serverSide': true,
+                'serverMethod': 'post',
+                
+                'ajax': {
+                    'url':'auditPlan',
+                     'type': "POST",
+                     "data": function (data){
+                        data.action = "teamDatatable",
+                        data.audit_plan = "<?php echo($_GET["id"]); ?>"
+                     }
+                },
+                'columns': [
+                    { data: 'team_number', "orderable": false },
+                    { data: 'team_members', "orderable": false  },
+                    { data: 'team_members', "orderable": false  },
+                    { data: 'team_members', "orderable": false  },
                     { data: 'team_members', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
