@@ -108,7 +108,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
-  <!-- <li class="nav-item">
+  <li class="nav-item">
       <a href="position" class="nav-link">
         <i class="nav-icon fas fa-user"></i>
         <p>
@@ -116,7 +116,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
           <span class="right badge badge-danger"></span>
         </p>
       </a>
-  </li> -->
+  </li>
     <?php
     break;
   case 6:

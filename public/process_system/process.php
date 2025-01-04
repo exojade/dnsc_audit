@@ -25,6 +25,8 @@
 				foreach($area_process as $row):
 					$AreaProcess[$row["process_id"]][$row["area_id"]] = $row;
 				endforeach;
+
+				// dump($AreaProcess);
 	
 		
 
@@ -51,10 +53,16 @@
 					</div>';
 
 
+					$assigned_area = "";
+					$AssignedAreas = [];
 					if(isset($AreaProcess[$row["process_id"]])):
-						// foreach($)
-
+						$theAreas = $AreaProcess[$row["process_id"]];
+						foreach($theAreas as $a):
+							$AssignedAreas[] = $Area[$a["area_id"]]["area_name"];
+						endforeach;
 					endif;
+					// dump($AssignedAreas);
+					$data[$i]["assigned_area"] = implode(", ", $AssignedAreas);
 
 
 					$i++;
@@ -84,12 +92,69 @@
 				echo json_encode($res_arr); exit();
 
 		elseif($_POST["action"] == "modalAssignedArea"):
-			dump($_POST);
+			// dump($_POST);
+
+			$process = query("select * from process where process_id = ?", $_POST["process_id"]);
+			$process = $process[0];
+
+			$area = query("select * from areas where type in ('office', 'institute')");
+
+			$area_process = query("select * from area_process where process_id = ?", $_POST["process_id"]);
+			$AreaProcess = [];
+			foreach($area_process as $row):
+				$AreaProcess[$row["area_id"]] = $row;
+			endforeach;
+
+			$html = '';
+
+			$html.='
+			<h4>'.$process["process_name"].'</h4>
+			<hr>
+			';
+
+
+			$html .= '
+			<input type="hidden" name="process_id" value="'.$_POST["process_id"].'">
+			<div class="form-group">
+                  <label>Assigned Areas</label>
+                  <select class="form-control" name="area_id[]" id="areaSelect" multiple style="width: 100%;">';
+				  foreach($area as $row):
+					if(isset($AreaProcess[$row["id"]])):
+						$html.='<option selected value="'.$row["id"].'">'.$row["area_name"].'</option>';
+					else:
+						$html.='<option value="'.$row["id"].'">'.$row["area_name"].'</option>';
+					endif;
+				  endforeach;
+
+
+                  $html.='</select>
+                </div>
+
+			';
+
+			echo($html);
+
+		elseif($_POST["action"] == "addAssignedArea"):
+			// dump($_POST);
+			if(isset($_POST["area_id"])):
+				foreach($_POST["area_id"] as $row):
+					query("insert INTO area_process (area_id, process_id) 
+					VALUES(?,?)", 
+					$row,$_POST["process_id"]);
+					
+				endforeach;
+			endif;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Success on Adding Process",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
 
 			
 
 
-			
 		endif;
 		
     }

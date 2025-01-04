@@ -13,27 +13,31 @@
     </section>
 
     <?php
-    $process = query("SELECT 
-    child.id AS child_id,
-    child.area_name AS child_area,
-    parent.area_name AS parent_area,
-    grandparent.area_name AS grandparent_area,
-    child.area_description,
-    child.type
-    FROM 
-        areas AS child
-    LEFT JOIN 
-        areas AS parent 
-    ON 
-        child.parent_area = parent.id
-    LEFT JOIN 
-        areas AS grandparent 
-    ON 
-        parent.parent_area = grandparent.id
-    WHERE 
-        child.type = 'process'
-        order by child_area asc
-    ");
+
+    $process = query("select * from process");
+
+
+    // $process = query("SELECT 
+    // child.id AS child_id,
+    // child.area_name AS child_area,
+    // parent.area_name AS parent_area,
+    // grandparent.area_name AS grandparent_area,
+    // child.area_description,
+    // child.type
+    // FROM 
+    //     areas AS child
+    // LEFT JOIN 
+    //     areas AS parent 
+    // ON 
+    //     child.parent_area = parent.id
+    // LEFT JOIN 
+    //     areas AS grandparent 
+    // ON 
+    //     parent.parent_area = grandparent.id
+    // WHERE 
+    //     child.type = 'process'
+    //     order by child_area asc
+    // ");
     
     ?>
 
@@ -90,14 +94,33 @@
                 <input type="hidden" name="action" value="addTeam">
                 <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
-                    <label>Process Area</label>
+                    <label>Process</label>
                     <select class="form-control" id="processSelect" name="process_id" required style="width: 100%;">
-                      <option value="" selected disabled>Please select process</option>
+                      <option value="" selected disabled>Please select process here!</option>
                       <?php foreach($process as $row): ?>
-                        <option value="<?php echo($row["child_id"]); ?>"><?php echo($row["grandparent_area"] ." > ".$row["parent_area"]." > ".$row["child_area"]); ?></option>
+                        <option value="<?php echo($row["process_id"]); ?>"><?php echo($row["process_name"]); ?></option>
                       <?php endforeach; ?>
                     </select>
-                  </div>
+                </div>
+                <div class="form-group">
+                    <label>Area</label>
+                    <select class="form-control" multiple id="areaSelect" name="area_id[]" required style="width: 100%;">
+                     
+                    </select>
+                </div>
+              
+                <div class="form-group">
+                    <label>Position</label>
+                    <select class="form-control" multiple  id="positionSelect" name="position_id[]" required style="width: 100%;">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                        <label>Criteria Clause</label>
+                        <textarea class="form-control" rows="5" name="criteria_clause" placeholder="Enter ..."></textarea>
+                      </div>
+
+
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
               </form>
           </div>
@@ -395,6 +418,99 @@ var teamDatatable =
 
         
      });
+
+
+    $(document).ready(function () {
+
+      $("#areaSelect").select2({
+                      placeholder: "Select Area", // Placeholder text
+                  });
+
+                  $("#positionSelect").select2({
+                      placeholder: "Select Position", // Placeholder text
+                      allowClear: true // Adds a clear button to remove the selection
+                  });
+    // Trigger on area select change
+    $("#processSelect").on("change", function () {
+        let process_id = $(this).val(); // Get selected area_id
+        
+        // Ensure an area is selected
+        if (process_id) {
+            // Send AJAX request
+            $.ajax({
+                url: "auditPlan", // Backend PHP script to handle the request
+                type: "POST",
+                data: { process_id: process_id , action: "fetchArea"},
+                dataType: "json",
+                success: function (response) {
+
+                  $("#areaSelect").select2({
+                      placeholder: "Select Area", // Placeholder text
+                      allowClear: true 
+                  });
+
+           
+                  console.log(response);
+
+
+                  // processSelect
+                    // Populate process select
+                    let areaSelect = $("#areaSelect");
+                    areaSelect.empty().append('');
+                    $.each(response.area, function (key, value) {
+                      console.log(value);
+                      areaSelect.append('<option value="' + value.id + '">' + value.area_name + '</option>');
+                    });
+
+                
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                },
+            });
+        }
+    });
+
+
+    $("#areaSelect").on("change", function () {
+        let areaId = $(this).val(); // Get selected area_id
+        
+        // Ensure an area is selected
+        if (areaId) {
+            // Send AJAX request
+            $.ajax({
+                url: "auditPlan", // Backend PHP script to handle the request
+                type: "POST",
+                data: { area_id: areaId , action: "fetchPosition"},
+                dataType: "json",
+                success: function (response) {
+
+                
+
+                  $("#positionSelect").select2({
+                      placeholder: "Select Position", // Placeholder text
+                      allowClear: true // Adds a clear button to remove the selection
+                  });
+                  console.log(response);
+
+
+                 
+
+                    // Populate position select
+                    let positionSelect = $("#positionSelect");
+                    positionSelect.empty().append('');
+                    $.each(response.positions, function (key, value) {
+                        positionSelect.append('<option value="' + value.position_id + '">' + value.position_name + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                },
+            });
+        }
+    });
+});
+
 </script>
 
 

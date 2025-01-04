@@ -12,8 +12,8 @@
           <div class="col-sm-6">
             <h1>Position</h1>
           </div>
-          <div class="col-sm-6">
-              <a data-toggle="modal" data-target="#modalAddPosition" class="btn btn-primary float-right">Add Position</a>
+          <div class="col-6">
+            <a href="#" data-toggle="modal" class="btn btn-success float-right" data-target="#modalAddProcess">Add Position</a>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -21,100 +21,67 @@
 
     <!-- Main content -->
     <section class="content">
+      <div class="container-fluid">
 
-    <?php
-    $process = query("SELECT 
-    child.id AS child_id,
-    child.area_name AS child_area,
-    parent.area_name AS parent_area,
-    grandparent.area_name AS grandparent_area,
-    child.area_description,
-    child.type
-FROM 
-    areas AS child
-LEFT JOIN 
-    areas AS parent 
-ON 
-    child.parent_area = parent.id
-LEFT JOIN 
-    areas AS grandparent 
-ON 
-    parent.parent_area = grandparent.id
-WHERE 
-    child.type = 'process'
-    order by child_area asc
-    ");
-
-    // dump($process);
-
-    ?>
-
-
-    <div class="modal fade" id="modalAddPosition">
-      <div class="modal-dialog ">
+      <div class="modal fade" id="modalAddProcess">
+      <div class="modal-dialog">
         <div class="modal-content ">
-          <div class="modal-header bg-primary">
+          <div class="modal-header bg-success">
               <h3 class="modal-title text-center">Add Position</h3>
           </div>
           <div class="modal-body">
-
               <form class="generic_form_trigger" data-url="position">
-                <input type="hidden" name="action" value="addPosition">
-
-                <div class="form-group">
-                  <label>Position Name</label>
-                  <input type="text" required class="form-control" name="positionName" placeholder="Enter Position Name">
-                </div>
-
-                <div class="form-group">
-                  <label>Process</label>
-                  <select class="form-control" name="process_id" required>
-                    <option value="" selected disabeld>Please select process</option>
-                    <?php foreach($process as $row): ?>
-                      <option value="<?php echo($row["child_id"]); ?>"><?php echo($row["grandparent_area"] ." > ".$row["parent_area"]." > ".$row["child_area"]); ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-
-
-
-
+                  <input type="hidden" name="action" value="addPosition">
+                  <div class="form-group">
+                    <label>Position Name</label>
+                    <input type="text" required class="form-control" name="position_name" placeholder="Enter Position Name">
+                  </div>
+                  <hr>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
-
-
               </form>
-
-                
           </div>
         </div>
       </div>
     </div>
 
 
+    <div class="modal fade" id="modalAssignedArea">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Assigned Area</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="position">
+                  <input type="hidden" name="action" value="addAssignedArea">
+                    <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div class="container-fluid">
+
         <div class="row">
           <div class="col-12">
             <!-- Default box -->
             <div class="card">
               <div class="card-body">
-                <table id="ajax_datatable" class="table table-bordered table-striped" >
+                <table id="ajax_datatable" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Action</th>
-                    <th>Position</th>
-                    <th>Area</th>
-                    <th>Status</th>
+                    <th width="15%">Action</th>
+                    <th width="20%">Position</th>
+                    <th>Assigned Area</th>
                   </tr>
                   </thead>
                   <tbody>
-                 
                   </tbody>
                 </table>
               </div>
-              <!-- /.card-body -->
             </div>
-            <!-- /.card -->
           </div>
         </div>
       </div>
@@ -150,6 +117,26 @@ WHERE
 
 
 
+    $('#modalAssignedArea').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'position', //Here you will fetch records 
+            data: {
+                position_id: rowid, action: "modalAssignedArea"
+            },
+            success : function(data){
+                $('#modalAssignedArea .fetched-data').html(data);
+                $("#areaSelect").select2({
+                    placeholder: "Select an area", // Placeholder text
+                    allowClear: true // Adds a clear button to remove the selection
+                });
+                Swal.close();
+                //Show fetched data from database
+            }
+        });
+     });
 
 
 var datatable = 
@@ -157,26 +144,24 @@ var datatable =
                 "searching": true,
                 "pageLength": 10,
                 language: {
-                    searchPlaceholder: "Search Name"
+                    searchPlaceholder: "Search Position"
                 },
                 "bLengthChange": true,
                 "ordering": false,
                 'processing': true,
                 'serverSide': true,
                 'serverMethod': 'post',
-                
                 'ajax': {
                     'url':'position',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "positionList";
+                        data.action = "position_list";
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
                     { data: 'position_name', "orderable": false  },
-                    { data: 'area_name', "orderable": false  },
-                    { data: 'active_status', "orderable": false  },
+                    { data: 'assigned_area', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
@@ -203,14 +188,77 @@ var datatable =
                 }
             });
 
+            $(document).on('click', '.btn-info', function (e) {
+    e.preventDefault();
+
+    // Get the data-id of the selected area
+    var areaId = $(this).data('id');
+
+    // Send an AJAX request to fetch processes
+    $.ajax({
+        url: 'area', // The same endpoint as the DataTable
+        type: 'POST',
+        data: {
+            action: 'getProcesses',
+            areaId: areaId
+        },
+        success: function (response) {
+          theResponse = JSON.parse(response);
+          // console.log(theResponse);
+            if (theResponse.success) {
+ 
+                // Clear the #processDatatable table
+                $('#processDatatable tbody').empty();
+
+                // Populate the table with the fetched processes
+                var processes = theResponse.data;
+                processes.forEach(function (process) {
+                    $('#processDatatable tbody').append(`
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-warning btn-block" data-id="${process.id}">Update</button>
+                            </td>
+                            <td>${process.area_name}</td>
+                            <td>${process.area_description}</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                alert('Failed to fetch processes.');
+            }
+        },
+        error: function () {
+            alert('An error occurred while fetching processes.');
+        }
+    });
+});
+
 
 
 
   $('.selectFilter').on('change', function() {
     // alert("change");
-            var roleSelect = $('#roleSelect').val();
-            datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
-  });
+  var petOwnerSelect = $('#petOwnerSelect').select2('data');
+  var petOwner = '';
+  if (petOwnerSelect[0]) {
+      clientId = petOwnerSelect[0].id;
+  }
+  // alert(id);
+  var from = $('#fromDate').val();
+  var to = $('#toDate').val();
+  // var type = $('#typeSelect').val();
+
+  var type = $('#typeSelect').val() || "";
+  var service = $('#serviceSelect').val() || "";
+  // var service = $('#serviceSelect').val();
+
+
+
+
+
+
+            datatable.ajax.url('medical?action=medicalRecordMasterList&clientId=' + clientId+'&from='+from+'&to='+to+'&service='+service+'&type='+type).load();
+});
 
 </script>
 

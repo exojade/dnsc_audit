@@ -249,6 +249,39 @@
 				];
 				echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "fetchArea"):
+
+			// dump($_POST);
+
+			$area = query("select a.* from area_process ap
+								left join areas a on a.id = ap.area_id
+								where ap.process_id = ?
+								",$_POST["process_id"]);
+
+			
+			$response = [];
+			$response['area'] = $area;
+			echo json_encode($response);
+
+
+			elseif($_POST["action"] == "fetchPosition"):
+
+				// dump($_POST);
+				$area = "'" . implode("','", $_POST["area_id"]) . "'";
+				// dump($area);
+		
+	
+				$position = query("select p.* from area_position ap
+									left join position p on p.position_id = ap.position_id
+									where ap.area_id in (".$area.")
+									group by p.position_id
+									");
+				
+				$response = [];
+				$response['positions'] = $position;
+				echo json_encode($response);
+			// dump($position);
+
 
 		
 

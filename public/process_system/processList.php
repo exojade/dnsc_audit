@@ -56,7 +56,7 @@
           </div>
           <div class="modal-body">
               <form class="generic_form_trigger" data-url="process">
-                  <input type="hidden" name="action" value="addProcess">
+                  <input type="hidden" name="action" value="addAssignedArea">
                     <div class="fetched-data"></div>
                   <hr>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
@@ -75,7 +75,7 @@
                 <table id="ajax_datatable" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Action</th>
+                    <th width="15%">Action</th>
                     <th>Process</th>
                     <th>Assigned Area</th>
                   </tr>
@@ -131,8 +131,12 @@
             },
             success : function(data){
                 $('#modalAssignedArea .fetched-data').html(data);
+                $("#areaSelect").select2({
+    placeholder: "Select an area", // Placeholder text
+    allowClear: true // Adds a clear button to remove the selection
+});
                 Swal.close();
-                // $(".select2").select2();//Show fetched data from database
+                //Show fetched data from database
             }
         });
      });
@@ -160,7 +164,7 @@ var datatable =
                 'columns': [
                     { data: 'action', "orderable": false },
                     { data: 'process_name', "orderable": false  },
-                    { data: 'action', "orderable": false  },
+                    { data: 'assigned_area', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
