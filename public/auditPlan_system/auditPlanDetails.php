@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
 <link rel="stylesheet" href="AdminLTE_new/plugins/summernote/summernote-bs4.min.css">
 <link rel="stylesheet" href="AdminLTE_new/plugins/toastr/toastr.min.css">
+<link rel="stylesheet" href="AdminLTE_new/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -15,6 +16,26 @@
     <?php
 
     $process = query("select * from process");
+    $team = query("SELECT 
+    t.team_id,
+    t.team_number AS team,
+    GROUP_CONCAT(
+        CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+        ORDER BY tm.role = 'LEADER' DESC, u.surname
+        SEPARATOR ', '
+    ) AS members
+    FROM 
+        audit_plan_teams t
+    JOIN 
+        audit_plan_team_members tm ON t.team_id = tm.team_id
+    JOIN 
+        users u ON tm.id = u.id
+    where t.audit_plan = ?
+    GROUP BY 
+        t.team_id
+    ORDER BY 
+        t.team_number
+    ", $_GET["id"]);
 
 
     // $process = query("SELECT 
@@ -91,7 +112,7 @@
           </div>
           <div class="modal-body">
               <form class="generic_form_trigger" data-url="auditPlan">
-                <input type="hidden" name="action" value="addTeam">
+                <input type="hidden" name="action" value="addSchedule">
                 <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
                     <label>Process</label>
@@ -105,7 +126,6 @@
                 <div class="form-group">
                     <label>Area</label>
                     <select class="form-control" multiple id="areaSelect" name="area_id[]" required style="width: 100%;">
-                     
                     </select>
                 </div>
               
@@ -115,10 +135,60 @@
                     </select>
                 </div>
 
+              
+
                 <div class="form-group">
-                        <label>Criteria Clause</label>
-                        <textarea class="form-control" rows="5" name="criteria_clause" placeholder="Enter ..."></textarea>
+                  <label>Criteria Clause</label>
+                  <textarea class="form-control" rows="3" name="criteria_clause" placeholder="Enter ..."></textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Process</label>
+                    <select class="form-control"  name="team_id" required style="width: 100%;">
+                      <option value="" selected disabled>Please select team here!</option>
+                      <?php foreach($team as $row): ?>
+                        <option value="<?php echo($row["team_id"]); ?>"><?php echo("TEAM " . $row["team"] . " - " . $row["members"]); ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Schedule Date</label>
+                  <input type="date" class="form-control" name="schedule_date">
+                </div>
+
+
+                <div class="row">
+                    <div class="col-6">
+                    <div class="bootstrap-timepicker">
+                      <div class="form-group">
+                        <label>From:</label>
+                        <div class="input-group date" id="fromtimepicker" data-target-input="nearest">
+                      <input name="fromTime" type="text" class="form-control datetimepicker-input" data-target="#fromtimepicker"/>
+                      <div class="input-group-append" data-target="#fromtimepicker" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="far fa-clock"></i></div>
                       </div>
+                      </div>
+                      </div>
+                    </div>
+
+                    </div>
+                    <div class="col-6">
+                    <div class="bootstrap-timepicker">
+                      <div class="form-group">
+                        <label>To:</label>
+                        <div class="input-group date" id="totimepicker" data-target-input="nearest">
+                      <input name="toTime" type="text" class="form-control datetimepicker-input" data-target="#totimepicker"/>
+                      <div class="input-group-append" data-target="#totimepicker" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+                      </div>
+                      </div>
+                      </div>
+                    </div>
+
+                    </div>
+                </div>
 
 
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
@@ -221,15 +291,17 @@
                   <div class="tab-pane" id="timeline">
                     <a href="#" data-toggle="modal" data-target="#modalAddSchedule" class="btn btn-success btn-sm">Add Audit Schedule</a>
                     <hr>
-                    <table class="table table-bordered" id="timelineDatatable" width="100%">
-                      <thead>
-                        <th>Time</th>
-                        <th>Audit Area</th>
-                        <th>Criteria / Clauses</th>
-                        <th>Auditors</th>
-                        <th>Area/Function/Auditee</th>
-                      </thead>
-                    </table>
+
+                    <table id="timelineDatatable" style="width: 100% !important;">
+                  <thead>
+                  <tr>
+                    <th width="100%;"></th>
+                  </tr>
+                  </thead>
+                </table>
+
+
+               
                   </div>
                   <div class="tab-pane" id="teams">
 
@@ -269,8 +341,22 @@
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
 <script src="AdminLTE_new/plugins/toastr/toastr.min.js"></script>
+<script src="AdminLTE_new/plugins/moment/moment.min.js"></script>
+<script src="AdminLTE_new/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 <script type="text/javascript" src="resources/vue.js"></script>
 <script>
+
+$('#fromtimepicker').datetimepicker({
+      format: 'LT',
+      stepping: 30,
+      defaultDate: moment("08:00 AM", "hh:mm A")
+    })
+
+    $('#totimepicker').datetimepicker({
+      format: 'LT',
+      stepping: 30,
+      defaultDate: moment("05:00 PM", "hh:mm A")
+    })
 
 $('#teamLeaderSelect').select2(
   {
@@ -342,11 +428,11 @@ var teamDatatable =
             var timelineDatatable = 
             $('#timelineDatatable').DataTable({
                 "searching": false,
-                "pageLength": 10,
+                "pageLength": 9999,
                 language: {
                     searchPlaceholder: "Search Name"
                 },
-                "bLengthChange": true,
+                "bLengthChange": false,
                 "ordering": false,
                 'processing': true,
                 'serverSide': true,
@@ -356,16 +442,13 @@ var teamDatatable =
                     'url':'auditPlan',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "teamDatatable",
+                        data.action = "timelineDatatable",
                         data.audit_plan = "<?php echo($_GET["id"]); ?>"
                      }
                 },
                 'columns': [
-                    { data: 'team_number', "orderable": false },
-                    { data: 'team_members', "orderable": false  },
-                    { data: 'team_members', "orderable": false  },
-                    { data: 'team_members', "orderable": false  },
-                    { data: 'team_members', "orderable": false  },
+                    { data: 'card', "orderable": false },
+                 
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

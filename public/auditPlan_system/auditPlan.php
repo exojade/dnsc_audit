@@ -118,6 +118,135 @@
 
 			echo($html);
 
+		elseif($_POST["action"] == "timelineDatatable"):
+			// dump($_POST);
+			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
+				$offset = $_POST["start"];
+				$limit = $_POST["length"];
+				$search = $_POST["search"]["value"];
+
+				$limitString = " limit " . $limit;
+				$offsetString = " offset " . $offset;
+
+				$where = " where audit_plan = '".$_POST["audit_plan"]."'";
+				$baseQuery = "select * from audit_plan_schedule" . $where;
+
+				$aps_position = query("select * from aps_position ap
+										left join position p on p.position_id = ap.position_id");
+				$aps_area = query("select * from aps_area aa
+										left join areas a on a.id = aa.area_id");
+				$Position = [];
+				$Area = [];
+				foreach($aps_position as $row):
+					$Position[$row["aps_id"]][$row["position_id"]] = $row;
+				endforeach;
+
+
+				$team = query("SELECT 
+						t.team_id,
+						t.team_number AS team,
+						GROUP_CONCAT(
+							CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+							ORDER BY tm.role = 'LEADER' DESC, u.surname
+							SEPARATOR ', '
+						) AS members
+						FROM 
+							audit_plan_teams t
+						JOIN 
+							audit_plan_team_members tm ON t.team_id = tm.team_id
+						JOIN 
+							users u ON tm.id = u.id
+						where t.audit_plan = ?
+						GROUP BY 
+							t.team_id
+						ORDER BY 
+							t.team_number
+						", $_POST["audit_plan"]);
+				$Team = [];
+				foreach($team as $row):
+					$Team[$row["team_id"]] = $row;
+				endforeach;
+
+
+
+				foreach($aps_area as $row):
+					$Area[$row["aps_id"]][$row["id"]] = $row;
+				endforeach;
+
+				// dump($Position);
+
+
+
+				$data = query($baseQuery . $limitString . " " . $offsetString);
+				$all_data = query($baseQuery);
+
+
+
+				$i = 0;
+				foreach($data as $row):
+					// $data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+					// $data[$i]["time"] = date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"]));
+					$area = [];
+					if(isset($Area[$row["aps_id"]])):
+						foreach($Area[$row["aps_id"]] as $a):
+							$area[] = $a["area_name"];
+						endforeach;
+					endif;
+					
+
+					// $data[$i]["team"] = "TEAM " . $Team[$row["team_id"]]["team"] . ": " . $Team[$row["team_id"]]["members"];
+					
+
+					$data[$i]["card"] = 
+					'
+              <div class="card card-widget" >
+              <div class="card-header">
+                <div class="user-block">
+                  <span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+                
+                </div>
+              </div>
+              <div class="card-body">
+                <!-- post text -->
+						'.$row["audit_clause"].'
+				<hr>
+				<b>Auditors</b> : TEAM ' . $Team[$row["team_id"]]["team"] . ': ' . $Team[$row["team_id"]]["members"].'
+				<hr>
+				<div class="row">
+					<div class="col-4">
+					<label>Process</label>
+					<br>
+					'.$row["process_id"].'
+
+					</div>
+					<div class="col-8">
+					<label>Area</label>
+					<br>
+					'.implode(",", $area).'
+
+					</div>
+				</div>
+
+                <!-- Attachment -->
+              
+              </div>
+          
+            </div>
+        
+						
+					';
+
+
+					$i++;
+				endforeach;
+				$json_data = array(
+					"draw" => $draw + 1,
+					"iTotalRecords" => count($all_data),
+					"iTotalDisplayRecords" => count($all_data),
+					"aaData" => $data
+				);
+				echo json_encode($json_data);
+
 
 		elseif($_POST["action"] == "updateAuditPlanInfo"):
 			// dump($_POST);
@@ -248,6 +377,82 @@
 				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
 				];
 				echo json_encode($res_arr); exit();
+
+		elseif($_POST["action"] == "addSchedule"):
+			// dump($_POST);
+			$aps_id = create_trackid("APS");
+			// dump($aps_id);
+
+
+			if (query("insert INTO audit_plan_schedule 
+				(aps_id, audit_plan,from_time, to_time,schedule_date,team_id,process_id,audit_clause,plan_type) 
+				VALUES(?,?,?,?,?,?,?,?,?)", 
+				$aps_id, $_POST["audit_plan_id"], 
+				date("H:i", strtotime($_POST["fromTime"])), 
+				date("H:i", strtotime($_POST["toTime"])), 
+				$_POST["schedule_date"],$_POST["team_id"],
+				$_POST["process_id"], $_POST["criteria_clause"],
+				"INDIVIDUAL") === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+
+
+
+			foreach($_POST["area_id"] as $row):
+				if (query("insert INTO aps_area 
+				(area_id, audit_plan, aps_id) 
+				VALUES(?,?,?)", 
+				$row, $_POST["audit_plan_id"], $aps_id
+				) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+
+			endforeach;
+
+
+			foreach($_POST["position_id"] as $row):
+				if (query("insert INTO aps_position 
+				(position_id, audit_plan, aps_id) 
+				VALUES(?,?,?)", 
+				$row, $_POST["audit_plan_id"], $aps_id
+				) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Schedule successfully added!",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
+
 
 		elseif($_POST["action"] == "fetchArea"):
 
