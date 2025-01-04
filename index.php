@@ -6,7 +6,6 @@
 	ini_set('max_execution_time', '300');
 	
 		$request = $_SERVER['REQUEST_URI'];
-	
 		$constants = get_defined_constants();
 		$request = explode('/dnsc_audit',$request);
 		// dump($request);
@@ -41,6 +40,9 @@
 					require 'public/position_system/position.php';
 				else if ($request == 'area')
 					require 'public/area_system/area.php';
+
+				else if ($request == 'process')
+					require 'public/process_system/process.php';
 
 				else if ($request == 'auditPlan')
 					require 'public/auditPlan_system/auditPlan.php';
