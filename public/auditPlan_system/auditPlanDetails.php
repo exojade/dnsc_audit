@@ -228,7 +228,11 @@
                 <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
                 <hr>
                 <a href="#" class="btn btn-warning btn-block"><b>Update Status</b></a>
-                <a href="#" class="btn btn-success btn-block"><b>Print Audit Plan</b></a>
+                <form class="generic_form_trigger_no_prompt mt-2" data-url="auditPlan">
+                  <input type="hidden" name="action" value="printAuditPlan">
+                  <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
+                  <button class="btn btn-success btn-block">Print Audit Plan</button>
+                </form>
               </div>
             </div>
         </div>

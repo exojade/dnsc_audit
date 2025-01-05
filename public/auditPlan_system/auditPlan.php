@@ -141,6 +141,12 @@
 					$Position[$row["aps_id"]][$row["position_id"]] = $row;
 				endforeach;
 
+				$Process = [];
+				$process = query("select * from process");
+				foreach($process as $row):
+					$Process[$row["process_id"]] = $row;
+				endforeach;
+
 
 				$team = query("SELECT 
 						t.team_id,
@@ -202,41 +208,33 @@
               <div class="card card-widget" >
               <div class="card-header">
                 <div class="user-block">
-                  <span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+                  		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+							
                 
                 </div>
+				<form class="generic_form_trigger">
+								<button class="btn btn-danger btn-sm float-right">Delete</button>
+							</form>
+								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
               </div>
               <div class="card-body">
-                <!-- post text -->
-						'.$row["audit_clause"].'
-				<hr>
-				<b>Auditors</b> : TEAM ' . $Team[$row["team_id"]]["team"] . ': ' . $Team[$row["team_id"]]["members"].'
-				<hr>
-				<div class="row">
-					<div class="col-4">
-					<label>Process</label>
-					<br>
-					'.$row["process_id"].'
 
-					</div>
-					<div class="col-8">
-					<label>Area</label>
-					<br>
-					'.implode(",", $area).'
 
-					</div>
-				</div>
-
-                <!-- Attachment -->
+			  <dl class="row">
+                  <dt class="col-sm-3">Process</dt>
+                  <dd class="col-sm-9">'.$Process[$row["process_id"]]["process_name"].'</dd>
+                  <dt class="col-sm-3">Area</dt>
+                  <dd class="col-sm-9">'.implode(",", $area).'</dd>
+                  <dt class="col-sm-3">Audit Clause</dt>
+                  <dd class="col-sm-9">'.$row["audit_clause"].'</dd>
+                  <dt class="col-sm-3">Audit Team</dt>
+                  <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+                </dl>
               
               </div>
           
             </div>
-        
-						
 					';
-
-
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -486,6 +484,382 @@
 				$response['positions'] = $position;
 				echo json_encode($response);
 			// dump($position);
+
+		elseif($_POST["action"] == "printAuditPlan"):
+			// dump($_POST);
+			// dump($_POST);
+// 
+
+			$auditPlan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan_id"]);
+			$auditPlan = $auditPlan[0];
+
+			$monthScope = "";
+			if($auditPlan["type"] == "1st Internal Quality Audit"):
+				$monthScope = "January - June";
+			else:
+				$monthScope = "July - December";
+			endif;
+
+			$daySchedule = query("select schedule_date from audit_plan_schedule where audit_plan = ? group by schedule_date", $_POST["audit_plan_id"]);
+			$theSchedule = query("select * from audit_plan_schedule 
+									aps left join process p on p.process_id = aps.process_id 
+									where aps.audit_plan = ?", $_POST["audit_plan_id"]);
+
+			$teams = query("select * from audit_plan_team_members aptm
+								left join users u on u.id = aptm.id where audit_plan = ?
+								order by aptm.role asc
+								", $_POST["audit_plan_id"]);
+			$Teams = [];
+			foreach($teams as $row):
+				$Teams[$row["team_id"]][$row["tblid"]] = $row;
+			endforeach;
+
+			$aps_position = query("select * from aps_position aps 
+									left join position p on p.position_id = aps.position_id
+									where aps.audit_plan = ?", $_POST["audit_plan_id"]);
+			$ApsPosition = [];
+			foreach($aps_position as $row):
+				$ApsPosition[$row["aps_id"]][$row["position_id"]] = $row;
+			endforeach;
+
+			$TheSchedule = [];
+			foreach($theSchedule as $row):
+				$TheSchedule[$row["schedule_date"]][$row["aps_id"]] = $row;
+			endforeach;
+
+			$team = query("SELECT 
+			t.team_id,
+			t.team_number AS team,
+			GROUP_CONCAT(
+				CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+				ORDER BY tm.role = 'LEADER' DESC, u.surname
+				SEPARATOR ', '
+			) AS members
+			FROM 
+				audit_plan_teams t
+			JOIN 
+				audit_plan_team_members tm ON t.team_id = tm.team_id
+			JOIN 
+				users u ON tm.id = u.id
+			where t.audit_plan = ?
+			GROUP BY 
+				t.team_id
+			ORDER BY 
+				t.team_number
+			", $_POST["audit_plan_id"]);
+
+		
+
+					// $medRecord = query("select *  from checkup c
+					// 					 left join pet p
+					// 					 on p.petId = c.petId
+					// 					 left join client cl
+					// 					 on p.clientId = cl.clientId
+					// 					 left join doctors d
+					// 					 on d.doctorsId = c.doctorId
+					// 					 where checkupId = ?", $_POST["checkupId"]);
+
+
+					$mpdf = new \Mpdf\Mpdf([
+						'mode' => 'utf-8',
+						'format' => 'A4-L', // 'A4-L' sets the orientation to landscape
+						'debug' => true,
+						'margin_top' => 4,
+						'margin_left' => 3,
+						'margin_right' => 3,
+						'margin_bottom' => 2,
+						'margin_footer' => 1,
+						'default_font' => 'helvetica'
+					]);
+
+					$mpdf->SetHTMLHeader('
+
+					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
+					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
+					<div class="row" >
+						<div class="col-xs-9">
+							<img src="resources/dnscHeader.png" 
+							style="width:100%; height: auto; max-height: 130px;">
+						</div>
+					</div>
+					');
+
+					$mpdf->SetHTMLFooter('
+					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
+					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
+					<hr>
+							<div class="row">
+							<div class="col-xs-4">
+								<dl class="row">
+									<dt class="col-xs-2"><b>Address</b></dt>
+									<dd class="col-xs-8 text-left">Davao del Norte State College<br>Tadeco Road, New Visayas <br>Panabo City, Davao del Norte, 8105</dd>
+								</dl>
+							</div>
+							<div class="col-xs-4">
+								<dl class="row">
+									<dt class="col-xs-2 text-left"><b>Website</b></dt>
+									<dd class="col-xs-8 text-left">www.dnsc.edu.ph</dd>
+									<dt class="col-xs-2 text-left"><b>Email</b></dt>
+									<dd class="col-xs-8 text-left">president@dnsc.edu.ph</dd>
+									<dt class="col-xs-2 text-left"><b>FB Page</b></dt>
+									<dd class="col-xs-8 text-left">www.facebook.com/davnorstatecollege</dd>
+								</dl>
+							</div>
+
+							<div class="col-xs-2 text-right">
+								<img src="resources/footerimage.jpg" 
+								style="width:100%;
+								height: auto; max-height: 60px;">
+							</div>
+						</div>
+						');
+
+					$html = "";
+
+					$html .='
+
+					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
+					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
+					<style>
+					.table, th, td, thead, tbody{
+						border: 1px solid black !important;
+						padding: 8px !important;
+					}
+					h5{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 15px !important;
+						font-weight: 800;
+					}
+
+					h4{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 100px !important;
+						font-weight: 800;
+						color:#000 !important;
+					}
+
+
+
+					b{
+						font-weight: bold;
+					}
+
+					</style>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					
+
+		
+					<h4 class="text-center"><b>Audit Plan</b></h4>
+
+					<table class="table" style="margin-top: 10px;">
+					<tbody>
+						<tr>
+							<td width="20%" class="text-center">Introduction</td>
+							<td>'.$auditPlan["introduction"].'</td>
+						</tr>
+						<tr>
+							<td width="20%" class="text-center">Audit Objectives</td>
+							<td>'.$auditPlan["audit_objectives"].'</td>
+						</tr>
+						<tr>
+							<td width="20%" class="text-center">Reference Standard</td>
+							<td>'.$auditPlan["reference_standard"].'</td>
+						</tr>
+						<tr>
+							<td width="20%" class="text-center">Audit Methodologies</td>
+							<td>'.$auditPlan["audit_methodologies"].'</td>
+						</tr>
+						<tr>
+							<td width="20%" class="text-center">Audit Team</td>
+							<td>Members</td>
+						</tr>
+						';
+
+					foreach($team as $row):
+
+						$html.='
+						<tr>
+							<td width="20%" class="text-center">Team '.$row["team"].'</td>
+							<td>'.$row["members"].'</td>
+						</tr>
+						';
+
+					endforeach;
+
+
+					$html.='
+					</tbody>
+
+
+
+					</table>
+				
+			
+			
+
+					<style>
+					dt{
+						font-size:12px;
+					
+					}
+						dl{
+						font-size:12px;
+					}
+					</style>
+				
+					';
+					$mpdf->WriteHTML($html);
+					$mpdf->AddPage();
+
+					$html = "";
+
+					$html .='
+					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
+					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
+					<style>
+					.table, th, td, thead, tbody{
+						border: 1px solid black !important;
+						padding: 8px !important;
+					}
+					h5{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 15px !important;
+						font-weight: 800;
+					}
+
+					h4{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 100px !important;
+						font-weight: 800;
+						color:#000 !important;
+					}
+
+
+
+					b{
+						font-weight: bold;
+					}
+
+					</style>
+
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+
+
+
+					<table class="table" style="margin-top: 10px;">
+					<tbody>
+						<tr>
+							<td  width="25%" colspan="2">Audit Scope for the Month/s of:</td>
+							<td>'.$monthScope.'</td>
+							<td>Year:</td>
+							<td>'.$auditPlan["year"].'</td>
+						</tr>
+						';
+					$html.='
+					</tbody>';
+					$day = 1;
+					foreach($daySchedule as $row):
+						$html.='
+						<tr>
+							<td colspan="5">Day '.$day.' - '.date("F d, Y", strtotime($row["schedule_date"])).'</td>
+						</tr>
+						';
+
+						if(isset($TheSchedule[$row["schedule_date"]])):
+							foreach($TheSchedule[$row["schedule_date"]] as $sched):
+								$html.='
+								<tr>
+									<td width="15%">'.date("g:i A", strtotime($sched["from_time"])) . "-" . date("g:i A", strtotime($sched["to_time"])).'</td>
+									<td>'.$sched["process_name"].'</td>
+									<td>'.$sched["audit_clause"].'</td>
+									<td>';
+									$i=0;
+									foreach($Teams[$sched["team_id"]] as $myteam):
+										// dump($myteam);
+										if($i != 0):
+											$html.='<br>';
+										endif;
+										$html.=$myteam["firstname"] . " " . $myteam["surname"];
+										$i++;
+									endforeach;
+									$html.='</td>
+									<td>';
+									$i=0;
+									foreach($ApsPosition[$sched["aps_id"]] as $myPosition):
+										if($i != 0):
+											$html.='<br>';
+										endif;
+										$html.=$myPosition["position_name"];
+										$i++;
+									endforeach;
+									$html.='</td>
+								</tr>
+								';
+
+							endforeach;
+						endif;
+
+
+						$day++;
+
+					endforeach;
+
+					$html.='
+
+
+
+					</table>
+				
+			
+			
+
+		
+					
+					';
+
+					$mpdf->WriteHTML($html);
+
+					
+
+					$filename = "audit_plan";
+					$path = "reports/".$filename.".pdf";
+					$mpdf->Output($path, \Mpdf\Output\Destination::FILE);
+
+					$res_arr = [
+						"result" => "success",
+						"title" => "Success",
+						"newlink" => "newlink",
+						"message" => "PDF success",
+						"link" => $path,
+						// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+						];
+						echo json_encode($res_arr); exit();
 
 
 		
