@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Users</h1>
+            <h1>Pending Users</h1>
           </div>
       
         </div>
@@ -20,6 +20,24 @@
     <!-- Main content -->
     <section class="content">
 
+    <div class="modal fade" id="modalAssignRole">
+      <div class="modal-dialog">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Assign Role</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="users">
+                <input type="hidden" name="action" value="assignRole">
+                <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 
       <div class="container-fluid">
@@ -28,21 +46,7 @@
             <!-- Default box -->
             <div class="card">
               <div class="card-header">
-                <div class="row">
-                  <div class="col-4">
-                  <div class="form-group">
-                  <label>Role List</label>
-                  <select class="form-control selectFilter" id="roleSelect">
-                    <option value="" selected disabled>Please select role to show</option>
-                    <?php $roles = query("select * from roles"); ?>
-                    <?php foreach($roles as $row): ?>
-                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["role_name"]); ?></option>
-                    <?php endforeach; ?>
-                  </select>
 
-                </div>
-                  </div>
-                </div>
                 
               </div>
               <!-- /.card-header -->
@@ -53,8 +57,6 @@
                     <th>Action</th>
                     <th>Fullname</th>
                     <th>Username</th>
-                    <th>Role</th>
-                    <th>Area</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -100,17 +102,17 @@
 
 
 
-    $('#medicalRecordModal').on('show.bs.modal', function (e) {
+    $('#modalAssignRole').on('show.bs.modal', function (e) {
         var rowid = $(e.relatedTarget).data('id');
         Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
         $.ajax({
             type : 'post',
-            url : 'medical', //Here you will fetch records 
+            url : 'users', //Here you will fetch records 
             data: {
-                checkupId: rowid, action: "medicalRecordModal"
+                id: rowid, action: "modalAssignRole"
             },
             success : function(data){
-                $('#medicalRecordModal .fetched-data').html(data);
+                $('#modalAssignRole .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
             }
@@ -135,15 +137,13 @@ var datatable =
                     'url':'users',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "usersList";
+                        data.action = "pendingUsersList";
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
                     { data: 'fullname', "orderable": false  },
                     { data: 'username', "orderable": false  },
-                    { data: 'role_name', "orderable": false  },
-                    { data: 'assigned_area', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
@@ -173,11 +173,6 @@ var datatable =
 
 
 
-  $('.selectFilter').on('change', function() {
-    // alert("change");
-            var roleSelect = $('#roleSelect').val();
-            datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
-  });
 
 </script>
 

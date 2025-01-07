@@ -79,15 +79,30 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
   <li class="nav-item">
-      <a href="users" class="nav-link">
-        <i class="nav-icon fas fa-users"></i>
-        <p>
-          Users
-          <span class="right badge badge-danger"></span>
-        </p>
-      </a>
-  </li>
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Users
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>All Users</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="users?action=pending_users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pending</p>
+                </a>
+              </li>
+            </ul>
+          </li>
   <li class="nav-item">
       <a href="area" class="nav-link">
         <i class="nav-icon fas fa-building"></i>
