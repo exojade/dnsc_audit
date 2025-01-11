@@ -21,6 +21,25 @@
     <section class="content">
 
 
+    <div class="modal fade" id="modalAssignedArea">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Assigned Area</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="users">
+                  <input type="hidden" name="action" value="addAssignedArea">
+                    <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 
       <div class="container-fluid">
         <div class="row">
@@ -50,7 +69,7 @@
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th>Action</th>
+                    <th width="15%">Action</th>
                     <th>Fullname</th>
                     <th>Username</th>
                     <th>Role</th>
@@ -113,6 +132,28 @@
                 $('#medicalRecordModal .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
+            }
+        });
+     });
+
+
+     $('#modalAssignedArea').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'users', //Here you will fetch records 
+            data: {
+                user_id: rowid, action: "modalAssignedArea"
+            },
+            success : function(data){
+                $('#modalAssignedArea .fetched-data').html(data);
+                $("#areaSelect").select2({
+    placeholder: "Select an area", // Placeholder text
+    allowClear: true // Adds a clear button to remove the selection
+});
+                Swal.close();
+                //Show fetched data from database
             }
         });
      });

@@ -40,10 +40,20 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     <?php
     break;
   case 2:
-    render("public/dashboard_system/dashboard_admin.php",[]);
+    ?>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+    <?php
     break;
   case 3:
-    render("public/dashboard_system/dashboard_admin.php",[]);
+    
     break;
   case 4:
     ?>

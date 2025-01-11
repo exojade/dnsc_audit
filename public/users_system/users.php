@@ -19,7 +19,17 @@
 						$where .= " and u.role_id = '".$_REQUEST["role"]."'";
 					endif;
 				endif;
+				$users_area = query("select * from users_area");
+				$UsersArea = [];
+				foreach($users_area as $row):
+					$UsersArea[$row["user_id"]][$row["area_id"]] = $row;
+				endforeach;
 
+				$area = query("select * from areas where type in ('office', 'institute')");
+				$Area = [];
+				foreach($area as $row):
+					$Area[$row["id"]] = $row;
+				endforeach;
 
 
 
@@ -45,11 +55,33 @@
 
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '
-						<div class="btn-group btn-block">
-						<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-warning btn-sm">Update</a>
-						<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-success btn-sm">Assign Area</a>
-					';
+
+					if($row["role_id"] == 2):
+						$data[$i]["action"] = '
+							<div class="btn-group btn-block">
+							<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-warning btn-sm">Update</a>
+							<a href="#" data-toggle="modal" data-target="#modalAssignedArea" data-id="'.$row["id"].'" class="btn btn-success btn-sm">Assign Area</a>
+						';
+					else:
+						$data[$i]["action"] = '
+							<div class="btn-group btn-block">
+							<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-warning btn-sm">Update</a>
+						';
+					endif;
+
+
+					$assigned_area = "";
+					$AssignedAreas = [];
+					if(isset($UsersArea[$row["id"]])):
+						$theAreas = $UsersArea[$row["id"]];
+						foreach($theAreas as $a):
+							$AssignedAreas[] = $Area[$a["area_id"]]["area_name"];
+						endforeach;
+					endif;
+					// dump($AssignedAreas);
+					$data[$i]["assigned_area"] = implode(", ", $AssignedAreas);
+
+					
 					$data[$i]["fullname"] = $row["surname"] .", " . $row["firstname"] . " " . $row["middlename"];
 					$i++;
 				endforeach;
@@ -60,6 +92,67 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+
+		elseif($_POST["action"] == "addAssignedArea"):
+			
+			if(isset($_POST["area_id"])):
+
+				query("delete from users_area where user_id = ?", $_POST["user_id"]);
+				foreach($_POST["area_id"] as $row):
+					query("insert INTO users_area (area_id, user_id) 
+					VALUES(?,?)", 
+					$row,$_POST["user_id"]);
+					
+				endforeach;
+			endif;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Success on Adding User",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
+
+		elseif($_POST["action"] == "modalAssignedArea"):
+			$user = query("select * from users where id = ?", $_POST["user_id"]);
+			$user = $user[0];
+
+			$area = query("select * from areas where type in ('office', 'institute')");
+
+			$area_user = query("select * from users_area where user_id = ?", $_POST["user_id"]);
+			$AreaUser = [];
+			foreach($area_user as $row):
+				$AreaUser[$row["area_id"]] = $row;
+			endforeach;
+
+			$html = '';
+
+			$html.='
+			<h4>'.$user["surname"]. ', ' . $user["firstname"] . '</h4>
+			<hr>
+			';
+
+
+			$html .= '
+			<input type="hidden" name="user_id" value="'.$_POST["user_id"].'">
+			<div class="form-group">
+                  <label>Assigned Areas</label>
+                  <select class="form-control" name="area_id[]" id="areaSelect" multiple style="width: 100%;">';
+				  foreach($area as $row):
+					if(isset($AreaUser[$row["id"]])):
+						$html.='<option selected value="'.$row["id"].'">'.$row["area_name"].'</option>';
+					else:
+						$html.='<option value="'.$row["id"].'">'.$row["area_name"].'</option>';
+					endif;
+				  endforeach;
+                  $html.='</select>
+                </div>
+
+			';
+
+			echo($html);
+			
+
 
 		elseif($_POST["action"] == "pendingUsersList"):
 			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
@@ -79,11 +172,7 @@
 					$Area[$row["id"]] = $row;
 				endforeach;
 
-				$users_area = query("select * from users_area");
-				$UsersArea = [];
-				foreach($users_area as $row):
-					$UsersArea[$row["process_id"]][$row["area_id"]] = $row;
-				endforeach;
+		
 
 
 
@@ -103,12 +192,16 @@
 
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
-
-
-
 				$i = 0;
 				foreach($data as $row):
+
+				
+
 					$data[$i]["action"] = '<a href="#" data-toggle="modal" data-id="'.$row["id"].'" data-target="#modalAssignRole" class="btn btn-block btn-success btn-sm">Assign Role</a>';
+
+					
+
+
 					$data[$i]["fullname"] = $row["surname"] .", " . $row["firstname"] . " " . $row["middlename"];
 					$i++;
 				endforeach;
