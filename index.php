@@ -15,7 +15,7 @@
 		$request = explode('/',$request);
 		$request = $request[1];
 		// dump($request);
-		$countering = array("login", "register", "verify");
+		$countering = array("login", "register", "verify", "survey_form");
 		// dump($_SESSION);
 		if (!in_array($request, $countering)){
 			if(empty($_SESSION["dnsc_audit"]["userid"]) && empty($_SESSION["dnsc_audit"]["application"])){
@@ -47,6 +47,12 @@
 				else if ($request == 'auditPlan')
 					require 'public/auditPlan_system/auditPlan.php';
 
+				else if ($request == 'survey')
+					require 'public/survey_system/survey.php';
+
+				else if ($request == 'survey_form')
+					require 'public/survey_form_system/survey_form.php';
+
 			
 
 
@@ -76,6 +82,9 @@
 
 			else if ($request == 'verify')
 				require 'public/verify_system/verify.php';
+
+			else if ($request == 'survey_form')
+					require 'public/survey_form_system/survey_form.php';
 
 			else if ($request == 'role')
 				require 'public/login_system/role.php';

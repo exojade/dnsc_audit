@@ -107,7 +107,7 @@
           <hr>
           <!-- <button type="submit" class="btn btn-success btn-block ">Log in</button> -->
            <div class="text-center">
-            <a href="#" class="btn btn-primary">Answer Survery Here</a>
+            <a href="<?= base_url(); ?>/survey_form" class="btn btn-primary">Answer Survery Here</a>
             </div>
           <hr>
         <!-- /.col -->

@@ -38,6 +38,44 @@
 				);
 				echo json_encode($json_data);
 
+			elseif($_POST["action"] == "auditPlanAuditorDatatable"):
+					// dump($_REQUEST);
+					$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
+					$offset = $_POST["start"];
+					$limit = $_POST["length"];
+					$search = $_POST["search"]["value"];
+	
+					$limitString = " limit " . $limit;
+					$offsetString = " offset " . $offset;
+	
+					$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
+					if($search != ""):
+					$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
+					$baseQuery = "select ap.* from audit_plans ap
+									left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
+					else:
+						$baseQuery = "select ap.* from audit_plans ap
+									left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
+					endif;
+	
+					$data = query($baseQuery . $limitString . " " . $offsetString);
+					$all_data = query($baseQuery);
+	
+	
+	
+					$i = 0;
+					foreach($data as $row):
+						$data[$i]["action"] = '<a href="auditPlan?action=auditorDetails&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+						$i++;
+					endforeach;
+					$json_data = array(
+						"draw" => $draw + 1,
+						"iTotalRecords" => count($all_data),
+						"iTotalDisplayRecords" => count($all_data),
+						"aaData" => $data
+					);
+					echo json_encode($json_data);
+
 		elseif($_POST["action"] == "teamDatatable"):
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
@@ -186,8 +224,6 @@
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 
-
-
 				$i = 0;
 				foreach($data as $row):
 					// $data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
@@ -198,13 +234,9 @@
 							$area[] = $a["area_name"];
 						endforeach;
 					endif;
-					
 
-					// $data[$i]["team"] = "TEAM " . $Team[$row["team_id"]]["team"] . ": " . $Team[$row["team_id"]]["members"];
-					
-
-					$data[$i]["card"] = 
-					'
+			$data[$i]["card"] = 
+				'
               <div class="card card-widget" >
               <div class="card-header">
                 <div class="user-block">
@@ -890,13 +922,24 @@
 							"auditPlan" => $auditPlan,
 							"auditors" => $auditors,
 						]);
-
+				elseif($_GET["action"] == "auditorDetails"):
+					$auditPlan = query("select * from audit_plans where audit_plan = ?", $_GET["id"]);
+					$auditPlan = $auditPlan[0];
+					render("public/auditPlan_system/auditPlanAuditorDetails.php",
+						[
+							"auditPlan" => $auditPlan,
+						]);
 				elseif($_GET["action"] == "getAuditPlanInfo"):
 					// dump($_GET);
-
 					$audit_plan = query("select * from audit_plans where audit_plan = ?", $_GET["audit_plan"]);
 					$data = $audit_plan[0];
 					echo json_encode($data);
+
+				elseif($_GET["action"] == "auditorList"):
+						render("public/auditPlan_system/auditPlan_auditorList.php",[
+						]);
+
+					
 				endif;
 
 			endif;
