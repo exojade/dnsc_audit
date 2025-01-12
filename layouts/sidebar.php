@@ -53,7 +53,37 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     <?php
     break;
   case 3:
-    
+    ?>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="auditPlan?action=auditorList" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Audit Plan
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Audit Reports
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+    <?php
     break;
   case 4:
     ?>
