@@ -24,8 +24,6 @@
 				foreach($office as $row):
 					$Office[$row["office_id"]] = $row;
 				endforeach;
-				
-
 
 				if(isset($_REQUEST["office_id"])):
 					if($_REQUEST["office_id"] != ""):
