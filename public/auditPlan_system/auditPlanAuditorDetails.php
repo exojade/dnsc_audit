@@ -238,7 +238,7 @@
         <div class="col-9">
         <div class="card">
               <div class="card-header p-2">
-                Process
+                <h4>Process assigned to auditor</h4>
               </div>
               <div class="card-body" style="max-height:65vh !important; overflow-y: auto;">
 
@@ -248,23 +248,85 @@
                               and id = ? group by team_id", $_GET["id"], $_SESSION["dnsc_audit"]["userid"]);
               $teamIds = array_column($myTeam, "team_id");
               $myTeam = "'".implode("','", $teamIds) . "'";
-              $myProcess = query("
               
+              $myProcess = query("
                                   select * from audit_plan_schedule aps
                                   left join process p on p.process_id = aps.process_id
-                                  
-                                  
+                                  where team_id in (".$myTeam.")
                                   ");
+              $ApsArea = [];
+              $aps_area = query("select aps_area.aps_id,a.id, a.area_name from aps_area
+                                  left join areas a on a.id = aps_area.area_id
+                                  where audit_plan = ?", $_GET["id"]);
+              foreach($aps_area as $row):
+                $ApsArea[$row["aps_id"]][$row["id"]] = $row;
+              endforeach;
+
+
+
+              $TeamMembers = [];
+              $team_members = query("select apt.*,aptm.*, concat(u.firstname, ' ', u.surname, ' ', u.suffix) as fullname from audit_plan_teams apt
+                                      left join audit_plan_team_members aptm
+                                      on aptm.team_id = apt.team_id
+                                      left join users u on u.id = aptm.id
+                                        where apt.audit_plan = ?", $_GET["id"]);
+              foreach($team_members as $row):
+                $TeamMembers[$row["team_id"]][$row["id"]] = $row;
+              endforeach;
+
+              // dump($TeamMembers);
               ?>
 
 
 
               <table class="table">
+                <tbody>
+                  <?php foreach($myProcess as $row): 
+                    $areaNames = array_column($ApsArea[$row["aps_id"]], "area_name");
+                    $areaNamesString = implode(', ', $areaNames);
 
-              <tbody>
+                    $teamMembers = array_column($TeamMembers[$row["team_id"]], "fullname");
+                    $areaNamesString = implode(', ', $areaNames);
+                    // dump($areaNames);
+                    // foreach($ApsArea[$row["aps_id"]] as $area):
 
-              </tbody>
+                    //   $thisArea =
 
+
+                    // endforeach;
+                    
+                    ?>
+                    <div class="card card-widget" >
+              <div class="card-header">
+                <div class="user-block">
+                  		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+							
+                
+                </div>
+				<form class="generic_form_trigger">
+								<button class="btn btn-danger btn-sm float-right">Delete</button>
+							</form>
+								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
+              </div>
+              <div class="card-body">
+
+
+			  <dl class="row">
+                  <dt class="col-sm-3">Process</dt>
+                  <dd class="col-sm-9"><?php echo($row["process_name"]); ?></dd>
+                  <dt class="col-sm-3">Area</dt>
+                  <dd class="col-sm-9"><?php echo($areaNamesString); ?></dd>
+                  <dt class="col-sm-3">Audit Clause</dt>
+                  <dd class="col-sm-9"><?php echo($row["audit_clause"]); ?></dd>
+                  <dt class="col-sm-3">Audit Team</dt>
+                  <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+                </dl>
+              
+              </div>
+          
+            </div>
+                  <?php endforeach; ?>
+                </tbody>
               </table>
 
 
