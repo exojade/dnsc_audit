@@ -240,7 +240,7 @@
               <div class="card-header p-2">
                 <h4>Process assigned to auditor</h4>
               </div>
-              <div class="card-body" style="max-height:65vh !important; overflow-y: auto;">
+              <div class="card-body" >
 
               <?php 
               
@@ -279,39 +279,24 @@
 
 
 
-              <table class="table">
-                <tbody>
+           
                   <?php foreach($myProcess as $row): 
                     $areaNames = array_column($ApsArea[$row["aps_id"]], "area_name");
                     $areaNamesString = implode(', ', $areaNames);
-
                     $teamMembers = array_column($TeamMembers[$row["team_id"]], "fullname");
-                    $areaNamesString = implode(', ', $areaNames);
-                    // dump($areaNames);
-                    // foreach($ApsArea[$row["aps_id"]] as $area):
-
-                    //   $thisArea =
-
-
-                    // endforeach;
-                    
+                    $teamMembersString = implode(', ', $teamMembers);
                     ?>
                     <div class="card card-widget" >
-              <div class="card-header">
-                <div class="user-block">
-                  		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
-							
-                
-                </div>
-				<form class="generic_form_trigger">
-								<button class="btn btn-danger btn-sm float-right">Delete</button>
-							</form>
-								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
-              </div>
+                      <div class="card-header">
+                        <div class="user-block">
+                              <span  class="username ml-2"><?php echo(date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])));?></span>
+                        </div>
+          
+                      </div>
               <div class="card-body">
 
 
-			  <dl class="row">
+			          <dl class="row">
                   <dt class="col-sm-3">Process</dt>
                   <dd class="col-sm-9"><?php echo($row["process_name"]); ?></dd>
                   <dt class="col-sm-3">Area</dt>
@@ -319,15 +304,63 @@
                   <dt class="col-sm-3">Audit Clause</dt>
                   <dd class="col-sm-9"><?php echo($row["audit_clause"]); ?></dd>
                   <dt class="col-sm-3">Audit Team</dt>
-                  <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+                  <dd class="col-sm-9"><?php echo($teamMembersString); ?></dd>
                 </dl>
+
+                <table class="table table-bordered">
+                  <thead>
+                    <th>Report</th>
+                    <th>Area</th>
+                    <th>Status</th>
+                    <th>Date </th>
+                  </thead>
+                  <tbody>
+                    <?php $audit_reports = query("
+                    SELECT 
+                            aa.*, 
+                            ar.audit_report_id,
+                            ar.timestamp,
+                            a.area_name,
+                            COALESCE(ar.audit_report_status, 'CREATE') AS audit_report_status
+                        FROM 
+                            audit_plan_schedule aps
+                        LEFT JOIN 
+                            aps_area aa ON aa.`aps_id` = aps.`aps_id`
+                        LEFT JOIN areas a 
+                        ON a.id = aa.`area_id`
+                        LEFT JOIN 
+                            audit_report ar ON ar.`aps_area` = aa.`area_id`
+                        WHERE 
+                        aps.`aps_id` = ?", $row["aps_id"]); 
+                        ?>
+
+                    <?php foreach($audit_reports as $report): ?>
+                      <tr>
+                        <td width="20%">
+                          <?php if($report["audit_report_id"] != ""): ?>
+                            <?php if($report["audit_report_status"] == "DONE"): ?>
+                              <a href="#" class="btn btn-success btn-sm btn-block" >Details</a>
+                            <?php else: ?>
+                              <a href="#" class="btn btn-warning btn-sm btn-block" >Update</a>
+                            <?php endif; ?>
+                          <?php else: ?>
+                              <a href="audit_report?action=create&aps_area_id=<?php echo($report["tblid"]); ?>" class="btn btn-info btn-sm btn-block" >Create</a>
+                          <?php endif; ?>
+                          </td>
+                          <td><?php echo($report["area_name"]); ?></td>
+                          <td><?php echo($report["audit_report_status"]); ?></td>
+                          <td><?php echo($report["timestamp"]); ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+
+         
               
               </div>
           
             </div>
                   <?php endforeach; ?>
-                </tbody>
-              </table>
 
 
               </div>

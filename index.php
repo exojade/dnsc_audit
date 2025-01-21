@@ -53,6 +53,9 @@
 				else if ($request == 'survey_form')
 					require 'public/survey_form_system/survey_form.php';
 
+				else if ($request == 'audit_report')
+					require 'public/audit_report_system/audit_report.php';
+
 			
 
 
