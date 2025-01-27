@@ -98,7 +98,9 @@
 
 			$processes = query("select * from areas where parent_area = ?", $_POST["areaId"]);
 			echo json_encode(['success' => true, 'data' => $processes]); exit();
-			
+
+		elseif($_POST["action"] == "createAuditReport"):
+			dump($_POST);
 		endif;
 		
     }
