@@ -1,6 +1,14 @@
 <script src="<?= asset("AdminLTE_new/plugins/bootstrap/js/bootstrap.bundle.min.js"); ?>"></script>
 <script src="<?= asset("AdminLTE_new/plugins/sweetalert2/sweetalert2.min.js");?>"></script>
+
 <script>
+
+$(document).on('click', '.deym', function() {
+    $(this).dropdown('toggle');
+});
+
+
+  
 $(document).on('submit', '.generic_form_trigger', function(e) {
     e.preventDefault(); // Prevent the default form submission
 
