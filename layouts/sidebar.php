@@ -50,6 +50,35 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-item">
+      <a href="evidence?action=myEvidence" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Evidences
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="evidence?action=myEvidence" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Manuals
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="evidence?action=myEvidence" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
     <?php
     break;
   case 3:
@@ -68,17 +97,19 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       <a href="auditPlan?action=auditorList" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>
-          Audit Plan
+          Audit Report
           <span class="right badge badge-danger"></span>
         </p>
       </a>
   </li>
 
+
+
   <li class="nav-item">
-      <a href="index" class="nav-link">
+      <a href="audit_checklist" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>
-          Audit Reports
+          Audit Checklist
           <span class="right badge badge-danger"></span>
         </p>
       </a>
@@ -106,6 +137,64 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
+  <li class="nav-item">
+      <a href="auditPlan" class="nav-link">
+        <i class="nav-icon fas fa-list-alt"></i>
+        <p>
+          Consolidated AR
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">Review</li>
+  <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Audit Reports
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Done</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="users?action=pending_users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pending</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Audit Checklist
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Done</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="users?action=pending_users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pending</p>
+                </a>
+              </li>
+            </ul>
+          </li>
     <?php
     break;
   case 5:

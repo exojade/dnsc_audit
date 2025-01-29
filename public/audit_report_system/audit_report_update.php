@@ -46,7 +46,7 @@
       ?>
 
   <div class="row">
-    <div class="col-3">
+    <!-- <div class="col-3">
     <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>About IAR</strong></h3>
@@ -70,7 +70,7 @@
                 
               </div>
             </div>
-    </div>
+    </div> -->
     <div class="col">
 
     <div class="card card-success">

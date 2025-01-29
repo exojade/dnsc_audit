@@ -1,45 +1,34 @@
 <?php
     if($_SERVER["REQUEST_METHOD"] === "POST") {
 
-			
-		if($_POST["action"] == "areaList"):
+		if($_POST["action"] == "audit_checklist_datatable"):
 				// dump($_REQUEST);
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
 				$limit = $_POST["length"];
 				$search = $_POST["search"]["value"];
-	
+
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
-	
-				$where = " where type in ('office', 'institute', 'program')";
-	
-		
 
-	
-				
-
-				if($search == ""):
-					$baseQuery = "select * from areas " . $where;
-					$data = query($baseQuery . $limitString . " " . $offsetString);
-					$all_data = query($baseQuery);
+				$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
+				if($search != ""):
+				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
+				$baseQuery = "select ap.* from audit_plans ap
+								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
 				else:
-					$where .= " and (area_name like '%".$search."%' or area_description like '%".$search."%') ";
-					$baseQuery = "select * from areas " . $where;
-					$data = query($baseQuery . $limitString . " " . $offsetString);
-					$all_data = query($baseQuery);
+					$baseQuery = "select ap.* from audit_plans ap
+								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
 				endif;
-	
-	
-	
-	
+
+				$data = query($baseQuery . $limitString . " " . $offsetString);
+				$all_data = query($baseQuery);
+
+
+
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '
-					<div class="btn-group btn-block">
-						<a href="#" data-toggle="modal" data-target="#modalUpdateArea" data-id="'.$row["id"].'" class="btn btn-sm btn-warning">Update</a>
-						<a href="#" data-id="'.$row["id"].'" class="btn btn-sm btn-info">Select</a>
-					</div>';
+					$data[$i]["action"] = '<a href="audit_checklist?action=myChecklist&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -50,8 +39,8 @@
 				);
 				echo json_encode($json_data);
 
-		elseif($_POST["action"] == "audit_plan_report_datatable"):
-
+		elseif($_POST["action"] == "audit_plan_checklist_datatable"):
+			// dump($_POST);
 
 			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
@@ -71,10 +60,10 @@
 						aps.*,
 						p.*,
 						aa.*,
-						ar.audit_report_id,
+						ar.audit_checklist_id,
 						ar.timestamp,
 						a.area_name,
-						COALESCE(ar.audit_report_status, 'CREATE') AS audit_report_status
+						COALESCE(ar.audit_checklist_status, 'CREATE') AS audit_checklist_status
 					FROM 
 						audit_plan_schedule aps
 					LEFT JOIN 
@@ -84,7 +73,7 @@
 					LEFT JOIN 
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
-						audit_report ar ON ar.aps_area = aa.area_id
+						audit_checklist ar ON ar.aps_area = aa.area_id
 					WHERE 
 						aps.team_id IN ($myTeam)
 				");
@@ -111,6 +100,7 @@
               endforeach;
 			$i = 0;
 				foreach($data as $row):
+
 					$areaNames = array_column($ApsArea[$row["aps_id"]], "area_name");
                     $areaNamesString = implode(', ', $areaNames);
                     $teamMembers = array_column($TeamMembers[$row["team_id"]], "fullname");
@@ -118,33 +108,36 @@
 					// dump($row);
 
 
-					$action = '
-							<div class="btn-group btn-block">
-								<button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-									Action
-								</button>
-								<ul class="dropdown-menu">
-									';
-									if($row["audit_report_id"] != ""):
-										if($row["audit_report_status"] == "DONE"):
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">View Audit Report</a></li>';
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Print Audit Report</a></li>';
-										else:
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Edit Audit Report</a></li>';
-										endif;
+					if($row["audit_checklist_id"] != ""):
+						if($row["audit_checklist_status"] == "DONE"):
+							$data[$i]["action"] = '
+						
 
-									else:
-										$action .= '<li><a class="dropdown-item" href="audit_report?action=create&aps_area_id='.$row["tblid"].'">Create Audit Report</a></li>';
-									endif;
-
-							$action.='
-									<li><a class="dropdown-item" target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'">Evidences</a></li>
-									<li><a class="dropdown-item" target="_blank" href="#" data-toggle="modal" data-target="#scheduleModal" data-id="'.$row["tblid"].'">Audit Plan Schedule Details</a></li>
-								</ul>
-							</div>
+								<div class="btn-block btn-group">
+										<a href="audit_checklist?action=details&id='.$row["audit_checklist_id"].'" class="btn btn-success btn-sm" ><i class="fa fa-eye"></i></a>
+										<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
+									</div>
+							
 							';
-
-					$data[$i]["action"] = $action;
+						else:
+							$data[$i]["action"] = '
+									<div class="btn-block btn-group">
+										<a href="audit_checklist?action=create&aps_area_id='.$row["tblid"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
+										<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
+									</div>
+							
+							';
+						endif;
+					else:
+						$data[$i]["action"] = '
+						<div class="btn-block btn-group">
+									<a href="audit_checklist?action=create&aps_area_id='.$row["tblid"].'" class="btn btn-info btn-sm" ><i class="fa fa-plus"></i></a>
+									<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
+								</div>
+						
+						';
+					endif;
+					
 					$data[$i]["team"] = $teamMembersString;
 					$data[$i]["process_name"] = $row["process_name"];
 					$data[$i]["area_name"] = $row["area_name"];
@@ -158,88 +151,51 @@
 				);
 				echo json_encode($json_data);
 
-
-
-
-
-		elseif($_POST["action"] == "getProcesses"):
+		elseif($_POST["action"] == "createChecklist"):
 			// dump($_POST);
-
-			$processes = query("select * from areas where parent_area = ?", $_POST["areaId"]);
-			echo json_encode(['success' => true, 'data' => $processes]); exit();
-
-		elseif($_POST["action"] == "createAuditReport"):
-			// dump($_POST);
-
 
 			$aps_area = query("select * from aps_area where tblid = ?", $_POST["aps_area_id"]);
 			$aps_area = $aps_area[0];
 
-			$questions =[
-				"Are the procedure steps accurate and complete as compared to true practice?",
-				"Are there sufficient check steps (inspections, tests, reviews, approvals, sign-offs, etc.) that ensure the process outputs meet requirements before passing onto the next process?",
-				"Does the process appear to adequately meet the requirements of ISO 9001 and its documentation?",
-				"Does the process appear to adequately meet all customer or regulatory requirements?",
-				"Are the quality objectives or targets identified in the process met?"
-			  ];
-			$i=1;
-			$Effectiveness = [];
-			foreach($questions as $row):
-				$Effectiveness[$i]["number"] = $i;
-				$Effectiveness[$i]["question"] = $row;
-				$Effectiveness[$i]["rate"] = $_POST[$i."_question"];
-				$Effectiveness[$i]["comment"] = $_POST[$i."_comments"];
-				$i++;
-			endforeach;
-
-			$Effectiveness = serialize($Effectiveness);
-
-			$car_details = [];
-			$car_details[0]["ofi_requirements"] = $_POST["ofi_requirements"];
-			$car_details[0]["ofi_findings"] = $_POST["ofi_findings"];
-			$car_details[0]["ofi_evidences"] = $_POST["ofi_evidences"];
-			$car_details = serialize($car_details);
 
 
-			// dump($car_details);
+
+
+			// dump($_POST);
 
 
 		
-			$ar_id = create_uuid("AR");
-			if (query("insert INTO audit_report 
-					(audit_report_id, audit_plan, aps_id, aps_area, timestamp, effectiveness_process, car_status, ofi_improvement,
-					ofi_nonconformance, car_details, audit_report_status, user_id) 
-			  VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", 
-				$ar_id, $aps_area["audit_plan"], $aps_area["aps_id"], $aps_area["area_id"], time(),
-				$Effectiveness,"ACTIVE", $_POST["ofi_improvement"],$_POST["ofi_2"], $car_details, "PENDING", $_SESSION["dnsc_audit"]["userid"]) === false)
-				{
-					$res_arr = [
-						"result" => "failed",
-						"title" => "Failed",
-						"message" => "User already Registered",
-						"link" => "auditPlan?action=auditorDetails&id=".$aps_area["audit_plan"],
-						];
-						echo json_encode($res_arr); exit();
-				}
+			$ac_id = create_trackid("AC");
+			
 
+				query("insert INTO audit_checklist 
+					(audit_checklist_id, audit_plan, aps_id, aps_area, timestamp, audit_trail, comply, remarks,user_id) 
+			  VALUES(?,?,?,?,?,?,?,?,?)", 
+				$ac_id, $aps_area["audit_plan"], $aps_area["aps_id"], $aps_area["area_id"], time(),
+				$_POST["audit_trail"],$_POST["comply"], $_POST["remarks"], $_SESSION["dnsc_audit"]["userid"]);
+				$res_arr = [
+					"result" => "success",
+					"title" => "Success",
+					"message" => "Checklist created successfully",
+					"link" => "audit_checklist?action=checklistDetails&id=".$ac_id,
+					];
+					echo json_encode($res_arr); exit();
 
-
-		$res_arr = [
-			"result" => "success",
-			"title" => "Success",
-			"message" => "Success",
-			"link" => "users?action=users_list",
-			];
-			echo json_encode($res_arr); exit();
-
-		elseif($_POST["action"] == "print_audit_report"):
+		
+		elseif($_POST["action"] == "print_audit_checklist"):
 			// dump($_POST);
-			$audit_report = query("select ar.*, u.firstname, u.middlename, u.surname from audit_report ar left join users u
-                                    on u.id = ar.user_id where audit_report_id = ?", $_POST["audit_report_id"]);
-			$audit_report = $audit_report[0];
+
+
+			$audit_checklist = query("select ac.*, concat(u.firstname, ' ' ,u.middlename, ' ', u.surname) as prepared_by,
+									concat(u2.firstname, ' ' ,u2.middlename, ' ', u2.surname) as reviewed_by
+									from audit_checklist ac 
+									left join users u on u.id = ac.user_id 
+									left join users u2 on u2.id = ac.reviewed_by
+									where audit_checklist_id = ?", $_POST["audit_checklist_id"]);
+			$audit_checklist = $audit_checklist[0];
 			$aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where aps_id = ? and area_id = ?", $audit_report["aps_id"], $audit_report["aps_area"]);
+                          where aps_id = ? and area_id = ?", $audit_checklist["aps_id"], $audit_checklist["aps_area"]);
 			$aps_area = $aps_area[0];
 
 			$aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -367,7 +323,7 @@
 					
 
 		
-					<h4 class="text-center"><b>Internal Audit Report</b></h4>
+					<h4 class="text-center"><b>AUDIT CHECKLIST</b></h4>
 
 				<br>
 			<style>
@@ -438,9 +394,9 @@ font-size: 12px;
 								<table class="tbl" style="font-size: 12px; padding-top: 10px;">
                                             <tr>
 												<td width="10%" class="p-2 nw"><b>Date of Audit: </b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.date("F d, Y", $audit_report["timestamp"]).'</td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.date("F d, Y", $audit_checklist["timestamp"]).'</td>
                                                 <td width="10%" class="p-2 nw"><b>IAR No: </b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_report["audit_report_id"].'</td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["audit_checklist_id"].'</td>
                                             </tr>
                                         </table>
 
@@ -463,90 +419,80 @@ font-size: 12px;
 					<table class="tbl" style="font-size: 12px; padding-top: 10px;">
                                             <tr>
 												<td width="10%" class="p-2 nw"><b>Auditor: </b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_report["firstname"] . " " . $audit_report["middlename"] . " " . $audit_report["surname"].'</td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["prepared_by"].'</td>
                                                 <td width="10%" class="p-2 nw"><b>Auditee</b></td>
                                                 <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;"></td>
                                             </tr>
                                         </table>
 					<br>
-					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-                                            <tr>
-												<td colspan="3"><b>A. Verify the Effectiveness of the Process</b></td>
-                                            </tr>
-											<tr>
-												<td colspan="3"><b>Review the applicable procedure(s) for this process and answer the questions below.</b></td>
-                                            </tr>
-											<tr>
-												<td style="text-align: center;"><b>Questions</b></td>
-												<td></td>
-												<td></td>
-                                            </tr>
-											
-											';
-
-					$effectives = unserialize($audit_report["effectiveness_process"]);
-					$car_details = unserialize($audit_report["car_details"]);
-
-					foreach($effectives as $row):
-
-						$html.='
-						<tr>
-							<td width="45%"><b>'.$row["question"].'</b></td>
-							<td style="text-align: center;" width="5%">'.$row["rate"].'</td>
-							<td width="45%">'.$row["comment"].'</td>
-						</tr>
-						';
-
-					endforeach;
-
-					$html.='
-
-											
-                                        </table>
 					<br>
-					<table class="tbl" style="font-size: 12px; padding-top: 10px;">
+					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
+											<tr>
+												<td width="40%" style="text-align: center;"><b>AUDIT TRAIL</b></td>
+												<td width="10%" style="text-align: center;"><b>Comply (Y/N)</b></td>
+												<td width="50%" style="text-align: center;"><b>AUDIT FINDINGS/NOTES/REMARKS (evidence)</b></td>
+                                            </tr>
+
+											<tr style="height: 580px;">
+        <td style="height: 580px; text-align: justify; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["audit_trail"].'</p></td>
+        <td style="height: 580px; text-align: center; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["comply"].'</p></td>
+        <td style="height: 580px; text-align: justify; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["remarks"].'</p></td>
+    </tr>
+                                        </table>
+					
+
+					
+				
+
+										<p style="font-size: 10px; margin:0px;margin-top:15px;"><b>**Reminder: This checklist is just a guide, you are free (and encouraged) to add more questions as you conduct the actual audit.
+										<br>**Note to the auditor: Please ensure to check status of open corrective/preventive actions from previous internal audit(s). You have the option to close-out the open item if you find that the action(s) taken have been implemented or are effective already.
+										<br>**Check the following:
+										<br>The procedure is followed.
+										<br>The forms are completely filled.
+										<br>The records have complete signatures of concerned personnel.
+										<br>The filing of records generated</b></p>
+										<br>
+										<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
                                             <tr>
-												<td class="p-2 nw"><b>B. Summarize Findings for CAR Form System</b></td>
+												<td class="p-2 nw" width="70%">
+												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
+                                            <tr style="height: 50px;">
+												<td width="45%" style="height: 50px; vertical-align: top;" class="p-2 nw">
+													<b>Prepared by: </b>
+												</td>
+												<td style="height: 50px; vertical-align: top;"></td>
+												<td width="45%" style="height: 50px; vertical-align: top;" class="p-2 nw">
+													<b>Reviewed by: </b>
+												</td>
+                                                
+                                                
+                                            </tr>
+
+											<tr>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["prepared_by"].'</td>
+												<td></td>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["reviewed_by"].'</td>
+											</tr>
+                                        </table>
+												</td>
+
+												<td style="vertical-align: top;">
+
+												<table class="tbl" style="font-size: 12px; ">
+													<tr style="height: 50px;">
+														<td class="p-2 nw" style="vertical-align: top; height: 50px;"><b>Date:</b></td>
+													</tr>
+													<tr>
+														<td class="p-2 nw" style="border-bottom: 1px solid black;">'.date("F d, Y", $audit_checklist["timestamp"]).'</td>
+													</tr>
+												</table>
+
+
+													
+												</td>
                                        
                                             </tr>
                                         </table>
-
-										<p style="font-size: 11px; padding-left: 25px; margin:0px;margin:0px;"><b>Based on the findings and nonconformities you have recorded in the previous sections, summarize the necessary actions needed For type, choose one of the following:</b></p>
-										<p style="font-size: 11px; padding-left: 50px; margin:0px;"><b>C = Corrective action needed (existing noncompliance)</b></p>
-										<p style="font-size: 11px; padding-left: 50px; margin:0px;"><b>OFI = Opportunity for Improvement</b></p>
-					<br>
-					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-                                            <tr>
-												<td class="p-2 nw"><b>OFI (Improvement)</b><br><br>'.$audit_report["ofi_improvement"].'</td>
-                                            </tr>
-											<tr>
-												<td class="p-2 nw"><b>OFI (Possible Non-conformance in the Future):</b><br><br>'.$audit_report["ofi_nonconformance"].'</td>
-                                            </tr>
-                                        </table>
-<br>
-										<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-                        
-											<tr>
-												<td width="20%" style="text-align: center;"><b>CAR FORM #</b></td>
-												<td width="60%" style="text-align: center;"><b>Describe finding as you want it to appear in the CAR Form System</b></td>
-												<td width="20%"></td>
-                                            </tr>
-											<tr>
-												<td></td>
-												<td>
-												<b>Requirements</b><br>
-												'.$car_details[0]["ofi_requirements"].'<br>
-												<b>Findings</b><br>
-												'.$car_details[0]["ofi_findings"].'<br>
-												<b>Evidence/s</b><br>
-												'.$car_details[0]["ofi_evidences"].'<br>
-												
-												
-
-												</td>
-												<td></td>
-                                            </tr>
-											</table>
 
 
 
@@ -558,7 +504,7 @@ font-size: 12px;
 
 					
 
-					$filename = "audit_report";
+					$filename = "audit_checklist";
 					$path = "reports/".$filename.".pdf";
 					$mpdf->Output($path, \Mpdf\Output\Destination::FILE);
 
@@ -571,27 +517,35 @@ font-size: 12px;
 						// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
 						];
 						echo json_encode($res_arr); exit();
+			
 
 
-
-
-
+			
 
 		endif;
+		
+
+
+
+
 		
     }
 	else {
 
 		if(!isset($_GET["action"])):
-
+			render("public/audit_checklist_system/audit_checklist_list.php",[
+			]);
 		else:
 
-			if($_GET["action"] == "create"):
-				render("public/audit_report_system/createARForm.php",[
+			if($_GET["action"] == "myChecklist"):
+				render("public/audit_checklist_system/audit_plan_checklist.php",[
+				]);
+			elseif($_GET["action"] == "create"):
+				render("public/audit_checklist_system/createChecklist.php",[
 				]);
 
 			elseif($_GET["action"] == "details"):
-				render("public/audit_report_system/audit_report_details.php",[
+				render("public/audit_checklist_system/audit_checklist_details.php",[
 				]);
 			endif;
 

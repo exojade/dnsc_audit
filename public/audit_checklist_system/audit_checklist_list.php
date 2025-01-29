@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Reports</h1>
+            <h1>Audit Plan List</h1>
           </div>
           <div class="col-sm-6">
           </div>
@@ -34,10 +34,8 @@
                   <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Team</th>
-                    <th>Process</th>
-                    <th>Area</th>
-                    <th>Created</th>
+                    <th>Audit Plan</th>
+                    <th>Year</th>
                     <th>Status</th>
                   </tr>
                   </thead>
@@ -116,44 +114,22 @@ var datatable =
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'audit_report',
+                    'url':'audit_checklist',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "audit_plan_report_datatable",
-                        data.interal_audit_id = "<?php echo($_GET["id"]); ?>"
+                        data.action = "audit_checklist_datatable",
+                        data.interal_audit_id = "<?php echo($_SESSION["dnsc_audit"]["userid"]); ?>"
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
-                    { 
-        data: 'team', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'process_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'area_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { data: 'timestamp', "orderable": false },
-    { data: 'audit_report_status', "orderable": false },
+                    { data: 'type', "orderable": false  },
+                    { data: 'year', "orderable": false  },
+                    { data: 'status', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
-                    $(document).on('click', '.dropdown-toggle', function() {
-    $(this).dropdown('toggle');
-});
+                    
 
                     // Remove the formatting to get integer data for summation
                     // var intVal = function (i) {

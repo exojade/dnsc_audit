@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Reports</h1>
+            <h1>Audit Check List</h1>
           </div>
           <div class="col-sm-6">
           </div>
@@ -38,7 +38,6 @@
                     <th>Process</th>
                     <th>Area</th>
                     <th>Created</th>
-                    <th>Status</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -116,10 +115,10 @@ var datatable =
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'audit_report',
+                    'url':'audit_checklist',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "audit_plan_report_datatable",
+                        data.action = "audit_plan_checklist_datatable",
                         data.interal_audit_id = "<?php echo($_GET["id"]); ?>"
                      }
                 },
@@ -147,13 +146,10 @@ var datatable =
         }
     },
     { data: 'timestamp', "orderable": false },
-    { data: 'audit_report_status', "orderable": false },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
-                    $(document).on('click', '.dropdown-toggle', function() {
-    $(this).dropdown('toggle');
-});
+                    
 
                     // Remove the formatting to get integer data for summation
                     // var intVal = function (i) {

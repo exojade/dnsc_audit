@@ -1,0 +1,10 @@
+#myFooter dl dt{
+    font-size: 5px !important;
+        }
+    #myFooter dl dd{
+    font-size: 5px !important;
+        }
+
+        #headerTable thead td{
+            padding:0px !important;
+        }

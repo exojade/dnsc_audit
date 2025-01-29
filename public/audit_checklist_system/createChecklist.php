@@ -70,6 +70,7 @@
                 
               </div>
             </div>
+            <a target="_blank" href="evidence?action=myEvidence&root=<?php echo($aps_area["area_id"]); ?>" class="btn btn-warning btn-block"><i class="fa fa-folder"></i> Check Evidence</a>
     </div>
     <div class="col">
 
@@ -81,8 +82,8 @@
               <!-- form start -->
               
                 <div class="card-body">
-                <form class="generic_form_trigger" data-url="audit_report" id="internalReportForm">
-                <input type="hidden" name="action" value="createAuditReport">
+                <form class="generic_form_trigger" data-url="audit_checklist" id="internalReportForm">
+                <input type="hidden" name="action" value="createChecklist">
                 <input type="hidden" name="aps_area_id" value="<?php echo($_GET["aps_area_id"]); ?>">
 
 <!-- <style>
@@ -104,141 +105,43 @@
                     
                     ?>
 
-<div class="bs-stepper">
-                  <div class="bs-stepper-header" role="tablist">
-                    <!-- your steps here -->
-                    <div class="step" data-target="#logins-part">
-                      <button type="button" class="step-trigger" role="tab" aria-controls="logins-part" id="logins-part-trigger">
-                        <span class="bs-stepper-circle">A</span>
-                        <span class="bs-stepper-label">Verify the Effectiveness of Process</span>
-                      </button>
-                    </div>
-                    <div class="line"></div>
-                    <div class="step" data-target="#information-part">
-                      <button type="button" class="step-trigger" role="tab" aria-controls="information-part" id="information-part-trigger">
-                        <span class="bs-stepper-circle">B</span>
-                        <span class="bs-stepper-label">Summarize Findings for CAR System</span>
-                      </button>
-                    </div>
-                    <div class="line"></div>
-                    <div class="step" data-target="#suggestion-part">
-                      <button type="button" class="step-trigger" role="tab" aria-controls="suggestion-part" id="suggestion-part-trigger">
-                        <span class="bs-stepper-circle">C</span>
-                        <span class="bs-stepper-label">Comments / Suggestions</span>
-                      </button>
-                    </div>
-                   
-                  </div>
+              
                   <div class="bs-stepper-content">
                     <!-- your steps content here -->
                     <div id="logins-part" class="content" role="tabpanel" aria-labelledby="logins-part-trigger">
                     <div class="alert alert-success alert-dismissible">
                       <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
-                      Rate the auditor with 4 being the highest and 1 being the lowest.<br>
-                      Review the applicable procedure(s) for this process and answer the questions below.
+                      <p class="text-justify">Reminder: This checklist is just a guide, you are free (and encouraged) to add more questions as you conduct the actual audit.</p>
+              
                     </div>
-                      <table class="table myTable table-bordered">
-                  <tbody>
-                    <th width="50%">Questions</th>
-                    <th width="15%">Rate</th>
-                    <th width="35%">Comments</th>
 
-                    <?php $i=1; foreach($questions as $row): ?>
 
-                      <tr>
-                        <th><?php echo($row); ?></th>
-                        <th>
-                          
-                        <select name="<?php echo($i); ?>_question" required class="form-control">
-                          <option selected disabled value=""></option>
-                          <option value="4">4</option>
-                          <option value="3">3</option>
-                          <option value="2">2</option>
-                          <option value="1">1</option>
+                    <div class="form-group">
+                        <label>Audit Trail</label>
+                        <textarea required name="audit_trail" class="form-control" rows="5" placeholder="Enter ..."></textarea>
+                      </div>
+
+                      <div class="form-group">
+                        <label>Comply</label>
+                        <select required name="comply" class="form-control">
+                        <option value="" selected disabled >Select option here!</option>
+
+                          <option value="YES"  >YES</option>
+                          <option value="NO"  >NO</option>
+
                         </select>
-                      </th>
-                      <th>
-                        <!-- <input type="text" class="form-control" placeholder="Enter comments"> -->
-                        <textarea name="<?php echo($i); ?>_comments" class="form-control" placeholder="Enter comments here..."></textarea>
-                      </th>
-                      </tr>
-
-                    <?php $i++; endforeach; ?>
-                  </tbody>
-                </table>
-                      <button class="btn btn-info btn-next" >Next</button>
-                    </div>
-                    <div id="information-part" class="content" role="tabpanel" aria-labelledby="information-part-trigger">
-                    <div class="alert alert-success alert-dismissible">
-                      <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
-                      Based on the findings and nonconformities you have recorded in the previous sections, summarize the necessary   
-                actions needed For type, choose one of the following: <br>
-                                <ul>
-                                <li>C = Corrective action needed (existing noncompliance)</li>
-                                <li>OFI = Opportunity for Improvement</li>
-</ul>
-                    </div>
-
-                    <div class="form-group">
-                        <label>OFI (Improvement)</label>
-                        <textarea name="ofi_improvement" class="form-control" rows="3" placeholder="Enter ..."></textarea>
                       </div>
+
 
                       <div class="form-group">
-                        <label>OFI (Possible Non-conformance in the Future):</label>
-                        <textarea name="ofi_2" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <label>AUDIT FINDINGS/NOTES/REMARKS (evidence)</label>
+                        <textarea name="remarks" class="form-control" rows="5" placeholder="Enter ..."></textarea>
                       </div>
-
-                      <div class="alert alert-info alert-dismissible">
-                      Describe finding as you want it to appear in the CAR Form System<br>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Requirements</label>
-                        <textarea name="ofi_requirements" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                      <div class="form-group">
-                        <label>Findings</label>
-                        <textarea name="ofi_findings" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                      <div class="form-group">
-                        <label>Evidence/s</label>
-                        <textarea name="ofi_evidences" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                  
-
-
-
-             
-                      <button class="btn btn-info btn-previous">Previous</button>
-                      <button class="btn btn-info btn-next">Next</button>
-                    </div>
-
-
-
-
-                    <div id="suggestion-part" class="content" role="tabpanel" aria-labelledby="suggestion-part-trigger">
-                    <div class="form-group">
-                        <label>Comments / Suggestions</label>
-                        <textarea name="comments" class="form-control" rows="5" placeholder="Enter ..."></textarea>
-                      </div>
-
-
                    
-                      <button class="btn btn-info btn-previous" >Previous</button>
-                      <button type="submit" class="btn btn-primary">Submit</button>
-
-
-             
-                      
+                <!-- <button class="btn btn-info btn-previous" >Previous</button> -->
+                <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
-
-
                   </div>
-              </div>
 
 
 

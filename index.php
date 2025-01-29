@@ -56,6 +56,12 @@
 				else if ($request == 'audit_report')
 					require 'public/audit_report_system/audit_report.php';
 
+				else if ($request == 'audit_checklist')
+					require 'public/audit_checklist_system/audit_checklist.php';
+
+				else if ($request == 'evidence')
+					require 'public/evidence_system/evidence.php';
+
 			
 
 

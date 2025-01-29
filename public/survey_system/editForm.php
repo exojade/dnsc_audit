@@ -69,7 +69,6 @@
                             <label>Office <span class="color-red">*</span></label>
                               <input value="" name="office" required type="text" class="form-control"  placeholder="Enter Office Here ..">
                           </div>
-
                           <?php $office = query("select * from office"); ?>
                           <div class="form-group">
                             <label>Parent Office </label>
@@ -80,7 +79,6 @@
                               <?php endforeach; ?>
                             </select>
                           </div>
-                          
                    <hr>
                   <button type="submit" class="btn btn-primary">Submit</button>
               </form>
@@ -107,7 +105,7 @@
 
 
         <div class="row">
-          <div class="col-6">
+          <div class="col-12">
             <!-- Default box -->
             <div class="card">
 
@@ -150,7 +148,7 @@
           </div>
 
 
-          <div class="col-6">
+          <div class="col-12">
             <!-- Default box -->
             <div class="card">
               <div class="card-header">
