@@ -79,6 +79,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
+  <li class="nav-item">
+      <a href="audit_evaluation?action=process_owners" class="nav-link">
+        <i class="nav-icon fas fa-table"></i>
+        <p>
+          Audit Evaluation
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
     <?php
     break;
   case 3:

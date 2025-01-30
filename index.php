@@ -62,6 +62,10 @@
 				else if ($request == 'evidence')
 					require 'public/evidence_system/evidence.php';
 
+
+				else if ($request == 'audit_evaluation')
+					require 'public/audit_evaluation_system/audit_evaluation.php';
+
 			
 
 
