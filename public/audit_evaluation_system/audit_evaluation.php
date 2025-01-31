@@ -1,42 +1,81 @@
 <?php
     if($_SERVER["REQUEST_METHOD"] === "POST") {
 
-		if($_POST["action"] == "audit_evaluation_list_process_owners"):
+		if($_POST["action"] == "audit_evaluation_list_process_owners_pending"):
 				// dump($_REQUEST);
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
 				$limit = $_POST["length"];
 				$search = $_POST["search"]["value"];
-
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
+
+				$AuditPlan = [];
+				$audit_plan = query("select * from audit_plans");
+				foreach($audit_plan as $row):
+					$AuditPlan[$row["audit_plan"]] = $row;
+				endforeach;
+
+				$Area = [];
+				$area = query("select * from areas");
+				foreach($area as $row):
+					$Area[$row["id"]] = $row;
+				endforeach;
+
+				$Process = [];
+				$process = query("select * from process");
+				foreach($process as $row):
+					$Process[$row["process_id"]] = $row;
+				endforeach;
+
+				$team = query("SELECT 
+						t.team_id,
+						t.team_number AS team,
+						GROUP_CONCAT(
+							CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+							ORDER BY tm.role = 'LEADER' DESC, u.surname
+							SEPARATOR ', '
+						) AS members
+						FROM 
+							audit_plan_teams t
+						JOIN 
+							audit_plan_team_members tm ON t.team_id = tm.team_id
+						JOIN 
+							users u ON tm.id = u.id
+						GROUP BY 
+							t.team_id
+						ORDER BY 
+							t.team_number
+						");
+				$Team = [];
+				foreach($team as $row):
+					$Team[$row["team_id"]] = $row;
+				endforeach;
 
 
 				$myArea = query("select * from users_area where user_id = ?", $_POST["process_owner"]);
 				$areaIds = "'".implode("','", array_column($myArea, 'area_id')) . "'";
-				dump($areaIds);
-
-
-				
-
-				$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
-				if($search != ""):
-				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
-				$baseQuery = "select ap.* from audit_plans ap
-								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
-				else:
-					$baseQuery = "select ap.* from audit_plans ap
-								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
-				endif;
-
-				$data = query($baseQuery . $limitString . " " . $offsetString);
-				$all_data = query($baseQuery);
-
-
-
+				$where = " where aps_area in (".$areaIds.")
+				and audit_report_status = 'DONE' and audit_evaluation_id is null";
+				$order_string = " order by timestamp desc";
+				// dump($areaIds);
+				// dump($audit_reports);
+				$baseQuery = "select * from audit_report ar
+								left join audit_plan_schedule aps
+								on aps.aps_id = ar.aps_id" . $where;
+				$data = query($baseQuery . $order_string .  $limitString . " " . $offsetString);
+				$all_data = query($baseQuery  . $order_string);
+				// dump($all_data);
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '<a href="audit_checklist?action=myChecklist&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+					$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["type"];
+					$data[$i]["team"] = $Team[$row["team_id"]]["members"];
+					$data[$i]["date"] =  date('F d, Y', strtotime($row["schedule_date"]));
+					$data[$i]["time"] = $Team[$row["team_id"]]["members"];
+					$data[$i]["process_name"] = $Process[$row["process_id"]]["process_name"];
+					$data[$i]["area"] = $Area[$row["aps_area"]]["area_name"];
+
+					$data[$i]["action"] = '<a href="audit_evaluation?action=create&id='.$row["audit_report_id"].'" class="btn btn-block btn-sm btn-warning">Create</a>';
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -544,8 +583,8 @@ font-size: 12px;
 			render("public/audit_checklist_system/audit_checklist_list.php",[
 			]);
 		else:
-			if($_GET["action"] == "process_owners"):
-				render("public/audit_evaluation_system/audit_evaluation_list_process_owners.php",[
+			if($_GET["action"] == "process_owners_pending"):
+				render("public/audit_evaluation_system/audit_evaluation_list_process_owners_pending.php",[
 				]);
 			elseif($_GET["action"] == "myChecklist"):
 				render("public/audit_checklist_system/audit_plan_checklist.php",[

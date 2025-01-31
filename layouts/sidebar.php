@@ -79,7 +79,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
-
+<!-- 
   <li class="nav-item">
       <a href="audit_evaluation?action=process_owners" class="nav-link">
         <i class="nav-icon fas fa-table"></i>
@@ -88,7 +88,34 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
           <span class="right badge badge-danger"></span>
         </p>
       </a>
-  </li>
+  </li> -->
+
+
+  
+
+  <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fas fa-table"></i>
+          <p>
+            Audit Evaluation
+            <i class="right fas fa-angle-left"></i>
+          </p>
+        </a>
+        <ul class="nav nav-treeview">
+          <li class="nav-item">
+            <a href="audit_evaluation?action=process_owners_pending" class="nav-link">
+              <i class="far fa-circle nav-icon"></i>
+              <p>Pending</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="users?action=pending_users" class="nav-link">
+              <i class="far fa-circle nav-icon"></i>
+              <p>Done</p>
+            </a>
+          </li>
+        </ul>
+      </li>
     <?php
     break;
   case 3:
@@ -124,6 +151,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
     <?php
     break;
   case 4:
