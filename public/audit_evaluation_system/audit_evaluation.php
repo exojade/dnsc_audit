@@ -590,7 +590,7 @@ font-size: 12px;
 				render("public/audit_checklist_system/audit_plan_checklist.php",[
 				]);
 			elseif($_GET["action"] == "create"):
-				render("public/audit_checklist_system/createChecklist.php",[
+				render("public/audit_evaluation_system/createAuditEvaluation.php",[
 				]);
 			elseif($_GET["action"] == "details"):
 				render("public/audit_checklist_system/audit_checklist_details.php",[
