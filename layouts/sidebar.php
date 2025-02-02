@@ -109,7 +109,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
             </a>
           </li>
           <li class="nav-item">
-            <a href="users?action=pending_users" class="nav-link">
+            <a href="audit_evaluation?action=process_owners_done" class="nav-link">
               <i class="far fa-circle nav-icon"></i>
               <p>Done</p>
             </a>
@@ -177,7 +177,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
   </li>
 
   <li class="nav-item">
-      <a href="auditPlan" class="nav-link">
+      <a href="consolidated_ar" class="nav-link">
         <i class="nav-icon fas fa-list-alt"></i>
         <p>
           Consolidated AR

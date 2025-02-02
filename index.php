@@ -59,6 +59,9 @@
 				else if ($request == 'audit_checklist')
 					require 'public/audit_checklist_system/audit_checklist.php';
 
+				else if ($request == 'consolidated_ar')
+					require 'public/consolidated_ar_system/consolidated_ar.php';
+
 				else if ($request == 'evidence')
 					require 'public/evidence_system/evidence.php';
 

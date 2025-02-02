@@ -17,11 +17,10 @@
       </div><!-- /.container-fluid -->
     </section>
 
-    <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-8">
+          <div class="col-12">
             <!-- Default box -->
             <div class="card">
               <div class="card-header">
@@ -45,29 +44,7 @@
             </div>
           </div>
 
-          <div class="col-4">
-
-          <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Process</h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <table id="processDatatable" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Action</th>
-                    <th>Process Name</th>
-                    <th>Description</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
+         
         </div>
       </div>
     </section>

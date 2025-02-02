@@ -308,11 +308,11 @@
 			if (query("insert INTO audit_plans 
 						(
                             type, introduction, audit_objectives, reference_standard,
-                            audit_methodologies, year, status
+                            audit_methodologies, year, status, created_by, timestamp
                             ) 
-                    VALUES(?,?,?,?,?,?,?)", 
+                    VALUES(?,?,?,?,?,?,?,?,?)", 
                     $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
-					$_POST["audit_methodologies"], $_POST["year"], "ONGOING") === false)
+					$_POST["audit_methodologies"], $_POST["year"], "ONGOING", $_SESSION["dnsc_audit"]["userid"], time()) === false)
                     {
                         $res_arr = [
                             "result" => "failed",

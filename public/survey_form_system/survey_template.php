@@ -158,8 +158,8 @@
                         <?php foreach ($criteria as $row): ?>
                           <tr>
                             <td>
-                              <?php echo($row["question"]); ?>
-                              <label></label>
+                            <label id="awit"><?php echo($row["question"]); ?>
+                              </label>
                             </td>
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                               <td>
@@ -448,9 +448,13 @@ $(function () {
 
       // For radio buttons, append the error to the parent container
       if (element.is(':radio')) {
+        let awitElement = element.closest('tr').find('#awit');
+        awitElement.append("<br>");
+        awitElement.append(error);
+        // console.log(awitElement);
     // Append the error to the closest parent of the group (e.g., the <td>)
-    element.closest('tr').append(error);
-  } else {
+      // element.closest('tr').prepend(error);
+  }  else {
     // Default behavior for other input types
     element.closest('.form-group').append(error);
   }

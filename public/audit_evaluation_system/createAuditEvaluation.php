@@ -87,140 +87,69 @@
               <!-- form start -->
               
                 <div class="card-body">
-                <form class="generic_form_trigger" data-url="audit_report" id="internalReportForm">
-                <input type="hidden" name="action" value="createAuditReport">
-                <input type="hidden" name="aps_area_id" value="<?php echo($_GET["aps_area_id"]); ?>">
-
-<!-- <style>
-.myTable th{
- padding: 5px;
-}
-</style> -->
-
-<?php
-                    
-                    $questions =[
-                      "Are the procedure steps accurate and complete as compared to true practice?",
-                      "Are there sufficient check steps (inspections, tests, reviews, approvals, sign-offs, etc.) that ensure the process outputs meet requirements before passing onto the next process?",
-                      "Does the process appear to adequately meet the requirements of ISO 9001 and its documentation?",
-                      "Does the process appear to adequately meet all customer or regulatory requirements?",
-                      "Are the quality objectives or targets identified in the process met?"
-                    ];
-                    // dump($questions);
-                    
-                    ?>
-
-<div class="bs-stepper">
+                <form class="generic_form_trigger" id="internalReportForm" data-url="audit_evaluation">
+                  <input type="hidden" name="action" value="newEvaluation">
+                  <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+                  <input type="hidden" name="evaluated_by" value="<?php echo($_SESSION["dnsc_audit"]["userid"]); ?>">
+                <div class="bs-stepper">
                   <div class="bs-stepper-header" role="tablist">
                     <!-- your steps here -->
-                    <div class="step" data-target="#logins-part">
-                      <button type="button" class="step-trigger" role="tab" aria-controls="logins-part" id="logins-part-trigger">
-                        <span class="bs-stepper-circle">A</span>
-                        <span class="bs-stepper-label">Verify the Effectiveness of Process</span>
-                      </button>
-                    </div>
-                    <div class="line"></div>
                     <div class="step" data-target="#information-part">
                       <button type="button" class="step-trigger" role="tab" aria-controls="information-part" id="information-part-trigger">
-                        <span class="bs-stepper-circle">B</span>
-                        <span class="bs-stepper-label">Summarize Findings for CAR System</span>
+                        <span class="bs-stepper-circle">1</span>
+                        <span class="bs-stepper-label">Criteria</span>
                       </button>
                     </div>
                     <div class="line"></div>
                     <div class="step" data-target="#suggestion-part">
                       <button type="button" class="step-trigger" role="tab" aria-controls="suggestion-part" id="suggestion-part-trigger">
-                        <span class="bs-stepper-circle">C</span>
+                        <span class="bs-stepper-circle">3</span>
                         <span class="bs-stepper-label">Comments / Suggestions</span>
                       </button>
                     </div>
-                   
                   </div>
                   <div class="bs-stepper-content">
                     <!-- your steps content here -->
-                    <div id="logins-part" class="content" role="tabpanel" aria-labelledby="logins-part-trigger">
-                    <div class="alert alert-success alert-dismissible">
-                      <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
-                      Rate the auditor with 4 being the highest and 1 being the lowest.<br>
-                      Review the applicable procedure(s) for this process and answer the questions below.
-                    </div>
-                      <table class="table myTable table-bordered">
-                  <tbody>
-                    <th width="50%">Questions</th>
-                    <th width="15%">Rate</th>
-                    <th width="35%">Comments</th>
-
-                    <?php $i=1; foreach($questions as $row): ?>
-
-                      <tr>
-                        <th><?php echo($row); ?></th>
-                        <th>
-                          
-                        <select name="<?php echo($i); ?>_question" required class="form-control">
-                          <option selected disabled value=""></option>
-                          <option value="4">4</option>
-                          <option value="3">3</option>
-                          <option value="2">2</option>
-                          <option value="1">1</option>
-                        </select>
-                      </th>
-                      <th>
-                        <!-- <input type="text" class="form-control" placeholder="Enter comments"> -->
-                        <textarea name="<?php echo($i); ?>_comments" class="form-control" placeholder="Enter comments here..."></textarea>
-                      </th>
-                      </tr>
-
-                    <?php $i++; endforeach; ?>
-                  </tbody>
-                </table>
-                      <button class="btn btn-info btn-next" >Next</button>
-                    </div>
+    
                     <div id="information-part" class="content" role="tabpanel" aria-labelledby="information-part-trigger">
-                    <div class="alert alert-success alert-dismissible">
-                      <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
-                      Based on the findings and nonconformities you have recorded in the previous sections, summarize the necessary   
-                actions needed For type, choose one of the following: <br>
-                                <ul>
-                                <li>C = Corrective action needed (existing noncompliance)</li>
-                                <li>OFI = Opportunity for Improvement</li>
-</ul>
-                    </div>
 
-                    <div class="form-group">
-                        <label>OFI (Improvement)</label>
-                        <textarea name="ofi_improvement" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
 
-                      <div class="form-group">
-                        <label>OFI (Possible Non-conformance in the Future):</label>
-                        <textarea name="ofi_2" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
+                    <?php $questions = query("select * from evaluation_questions order by question_id asc"); ?>
+                   
+                    <table class="table table-bordered">
+                      <thead>
+                        <th>Criteria</th>
+                        <th class="text-center">1</th>
+                        <th class="text-center">2</th>
+                        <th class="text-center">3</th>
+                        <th class="text-center">4</th>
 
-                      <div class="alert alert-info alert-dismissible">
-                      Describe finding as you want it to appear in the CAR Form System<br>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Requirements</label>
-                        <textarea name="ofi_requirements" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                      <div class="form-group">
-                        <label>Findings</label>
-                        <textarea name="ofi_findings" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                      <div class="form-group">
-                        <label>Evidence/s</label>
-                        <textarea name="ofi_evidences" class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                      </div>
-
-                  
+                      </thead>
+                      <tbody>
+                        <?php foreach ($questions as $row): ?>
+                          <tr>
+                            <td width="60%">
+                              <span id="awit"><b><?php echo($row["question_title"]); ?></b><br><small><?php echo($row["question_desc"]); ?></small></span>
+                            </td>
+                            <?php for ($i = 1; $i <= 4; $i++): ?>
+                              <td>
+                                <input 
+                                  type="radio" 
+                                  required
+                                  class="form-control" 
+                                  name="<?php echo($row["question_id"]); ?>" 
+                                  value="<?php echo $i; ?>">
+                            <?php endfor; ?>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
 
 
 
              
-                      <button class="btn btn-info btn-previous">Previous</button>
-                      <button class="btn btn-info btn-next">Next</button>
+                      <button class="btn btn-primary btn-next">Next</button>
                     </div>
 
 
@@ -234,26 +163,18 @@
 
 
                    
-                      <button class="btn btn-info btn-previous" >Previous</button>
-                      <button type="submit" class="btn btn-primary">Submit</button>
+
 
 
              
-                      
+                      <button class="btn btn-primary btn-previous" >Previous</button>
+                      <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
 
 
                   </div>
               </div>
-
-
-
-
-                
-              
-                <hr>
-                <!-- <button class="btn btn-primary">Save Audit Report</button> -->
-                </form>
+              </form>
                 </div>
 
             </div>
@@ -331,8 +252,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // For radio buttons, append the error to the parent container
       if (element.is(':radio')) {
+        let awitElement = element.closest('tr').find('#awit');
+        awitElement.append("<br>");
+        awitElement.append(error);
+        // console.log(awitElement);
     // Append the error to the closest parent of the group (e.g., the <td>)
-    element.closest('tr').append(error);
+      // element.closest('tr').prepend(error);
   } else {
     // Default behavior for other input types
     element.closest('.form-group').append(error);

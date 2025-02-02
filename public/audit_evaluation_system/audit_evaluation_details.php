@@ -11,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Checklist</h1>
+            <h1>Audit Evaluation</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -28,12 +28,18 @@
       <div class="container-fluid">
 
       <?php
-      $checklist = query("select * from audit_checklist where audit_checklist_id = ?", $_GET["id"]);
-      $checklist = $checklist[0];    
-      // dump($checklist);  
+
+      $auditEvaluation = query("select * from audit_evaluation where audit_evaluation_id = ?", $_GET["id"]);
+      $auditEvaluation = $auditEvaluation[0];
+
+      $audit_report = query("select ar.*, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as auditor from audit_report ar 
+                              left join users u on u.id = ar.user_id
+                              where audit_report_id = ?", $auditEvaluation["audit_report_id"]);
+      $audit_report = $audit_report[0];
+
       $aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where area_id = ? and aps_id = ?", $checklist["aps_area"], $checklist["aps_id"]);
+                          where area_id = ? and audit_plan = ?", $audit_report["aps_area"], $audit_report["audit_plan"]);
       $aps_area = $aps_area[0];
 
       $aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -68,55 +74,92 @@
                 <p class="text-muted mb-0"><?php echo($aps_schedule["audit_clause"]); ?></p>
                 <hr>
                 <strong>Auditor</strong>
-                <p class="text-muted mb-0"><?php echo($_SESSION["dnsc_audit"]["fullname"]); ?></p>
+                <p class="text-muted mb-0"><?php echo($audit_report["auditor"]); ?></p>
                 <hr>
                 
               </div>
             </div>
-            <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
-              <input type="hidden" name="action" value="print_audit_checklist">
-              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
-              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
-            </form>
+    <form class="generic_form_trigger_no_prompt mb-2" data-url="audit_evaluation">
+      <input type="hidden" name="action" value="printEvaluation">
+      <input type="hidden" name="audit_evaluation_id" value="<?php echo($_GET["id"]); ?>">
+      <button type="submit" class="btn btn-block btn-primary">Print Audit Evaluation</button>
+    </form>
+
+    <form class="generic_form_trigger_no_prompt mb-2" data-url="audit_report">
+      <input type="hidden" name="action" value="print_audit_report">
+      <input type="hidden" name="audit_report_id" value="<?php echo($audit_report["audit_report_id"]); ?>">
+      <button class="btn btn-block btn-primary">Print Audit Report</button>
+    </form>
+
+
     </div>
     <div class="col">
 
-
     <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Compliance</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["comply"]); ?>
-        </div>
-    </div>
+              <div class="card-header">
+                <h3 class="card-title"><strong><?php echo($aps_schedule["process_name"]); ?></strong></h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              
+                <div class="card-body">
+               
+                <table class="table table-bordered">
+                      <thead>
+                        <th>Criteria</th>
+                        <th class="text-center">1</th>
+                        <th class="text-center">2</th>
+                        <th class="text-center">3</th>
+                        <th class="text-center">4</th>
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Audit Trail</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["audit_trail"]); ?>
-        </div>
-    </div>
+                      </thead>
+                      <tbody>
+                        <?php
+                        $questions = unserialize($auditEvaluation["evaluation_details"]);
+                        
+                        ?>
+                        <?php foreach ($questions as $row): ?>
+                          <tr>
+                            <td width="60%">
+                              <span id="awit"><b><?php echo($row["question_title"]); ?></b><br><small><?php echo($row["question_desc"]); ?></small></span>
+                            </td>
+                            <?php for ($i = 1; $i <= 4; $i++): ?>
+                                <td class="text-center align-middle">
+                                    <!-- <input 
+                                        type="radio" 
+                                        required
+                                        readonly
+                                        class="form-control" 
+                                        name="<?php echo $row["question_id"]; ?>" 
+                                        value="<?php echo $i; ?>"
+                                        <?php  ?>
+                                    > -->
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Remarks</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["remarks"]); ?>
-        </div>
-    </div>
+                                    <?php echo ($i == $row["rate"]) ? '<i class="fa fa-check"></i>' : ''; ?>
+                                </td>
+                            <?php endfor; ?>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+
+            <div class="card card-success">
+              <div class="card-header">
+                <h3 class="card-title"><strong>Comments / Suggestions</strong></h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              
+                <div class="card-body">
+                  <?php echo($auditEvaluation["comments"]); ?>
+                </div>
+
+            </div>
 
     </div>
   </div>
@@ -191,8 +234,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // For radio buttons, append the error to the parent container
       if (element.is(':radio')) {
+        let awitElement = element.closest('tr').find('#awit');
+        awitElement.append("<br>");
+        awitElement.append(error);
+        // console.log(awitElement);
     // Append the error to the closest parent of the group (e.g., the <td>)
-    element.closest('tr').append(error);
+      // element.closest('tr').prepend(error);
   } else {
     // Default behavior for other input types
     element.closest('.form-group').append(error);

@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Check List</h1>
+            <h1>Audit Evaluation List</h1>
           </div>
           <div class="col-sm-6">
           </div>
@@ -19,9 +19,6 @@
     </section>
 
     <section class="content">
-
-
-
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
@@ -34,13 +31,17 @@
                   <thead>
                   <tr>
                     <th>Action</th>
-                    <th>Team</th>
+                    <th>AP</th>
                     <th>Process</th>
                     <th>Area</th>
+                    <th>Team</th>
                     <th>Created</th>
+                    <th>Evaluated</th>
                   </tr>
                   </thead>
                   <tbody>
+
+                
                  
                   </tbody>
                 </table>
@@ -115,38 +116,24 @@ var datatable =
                     'url':'audit_evaluation',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "audit_evaluation_list_process_owners",
+                        data.action = "audit_evaluation_list_process_owners_done",
                         data.process_owner = "<?php echo($_SESSION["dnsc_audit"]["userid"]); ?>"
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
-                    { 
-        data: 'team', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'process_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'area_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { data: 'timestamp', "orderable": false },
-                ],
+                    { data: 'audit_plan', "orderable": false },
+                    { data: 'process_name', "orderable": false },
+                    { data: 'area', "orderable": false },
+                    { data: 'team', "orderable": false },
+                    { data: 'date_created', "orderable": false },
+                    { data: 'evaluated_by', "orderable": false },
+                    ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
-                    
+                    $(document).on('click', '.dropdown-toggle', function() {
+    $(this).dropdown('toggle');
+});
 
                     // Remove the formatting to get integer data for summation
                     // var intVal = function (i) {

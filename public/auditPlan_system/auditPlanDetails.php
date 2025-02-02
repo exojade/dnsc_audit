@@ -215,7 +215,6 @@
         </div>
       </div>
     </div>
-
       <div class="container-fluid">
         <div class="row">
           <div class="col-3">
@@ -243,10 +242,11 @@
                   <li class="nav-item"><a class="nav-link active" href="#audit_plan" data-toggle="tab">Audit Plan Info</a></li>
                   <li class="nav-item"><a class="nav-link" href="#teams" data-toggle="tab">Teams</a></li>
                   <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#audit_reports" data-toggle="tab">Audit Reports</a></li>
+                  <!-- <li class="nav-item"><a class="nav-link" href="#audit_reports" data-toggle="tab">Audit Reports</a></li> -->
                 </ul>
               </div><!-- /.card-header -->
-              <div class="card-body" style="max-height:65vh !important; overflow-y: auto;">
+              <!-- <div class="card-body" style="max-height:65vh !important; overflow-y: auto;"> -->
+              <div class="card-body">
                 <div class="tab-content">
                   <div class="active tab-pane" id="audit_plan">
 

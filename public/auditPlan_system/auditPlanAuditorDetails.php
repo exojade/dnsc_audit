@@ -4,15 +4,66 @@
   <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
 
+<style>
+.info-box{
+  min-height:20px;
+}
+
+.info-box .info-box-icon{
+  font-size: 1rem;
+}
+</style>
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
+          <div class="col-sm-5">
             <h1>Audit Reports</h1>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-7">
+          <div class="row">
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box mb-0">
+              
+
+              <div class="info-box-content">
+                <span class="info-box-text"><b>To Create</b></span>
+              </div>
+              <span class="info-box-icon bg-danger float-right">1</span>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box mb-0">
+              
+
+              <div class="info-box-content">
+                <span class="info-box-text"><b>Pending</b></span>
+              </div>
+              <span class="info-box-icon bg-warning float-right">1</span>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box mb-0">
+              
+
+              <div class="info-box-content">
+                <span class="info-box-text"><b>Done</b></span>
+              </div>
+              <span class="info-box-icon bg-success float-right">1</span>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+        
+        </div>
           </div>
         </div>
       </div>
