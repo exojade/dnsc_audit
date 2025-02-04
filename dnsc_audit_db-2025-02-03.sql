@@ -12,7 +12,7 @@ MySQL - 8.0.39 : Database - dnsc_audit_db
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`dnsc_audit_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`dnsc_audit_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 /*Table structure for table `aps_area` */
 
@@ -24,7 +24,7 @@ CREATE TABLE `aps_area` (
   `audit_plan` varchar(100) DEFAULT NULL,
   `aps_id` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`tblid`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `aps_area` */
 
@@ -48,7 +48,7 @@ CREATE TABLE `aps_position` (
   `aps_id` varchar(100) DEFAULT NULL,
   `audit_plan` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`tblid`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `aps_position` */
 
@@ -67,7 +67,7 @@ CREATE TABLE `area_position` (
   `area_id` varchar(100) DEFAULT NULL,
   `position_id` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`tblid`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `area_position` */
 
@@ -92,7 +92,7 @@ CREATE TABLE `area_process` (
   `process_id` varchar(100) DEFAULT NULL,
   `active_status` enum('ACTIVE','INACTIVE') DEFAULT NULL,
   PRIMARY KEY (`tblid`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `area_process` */
 
@@ -223,8 +223,8 @@ CREATE TABLE `audit_checklist` (
   `timestamp` int DEFAULT NULL,
   `user_id` varchar(100) DEFAULT NULL,
   `reviewed_by` varchar(100) DEFAULT NULL,
-  `audit_checklist_status` enum('PENDING','DONE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'PENDING'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `audit_checklist_status` enum('PENDING','DONE') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'PENDING'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `audit_checklist` */
 
@@ -246,7 +246,7 @@ CREATE TABLE `audit_evaluation` (
   `noted_by` varchar(100) DEFAULT NULL,
   `audit_plan` varchar(100) DEFAULT NULL,
   `comments` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `audit_evaluation` */
 
@@ -374,7 +374,7 @@ CREATE TABLE `consolidated_audit_report` (
   `audit_plan` varchar(100) DEFAULT NULL,
   `title` varchar(100) DEFAULT NULL,
   `comments` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `consolidated_audit_report` */
 
@@ -390,7 +390,7 @@ CREATE TABLE `evaluation_questions` (
   `question_desc` text,
   `question_id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `evaluation_questions` */
 
@@ -411,7 +411,7 @@ CREATE TABLE `office` (
   `active_status` varchar(100) DEFAULT NULL,
   `parent_id` varchar(100) DEFAULT NULL,
   KEY `office_id` (`office_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `office` */
 
@@ -467,7 +467,7 @@ CREATE TABLE `process` (
   `process_id` int NOT NULL AUTO_INCREMENT,
   `process_name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`process_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `process` */
 
@@ -517,7 +517,7 @@ CREATE TABLE `survey` (
   `timestamp` varchar(100) DEFAULT NULL,
   `contact_number` varchar(100) DEFAULT NULL,
   KEY `survey_id` (`survey_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `survey` */
 
@@ -534,7 +534,7 @@ CREATE TABLE `survey_questionnaire` (
   `question` varchar(100) DEFAULT NULL,
   `active_status` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`questionnaire_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `survey_questionnaire` */
 

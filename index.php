@@ -35,51 +35,33 @@
 
 				else if ($request == 'users')
 					require 'public/users_system/users.php';
-
 				else if ($request == 'position')
 					require 'public/position_system/position.php';
 				else if ($request == 'area')
 					require 'public/area_system/area.php';
-
 				else if ($request == 'process')
 					require 'public/process_system/process.php';
-
 				else if ($request == 'auditPlan')
 					require 'public/auditPlan_system/auditPlan.php';
-
 				else if ($request == 'survey')
 					require 'public/survey_system/survey.php';
-
 				else if ($request == 'survey_form')
 					require 'public/survey_form_system/survey_form.php';
-
 				else if ($request == 'audit_report')
 					require 'public/audit_report_system/audit_report.php';
-
 				else if ($request == 'audit_checklist')
 					require 'public/audit_checklist_system/audit_checklist.php';
-
 				else if ($request == 'consolidated_ar')
 					require 'public/consolidated_ar_system/consolidated_ar.php';
-
 				else if ($request == 'evidence')
 					require 'public/evidence_system/evidence.php';
-
-
 				else if ($request == 'audit_evaluation')
 					require 'public/audit_evaluation_system/audit_evaluation.php';
-
-			
-
-
 				else if ($request == 'settings')
 					require 'public/settings_system/settings.php';
-
-				
-
 				else if ($request == 'logout'){
-				require 'logout.php';
-			}
+					require 'logout.php';
+				}
 			else
 				require 'public/404_system/404.php';
 			
