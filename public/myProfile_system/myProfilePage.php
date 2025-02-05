@@ -97,6 +97,26 @@
                     </div>
                   </div>
 
+
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label>Username <span class="color-red">*</span></label>
+                        <input required type="text" class="form-control" name="username" value="<?php echo($myProfile["username"]); ?>">
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label>Profile Image</label>
+                        <input type="file" class="form-control" name="profile_image" accept="image/*">
+                      </div>
+                    </div>
+                  </div>
+
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
               </form>
           </div>
