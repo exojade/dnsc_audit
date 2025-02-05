@@ -331,6 +331,18 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
+  <li class="nav-item">
+      <a href="controlled_forms" class="nav-link">
+        <i class="nav-icon fas fa-user"></i>
+        <p>
+          Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
     <?php
     break;
   case 6:

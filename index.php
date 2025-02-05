@@ -55,6 +55,9 @@
 					require 'public/consolidated_ar_system/consolidated_ar.php';
 				else if ($request == 'evidence')
 					require 'public/evidence_system/evidence.php';
+
+				else if ($request == 'controlled_forms')
+					require 'public/controlled_forms_system/controlled_forms.php';
 				else if ($request == 'audit_evaluation')
 					require 'public/audit_evaluation_system/audit_evaluation.php';
 				else if ($request == 'settings')
