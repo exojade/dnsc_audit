@@ -61,7 +61,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
   </li>
 
   <li class="nav-item">
-      <a href="evidence?action=myEvidence" class="nav-link">
+      <a href="mymanuals" class="nav-link">
         <i class="nav-icon fas fa-folder"></i>
         <p>
           Manuals
@@ -71,7 +71,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
   </li>
 
   <li class="nav-item">
-      <a href="evidence?action=myEvidence" class="nav-link">
+      <a href="controlled_forms" class="nav-link">
         <i class="nav-icon fas fa-folder"></i>
         <p>
           Controlled Forms
@@ -337,6 +337,17 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-user"></i>
         <p>
           Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
+  <li class="nav-item">
+      <a href="manuals" class="nav-link">
+        <i class="nav-icon fas fa-user"></i>
+        <p>
+          Manuals
           <span class="right badge badge-danger"></span>
         </p>
       </a>

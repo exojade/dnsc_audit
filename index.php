@@ -58,6 +58,14 @@
 
 				else if ($request == 'controlled_forms')
 					require 'public/controlled_forms_system/controlled_forms.php';
+
+				else if ($request == 'manuals')
+					require 'public/manuals_system/manuals.php';
+
+				else if ($request == 'mymanuals')
+					require 'public/mymanuals_system/mymanuals.php';
+
+
 				else if ($request == 'audit_evaluation')
 					require 'public/audit_evaluation_system/audit_evaluation.php';
 				else if ($request == 'settings')

@@ -4,11 +4,11 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <!-- <div class="col-sm-6">
-            <h1>controlled_formss</h1>
+            <h1>manualss</h1>
           </div> -->
           <div class="col-sm-12">
             <ol class="breadcrumb" id="breadcrumb" style="font-size: 180%; color: #000;">
-              <li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">controlled_forms</a></li>
+              <li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">manuals</a></li>
             </ol>
           </div>
         </div>
@@ -103,7 +103,7 @@
     // Function to load files and folders
     function loadFiles(folder = "") {
         $.ajax({
-            url: "controlled_forms",
+            url: "manuals",
             type: "post",
             data: { 
 
@@ -149,7 +149,7 @@
     function showMoveDialog() {
         // Fetch all folders inside the base directory
         $.ajax({
-            url: 'controlled_forms', 
+            url: 'manuals', 
             type: 'POST',
             data: {
                 action: 'get_folder_structure',
@@ -173,12 +173,13 @@
 
     // Function to update breadcrumb
     function updateBreadcrumb(folder) {
+        // alert(folder);
         let pathSegments = folder.split("/").filter(segment => segment !== "");
-        let breadcrumbHtml = `<li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">Controlled Forms</a></li>`;
+        let breadcrumbHtml = `<li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">Manuals</a></li>`;
 
         let path = "";
         pathSegments.forEach((segment, index) => {
-            path += segment + "/";
+            path += "/"+segment + "/";
             breadcrumbHtml += `<li class="breadcrumb-item"><a href="#" onclick="loadFiles('${path}')">${segment}</a></li>`;
         });
 
@@ -216,7 +217,7 @@
         }
 
         $.ajax({
-            url: "controlled_forms",
+            url: "manuals",
             type: "post",
             data: { 
                 action: "create_folder",
@@ -244,7 +245,7 @@
     // Function to download a file when double-clicked
     function downloadFile(filePath) {
         const encodedFilePath = encodeURIComponent(filePath);
-        window.location.href = "controlled_forms?action=download&file=" + encodedFilePath;
+        window.location.href = "manuals?action=download&file=" + encodedFilePath;
     }
 
     $(document).ready(function () {
@@ -297,7 +298,7 @@ $(document).on("submit", "#fileUploadForm", function(event) {
 
     // Make AJAX request to upload the file
     $.ajax({
-        url: 'controlled_forms',  // Adjust this to your PHP script's URL
+        url: 'manuals',  // Adjust this to your PHP script's URL
         type: 'POST',
         data: formData,
         contentType: false,
@@ -316,7 +317,7 @@ $(document).on("submit", "#fileUploadForm", function(event) {
 function moveToFolder(folder) {
     // Perform the move action here
     $.ajax({
-        url: 'controlled_forms', // Your server-side PHP file
+        url: 'manuals', // Your server-side PHP file
         type: 'POST',
         data: {
             action: 'move_file',  // Action type
@@ -380,7 +381,7 @@ function deleteFolder() {
   },
               imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif");?>', showConfirmButton: false });
               $.ajax({
-                  url: 'controlled_forms', // Your server-side PHP file
+                  url: 'manuals', // Your server-side PHP file
                   type: 'POST',
                   data: {
                       action: 'deleteFolder',  // Action type

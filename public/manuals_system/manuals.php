@@ -3,7 +3,7 @@
 
         if($_POST["action"] == "create_folder"):
            
-            $folderPath = $base_path = "file_manager/controlled_forms/".$_POST['folder']; // Get the full folder path
+            $folderPath = $base_path = "file_manager/manuals/".$_POST['folder']; // Get the full folder path
     //  dump($folderPath);
             if (!file_exists($folderPath)) {
                 // Create folder if it doesn't exist
@@ -19,16 +19,60 @@
 
 		elseif($_POST["action"] == "access_folder"):
             // phpinfo();
-            $base_path = "file_manager/controlled_forms/";
-       
+            $Area = [];
+            $area=query("select * from areas where type in ('office', 'institute', 'program')");
+            foreach($area as $row):
+                $Area[] = $row["id"];
+            endforeach;
+            // dump($Area);
+
+
+            // dump($_SESSION);
+            $base_path = "file_manager/manuals";
+
+// Ensure base path exists
+if (!is_dir($base_path)) {
+    mkdir($base_path, 0777, true);
+}
+
+// List of required directories
+$requiredFolders = $Area;
+
+// Get existing directories
+$existingFolders = array_filter(glob($base_path . '/*'), 'is_dir');
+
+// Convert to folder names only
+$existingFolderNames = array_map('basename', $existingFolders);
+
+// Loop through required folders and create missing ones
+foreach ($requiredFolders as $folder) {
+    $folderPath = $base_path . "/" . $folder;
+    
+    if (!in_array($folder, $existingFolderNames)) {
+        mkdir($folderPath, 0777, true);
+        // echo "Created: $folderPath <br>";
+    } else {
+        // echo "Exists: $folderPath <br>";
+    }
+}
+
+
+    
+                $myArea = query("select * from areas where type in ('office', 'institute', 'program')");
+                $MyArea = [];
+                foreach($myArea as $row):
+                    $MyArea[$row["id"]] = $row;
+                endforeach;
+                
            
-            // dump($base_path);
+           
+            // dump($myArea);
 
 
   // Root directory
 $current_path = isset($_POST['folder']) ? $_POST['folder'] : "";
 $full_path = $base_path . $current_path;
-
+// dump($full_path);
 if (!is_dir($full_path)) {
     echo "<tr><td colspan='3' class='text-danger'>Invalid directory</td></tr>";
     exit;
@@ -57,20 +101,6 @@ sort($files);
 $sorted_items = array_merge($folders, $files);
 if($current_path == ""):
 
-    echo('
-    <div class="row">
-        <div class="col-3">
-            <div class="row">
-                <div class="col">
-                    <a href="#" onclick="showCreateFolderModal()" class="btn btn-block btn-sm btn-info mb-2">New Folder</a>
-                </div>
-                <div class="col">
-                    <a href="#" onclick="showFileUploadModal()" class="btn btn-block btn-sm btn-info mb-2">File Upload</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    ');
 
     echo('<div class="row">');
 
@@ -80,35 +110,29 @@ if($current_path == ""):
 
         // $item = "awit";
 
-
+        if(isset($MyArea[$item])):
             $item_path = $full_path . DIRECTORY_SEPARATOR . $item;
             $is_dir = is_dir($item_path);
 
-            if (is_dir($item_path)) {
-                // For folders, add a class and data-path attribute
-                echo '<div title="'.$item.'" class="col-3 folder-item" data-fullpath="'.$item_path.'" data-path="' . $item . '/">';
-                echo '<div class="info-box">';
-                echo '<span class="info-box-icon bg-success"><i class="far fa-folder"></i></span>';
-                echo '<div class="info-box-content">';
-                echo '<span class="info-box-text"><b>' . $item . '</b></span>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            } else {
-                // dump($full_path);
-                // For files, add a class and data-path attribute
-                echo '<div title="'.$item.'" class="col-3 file-item" data-fullpath="'.$item_path.'" data-path="' .$item_path . '">';
-                echo '<div class="info-box">';
-                echo '<span class="info-box-icon bg-info"><i class="far fa-file"></i></span>';
-                echo '<div class="info-box-content">';
-                echo '<span class="info-box-text"><b>' . $item . '</b></span>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
+            
+            echo('
+            <div class="col-3">');
+            echo("<a href='#' onclick='openFolder(\"$current_path/$item/\")'>");
+            echo('
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="far fa-folder"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text"><b>'.$MyArea[$item]["area_name"].'</b></span>
+              </div>
+            </div>
+            </a>
+            </div>
+            
+            ');
 
         
            
+        endif;
     
         
     }
@@ -186,7 +210,7 @@ endif;
 
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';
-    $target_dir = "file_manager/controlled_forms/" . $current_path; // Define the target directory
+    $target_dir = "file_manager/manuals/" . $current_path; // Define the target directory
 
     // Check if the directory exists
     if (!is_dir($target_dir)) {
@@ -256,69 +280,96 @@ elseif($_POST["action"] == "upload"):
             closedir($directory);
             return $folders;
         }
-        $rootDir = 'file_manager/controlled_forms';
+        $rootDir = 'file_manager/manuals';
         $rootFolders = getRootDirectories($rootDir);
         // dump($rootFolders);
-        // dump($rootFolders);
 
-        // $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
-        //                     where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
-        //     $MyArea = [];
-        //     foreach($myArea as $row):
-        //         $MyArea["file_manager/controlled_forms//".$row["area_id"]] = $row;
-        //     endforeach;
+        $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
+                            where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+            $MyArea = [];
+            foreach($myArea as $row):
+                $MyArea["file_manager/manuals//".$row["area_id"]] = $row;
+            endforeach;
             // dump($MyArea);
-            function getFolderStructure($dir, $isRoot = true) {
-                $folders = [];
+        function getFolderStructure($dir, $myAllowedRoot) {
+
             
-                // Include the root directory itself
-                if ($isRoot) {
-                    $folders[$dir] = [
-                        "path" => $dir,
-                        "name" => basename($dir)
-                    ];
-                }
+
+            $rootDir = 'file_manager/manuals';
+        $rootFolders = getRootDirectories($rootDir);
+            $folders = [];
+            $directory = opendir($dir);
             
-                $directory = opendir($dir);
-                
-                while (($file = readdir($directory)) !== false) {
-                    if ($file !== '.' && $file !== '..') {
-                        $path = $dir . "/" .  $file;
-            
-                        if (is_dir($path)) {
-                            $folders[$path] = [
-                                "path" => $path,
-                                "name" => $file
-                            ];
-                            // Recurse into subdirectories
-                            $subfolders = getFolderStructure($path, false);
-                            $folders = array_merge($folders, $subfolders);
-                        }
+            while (($file = readdir($directory)) !== false) {
+                if ($file !== '.' && $file !== '..') {
+                    $path = $dir . "/" .  $file;
+                    
+
+                    // dump($folders);
+                    // echo(is_dir("file_manager/manuals//2/Internal Audit 2024 1st Semester"));
+                    if (is_dir($path)) {
+
+                        
+                    $folders[$path]["path"] = $path;
+                    $folders[$path]["name"] = $file;
+                    $subfolders = getFolderStructure($path, $myAllowedRoot); // Recurse into subdirectories
+                    $folders = array_merge($folders, $subfolders);
+                        // $bool = 0;
+                        foreach($rootFolders as $f):
+                            
+                            if(compareDirectories($f, $path)):
+                                // dump($myAllowedRoot);
+                                if(!isset($myAllowedRoot[$path])):
+                                    unset($folders[$path]);
+                                else:
+                                    $folders[$path]["path"] = $path;
+                                    $folders[$path]["name"] = $myAllowedRoot[$path]["area_name"] . " (Root Folder)";
+                                endif;
+                            endif;
+                            
+                            
+                        endforeach;
+                        
+
+                        // echo($path . "<br>");
+                        
+
                     }
+                    
                 }
-            
-                closedir($directory);
-                return $folders;
+               
             }
-            
-            $base_path = 'file_manager/controlled_forms/';
-            $folders = getFolderStructure($base_path);
+        
+            closedir($directory);
+            return $folders;
+        }
+        $base_path = 'file_manager/manuals/';
 
 
 
-            echo '<table class="table">';
-            echo '<thead><tr><th>Path</th><th>Action</th></tr></thead>';
-            echo '<tbody>';
-            
-            foreach ($folders as $folderPath) {
-                echo '<tr>';
-                echo '<td title="'.$folderPath["path"].'">' . $folderPath["name"] . '</td>';
-                echo '<td><button class="btn btn-primary" onclick="moveToFolder(\'' . $folderPath["path"] . '\')">Move Here</button></td>';
-                echo '</tr>';
-            }
-            
-            echo '</tbody>';
-            echo '</table>';
+// Get the folder structure for modal (including subfolders)
+    // $folder = isset($_POST['folder']) ? $_POST['folder'] : '';
+
+    // Get all folders inside the base folder (including subfolders)
+    $directory = $base_path;
+    $folders = getFolderStructure($directory, $MyArea);
+    // dump($folders);
+
+    // Output folder structure for modal
+    echo '<table class="table">';
+    echo '<thead><tr><th>Path</th><th>Action</th></tr></thead>';
+    echo '<tbody>';
+
+    foreach ($folders as $folderPath) {
+        // dump($folderPath);
+        echo '<tr>';
+        echo '<td title="'.$folderPath["path"].'">' . $folderPath["name"] . '</td>';
+        echo '<td><button class="btn btn-primary" onclick="moveToFolder(\'' . $folderPath["path"] . '\')">Move Here</button></td>';
+        echo '</tr>';
+    }
+
+    echo '</tbody>';
+    echo '</table>';
 
 // Recursive function to get all folders
 
@@ -326,7 +377,7 @@ elseif($_POST["action"] == "upload"):
 
 elseif($_POST["action"] == "move_file"):
 
-    $base_path = 'file_manager/controlled_forms/';
+    $base_path = 'file_manager/manuals/';
     // dump($_POST);
 // Handle the move file request
     $source = isset($_POST['source']) ? $_POST['source'] : ''; // The selected file
@@ -420,13 +471,12 @@ elseif($_POST["action"] == "move_file"):
 	else {
 
 			if(!isset($_GET["action"])):
-				// $users = query("select * from users");
-				render("public/controlled_forms_system/controlled_forms_page.php",[
+                render("public/manuals_system/manuals_page.php",[
                 ]);
 			else:
-				if($_GET["action"] == "myEvidence"):
+				if($_GET["action"] == "myManuals"):
 			
-					render("public/controlled_forms_system/controlled_forms_page.php",[
+					render("public/manuals_system/manuals_process_owners_page.php",[
 					]);
 
                     elseif($_GET["action"] == "download"):
