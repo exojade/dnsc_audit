@@ -85,7 +85,7 @@
       <!-- Notifications Dropdown Menu -->
 
       <li class="nav-item">
-        <a class="nav-link" href="updateUser">
+        <a class="nav-link" href="myProfile">
           <i class="fas fa-user" style="color:white;"></i>
         </a>
         

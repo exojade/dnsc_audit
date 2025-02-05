@@ -65,6 +65,9 @@
 				else if ($request == 'mymanuals')
 					require 'public/mymanuals_system/mymanuals.php';
 
+				else if ($request == 'myProfile')
+					require 'public/myProfile_system/myProfile.php';
+
 
 				else if ($request == 'audit_evaluation')
 					require 'public/audit_evaluation_system/audit_evaluation.php';
