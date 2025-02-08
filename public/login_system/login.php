@@ -8,6 +8,7 @@ require("includes/google_class.php");
 						 WHERE username = ?", $_POST["username"]);
         if (count($rows) == 1)
         {
+
             $row = $rows[0];
 			if (password_verify($_POST["password"], $row["password"])){
 				// dump($row);
@@ -26,7 +27,7 @@ require("includes/google_class.php");
 					"role" => $row["role_id"],
 					"role_name" => $row["role_name"],
 					"fullname" => $row["firstname"] . " " . $row["middlename"] . " " . $row["surname"],
-					"profile_image" =>  $row["img"],
+					"img" =>  $row["img"],
 					"application" => "dnsc_audit"
 				];
 

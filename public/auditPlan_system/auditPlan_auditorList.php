@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Plans</h1>
+            <h1>Audit Plan (Audit Reports)</h1>
           </div>
           <div class="col-sm-6">
           </div>
@@ -27,33 +27,19 @@
           <div class="col-12">
             <!-- Default box -->
             <div class="card">
-              <div class="card-header">
-                <!-- <div class="row">
-                  <div class="col-4">
-                  <div class="form-group">
-                  <label>Role List</label>
-                  <select class="form-control selectFilter" id="roleSelect">
-                    <option value="" selected disabled>Please select role to show</option>
-                    <?php $roles = query("select * from roles"); ?>
-                    <?php foreach($roles as $row): ?>
-                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["role_name"]); ?></option>
-                    <?php endforeach; ?>
-                  </select>
-
-                </div>
-                  </div>
-                </div> -->
-                
-              </div>
+ 
               <!-- /.card-header -->
               <div class="card-body">
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th>Action</th>
-                    <th>Audit Plan</th>
-                    <th>Year</th>
-                    <th>Status</th>
+                    <th class="bg-success">Action</th>
+                    <th class="bg-success">Audit Plan</th>
+                    <th class="bg-success">Year</th>
+                    <th class="bg-success">Status</th>
+                    <th class="bg-danger">To Create</th>
+                    <th class="bg-warning">Pending</th>
+                    <th class="bg-info">Done</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -143,6 +129,9 @@ var datatable =
                     { data: 'type', "orderable": false  },
                     { data: 'year', "orderable": false  },
                     { data: 'status', "orderable": false  },
+                    { data: 'create_count', "orderable": false  },
+                    { data: 'pending_count', "orderable": false  },
+                    { data: 'done_count', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

@@ -51,6 +51,10 @@
   .color-red{
     color:red;
   }
+
+  .navbar-nav>.user-menu .user-image {
+    height: 2.1rem !important;
+}
 </style>
 <body class="hold-transition sidebar-mini layout-fixed">
 <!-- Site wrapper -->
@@ -84,12 +88,25 @@
      
       <!-- Notifications Dropdown Menu -->
 
-      <li class="nav-item">
+      <li class="nav-item dropdown user-menu">
+      <a class="nav-link" href="myProfile">
+
+      <?php if($_SESSION["dnsc_audit"]["img"] != ""): ?>
+                    <img class="user-image img-circle elevation-2" src="<?php echo($_SESSION["dnsc_audit"]["img"]); ?>" alt="User profile picture">
+                  <?php else: ?>
+                    <img src="hecker.pnh" class="user-image img-circle elevation-2" alt="User Image">
+
+                  <?php endif; ?>
+        </a>
+       
+      </li>
+
+      <!-- <li class="nav-item">
         <a class="nav-link" href="myProfile">
           <i class="fas fa-user" style="color:white;"></i>
         </a>
         
-      </li>
+      </li> -->
 
       <li class="nav-item dropdown">
         <a class="nav-link deym" data-toggle="dropdown" href="#">

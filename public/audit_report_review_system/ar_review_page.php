@@ -11,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Checklist</h1>
+            <h1>Review Audit Report</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -26,14 +26,16 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
+        <?php $audit_report = query("select ar.*, u.firstname, u.middlename, u.surname from audit_report ar left join users u
+                                    on u.id = ar.user_id where audit_report_id = ?", $_GET["id"]);
+              $audit_report = $audit_report[0];
+              // dump($audit_report);
+        ?>
 
       <?php
-      $checklist = query("select * from audit_checklist where audit_checklist_id = ?", $_GET["id"]);
-      $checklist = $checklist[0];    
-      // dump($checklist);  
       $aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where area_id = ? and aps_id = ?", $checklist["aps_area"], $checklist["aps_id"]);
+                          where aps_id = ? and area_id = ?", $audit_report["aps_id"], $audit_report["aps_area"]);
       $aps_area = $aps_area[0];
 
       $aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -48,15 +50,44 @@
         
       ?>
 
+    
+
   <div class="row">
     <div class="col-3">
+
+
+    <div class="modal fade" id="modalReview">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Review Audit Report</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_report_review">
+                <input type="hidden" name="action" value="review_audit_report">
+                <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
+                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">REVIEW THIS REPORT</a>
+    
     <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>About IAR</strong></h3>
               </div>
               <div class="card-body">
                 <strong>IAR No</strong>
-                <p class="text-muted mb-0"><?php echo($aps_area["area_name"]); ?></p>
+                <p class="text-muted mb-0"><?php echo($audit_report["audit_report_id"]); ?></p>
                 <hr>
                 <strong>Date of Audit</strong>
                 <p class="text-muted mb-0"><?php echo(date("F d, Y")); ?></p>
@@ -68,57 +99,127 @@
                 <p class="text-muted mb-0"><?php echo($aps_schedule["audit_clause"]); ?></p>
                 <hr>
                 <strong>Auditor</strong>
-                <p class="text-muted mb-0"><?php echo($_SESSION["dnsc_audit"]["fullname"]); ?></p>
+                <p class="text-muted mb-0"><?php echo($audit_report["firstname"] . " " . $audit_report["middlename"]. ' '. $audit_report["surname"]); ?></p>
                 <hr>
-                
+
+                <form class="generic_form_trigger_no_prompt" data-url="audit_report" >
+                  <input type="hidden" name="action" value="print_audit_report">
+                  <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+
+                  <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
+                </form>
               </div>
             </div>
-            <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
-              <input type="hidden" name="action" value="print_audit_checklist">
-              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
-              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
-            </form>
-            <br>
-            <br>
+
+           
+
+
     </div>
+
     <div class="col">
 
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Compliance</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["comply"]); ?>
-        </div>
-    </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Audit Trail</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["audit_trail"]); ?>
-        </div>
-    </div>
+<!-- <style>
+.myTable th{
+ padding: 5px;
+}
+</style> -->
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Remarks</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["remarks"]); ?>
-        </div>
-    </div>
+<div class="alert alert-success alert-dismissible">
+                      <h5><i class="icon fas fa-exclamation"></i> Effectiveness Process!</h5>
+                    </div>
+<table class="table myTable table-bordered">
+                  <tbody>
+                    <th width="5%">#</th>
+                    <th width="50%">Questions</th>
+                    <th width="15%">Rate</th>
+                    <th width="35%">Comments</th>
+
+                    <?php 
+                    $effectiveness = unserialize($audit_report["effectiveness_process"]);
+                    foreach($effectiveness as $row): ?>
+
+                      <tr>
+                        <th><?php echo($row["number"]); ?></th>
+                        <th><?php echo($row["question"]); ?></th>
+                        <th><?php echo($row["rate"]); ?></th>
+                        <th><?php echo($row["comment"]); ?></th>
+                      </tr>
+
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+                <br>
+                <div class="alert alert-success alert-dismissible">
+                      <h5><i class="icon fas fa-exclamation"></i> Findings for CAR System!</h5>
+                    </div>
+
+              <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+               
+                <strong>OFI (Improvement)</strong>
+                </h3>
+              </div>
+              <div class="card-body">
+                <?php echo($audit_report["ofi_improvement"]); ?>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+               
+                <strong>OFI (Possible Non-conformance in the Future):</strong>
+                </h3>
+              </div>
+              <div class="card-body">
+                <?php echo($audit_report["ofi_nonconformance"]); ?>
+              </div>
+            </div>
+
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                <strong>CAR Details:</strong>
+                </h3>
+              </div>
+              <div class="card-body">
+              <dl>
+
+              <?php $car_details = unserialize($audit_report["car_details"]); ?>
+              <?php if($car_details[0]["ofi_requirements"] != ""): ?>
+                <dt>Requirements</dt>
+                <dd><?php echo($car_details[0]["ofi_requirements"]); ?></dd>
+              <?php endif; ?>
+              <?php if($car_details[0]["ofi_findings"] != ""): ?>
+                <dt>Findings</dt>
+                <dd><?php echo($car_details[0]["ofi_findings"]); ?></dd>
+              <?php endif; ?>
+              <?php if($car_details[0]["ofi_evidences"] != ""): ?>
+                <dt>Evidence/s</dt>
+                <dd><?php echo($car_details[0]["ofi_evidences"]); ?></dd>
+              <?php endif; ?>
+                  
+              
+                </dl>
+              </div>
+            </div>
+
+
+
+
+
+                
+              
+                <hr>
+                <!-- <button class="btn btn-primary">Save Audit Report</button> -->
+        
 
     </div>
   </div>

@@ -220,26 +220,8 @@ $(document).on('submit', '.generic_form_no_trigger', function(e) {
                     console.log(o);
                     if (o.result === "success") {
                         swal.close();
-                        Swal.fire({
-                            title: "Submit success",
-                            showClass: {
-    popup: `
-      animate__animated
-      animate__bounceIn
-      animate__faster
-    `
-  },
-  hideClass: {
-    popup: `
-      animate__animated
-      animate__bounceOut
-      animate__faster
-    `
-  },
-                            text: o.message,
-                            icon: "success"
-                        }).then(function () {
-                          if(typeof(o.newlink) != "undefined" && o.newlink !== null) {
+
+                        if(typeof(o.newlink) != "undefined" && o.newlink !== null) {
                           if(o.newlink == "newlink"){
                             console.log(o);
                             if(o.link == "refresh")
@@ -260,7 +242,7 @@ $(document).on('submit', '.generic_form_no_trigger', function(e) {
                           window.location.replace(o.link);
 
                       }
-                        });
+                       
                     } else {
                         Swal.fire({
                           showClass: {

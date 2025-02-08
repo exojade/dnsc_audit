@@ -135,7 +135,49 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>
           Audit Report
-          <span class="right badge badge-danger"></span>
+
+
+          <?php
+          $myTeam = query("SELECT team_id FROM audit_plan_team_members 
+					WHERE id = ? 
+					GROUP BY team_id", 
+					$_SESSION["dnsc_audit"]["userid"]);
+					$teamIds = array_column($myTeam, "team_id");
+
+					$myTeam = "'" . implode("','", $teamIds) . "'";
+
+					$audit_plans = "
+					SELECT 
+						aps.audit_plan,
+						SUM(CASE WHEN ar.audit_report_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
+						SUM(CASE WHEN ar.audit_report_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
+						SUM(CASE WHEN ar.audit_report_status = 'DONE' THEN 1 ELSE 0 END) as done_count
+					FROM 
+						audit_plan_schedule aps
+					LEFT JOIN 
+						process p ON p.process_id = aps.process_id
+					LEFT JOIN 
+						aps_area aa ON aa.aps_id = aps.aps_id
+					LEFT JOIN 
+						areas a ON a.id = aa.area_id
+					LEFT JOIN 
+						audit_report ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+						WHERE 
+						aps.team_id IN ($myTeam)
+					";
+					$audit_plans = query($audit_plans);
+          ?>
+          <?php if(!empty($audit_plans)): ?>
+            <?php if($audit_plans[0]["create_count"] != 0): ?>
+              <span class="right badge badge-danger"><?php echo($audit_plans[0]["create_count"]); ?></span>
+            <?php endif; ?>
+          <?php endif; ?>
+          <?php if(!empty($audit_plans)): ?>
+            <?php if($audit_plans[0]["pending_count"] != 0): ?>
+              <span class="right badge badge-warning"><?php echo($audit_plans[0]["pending_count"]); ?></span>
+            <?php endif; ?>
+          <?php endif; ?>
+          
         </p>
       </a>
   </li>
@@ -147,7 +189,46 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>
           Audit Checklist
-          <span class="right badge badge-danger"></span>
+          <?php
+          $myTeam = query("SELECT team_id FROM audit_plan_team_members 
+					WHERE id = ? 
+					GROUP BY team_id", 
+					$_SESSION["dnsc_audit"]["userid"]);
+					$teamIds = array_column($myTeam, "team_id");
+
+					$myTeam = "'" . implode("','", $teamIds) . "'";
+
+					$audit_plans = "
+					SELECT 
+						aps.audit_plan,
+						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
+						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
+						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
+					FROM 
+						audit_plan_schedule aps
+					LEFT JOIN 
+						process p ON p.process_id = aps.process_id
+					LEFT JOIN 
+						aps_area aa ON aa.aps_id = aps.aps_id
+					LEFT JOIN 
+						areas a ON a.id = aa.area_id
+					LEFT JOIN 
+						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+						WHERE 
+						aps.team_id IN ($myTeam)
+					";
+					$audit_plans = query($audit_plans);
+          ?>
+          <?php if(!empty($audit_plans)): ?>
+            <?php if($audit_plans[0]["create_count"] != 0): ?>
+              <span class="right badge badge-danger"><?php echo($audit_plans[0]["create_count"]); ?></span>
+            <?php endif; ?>
+          <?php endif; ?>
+          <?php if(!empty($audit_plans)): ?>
+            <?php if($audit_plans[0]["pending_count"] != 0): ?>
+              <span class="right badge badge-warning"><?php echo($audit_plans[0]["pending_count"]); ?></span>
+            <?php endif; ?>
+          <?php endif; ?>
         </p>
       </a>
   </li>
@@ -186,7 +267,26 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       </a>
   </li>
   <li class="nav-header">Review</li>
+
   <li class="nav-item">
+      <a href="audit_report_review" class="nav-link">
+        <i class="nav-icon fas fa-list-alt"></i>
+        <p>
+          Audit Reports
+          <span class="right badge badge-danger">1</span><span class="right badge badge-warning">2</span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="audit_checklist_review" class="nav-link">
+        <i class="nav-icon fas fa-list-alt"></i>
+        <p>
+          Audit Checklist
+          <span class="right badge badge-danger">1</span><span class="right badge badge-warning">2</span>
+        </p>
+      </a>
+  </li>
+  <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
               <p>
@@ -208,9 +308,9 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
 
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
               <p>
@@ -232,7 +332,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
     <?php
     break;
   case 5:

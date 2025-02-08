@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Plan List</h1>
+            <h1>Audit Plan (Audit Checklist)</h1>
           </div>
           <div class="col-sm-6">
           </div>
@@ -33,10 +33,13 @@
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th>Action</th>
-                    <th>Audit Plan</th>
-                    <th>Year</th>
-                    <th>Status</th>
+                    <th class="bg-success">Action</th>
+                    <th class="bg-success">Audit Plan</th>
+                    <th class="bg-success">Year</th>
+                    <th class="bg-success">Status</th>
+                    <th class="bg-danger">To Create</th>
+                    <th class="bg-warning">Pending</th>
+                    <th class="bg-info">Done</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -126,6 +129,9 @@ var datatable =
                     { data: 'type', "orderable": false  },
                     { data: 'year', "orderable": false  },
                     { data: 'status', "orderable": false  },
+                    { data: 'create_count', "orderable": false  },
+                    { data: 'pending_count', "orderable": false  },
+                    { data: 'done_count', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

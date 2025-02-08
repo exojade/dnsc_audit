@@ -11,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Report</h1>
+            <h1>Update Audit Report</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -28,9 +28,15 @@
       <div class="container-fluid">
 
       <?php
+
+      $audit_report = query("select * from audit_report where audit_report_id = ?", $_GET["id"]);
+
+      $audit_report = $audit_report[0];
+    // dump($audit_report);
+
       $aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where tblid = ?", $_GET["aps_area_id"]);
+                          where aps_id = ? and area_id = ?", $audit_report["aps_id"], $audit_report["aps_area"]);
       $aps_area = $aps_area[0];
 
       $aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -46,7 +52,7 @@
       ?>
 
   <div class="row">
-    <!-- <div class="col-3">
+    <div class="col-3">
     <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>About IAR</strong></h3>
@@ -70,7 +76,7 @@
                 
               </div>
             </div>
-    </div> -->
+    </div>
     <div class="col">
 
     <div class="card card-success">
@@ -82,8 +88,8 @@
               
                 <div class="card-body">
                 <form class="generic_form_trigger" data-url="audit_report" id="internalReportForm">
-                <input type="hidden" name="action" value="createAuditReport">
-                <input type="hidden" name="aps_area_id" value="<?php echo($_GET["aps_area_id"]); ?>">
+                <input type="hidden" name="action" value="updateReport">
+                <input type="hidden" name="report_id" value="<?php echo($_GET["id"]); ?>">
 
 <!-- <style>
 .myTable th{
@@ -100,8 +106,12 @@
                       "Does the process appear to adequately meet all customer or regulatory requirements?",
                       "Are the quality objectives or targets identified in the process met?"
                     ];
-                    // dump($questions);
-                    
+                    // dump($audit_report);
+                    $effectiveness_process = unserialize($audit_report["effectiveness_process"]);
+                    $car_details = unserialize($audit_report["car_details"]);
+                    $audit_report["ofi_requirements"] = $car_details[0]["ofi_requirements"];
+                    $audit_report["ofi_findings"] = $car_details[0]["ofi_findings"];
+                    $audit_report["ofi_evidences"] = $car_details[0]["ofi_evidences"];
                     ?>
 
 <div class="bs-stepper">
@@ -150,7 +160,7 @@
                         <th>
                           
                         <select name="<?php echo($i); ?>_question" required class="form-control">
-                          <option selected disabled value=""></option>
+                          <option selected value="<?php echo($effectiveness_process[$i]["rate"]); ?>"><?php echo($effectiveness_process[$i]["rate"]); ?></option>
                           <option value="4">4</option>
                           <option value="3">3</option>
                           <option value="2">2</option>
@@ -159,7 +169,7 @@
                       </th>
                       <th>
                         <!-- <input type="text" class="form-control" placeholder="Enter comments"> -->
-                        <textarea name="<?php echo($i); ?>_comments" class="form-control" placeholder="Enter comments here..."></textarea>
+                        <textarea name="<?php echo($i); ?>_comments" class="form-control" placeholder="Enter comments here..."><?php echo($effectiveness_process[$i]["comment"]); ?></textarea>
                       </th>
                       </tr>
 
@@ -181,12 +191,12 @@
 
                     <div class="form-group">
                         <label>OFI (Improvement)</label>
-                        <textarea name="ofi_improvement" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <textarea name="ofi_improvement" class="form-control" rows="3" placeholder="Enter ..."><?php echo($audit_report["ofi_improvement"]); ?></textarea>
                       </div>
 
                       <div class="form-group">
                         <label>OFI (Possible Non-conformance in the Future):</label>
-                        <textarea name="ofi_2" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <textarea name="ofi_nonconformance" class="form-control" rows="3" placeholder="Enter ..."><?php echo($audit_report["ofi_nonconformance"]); ?></textarea>
                       </div>
 
                       <div class="alert alert-info alert-dismissible">
@@ -195,17 +205,17 @@
 
                     <div class="form-group">
                         <label>Requirements</label>
-                        <textarea name="ofi_requirements" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <textarea name="ofi_requirements" class="form-control" rows="3" placeholder="Enter ..."><?php echo($audit_report["ofi_requirements"]); ?></textarea>
                       </div>
 
                       <div class="form-group">
                         <label>Findings</label>
-                        <textarea name="ofi_findings" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <textarea name="ofi_findings" class="form-control" rows="3" placeholder="Enter ..."><?php echo($audit_report["ofi_findings"]); ?></textarea>
                       </div>
 
                       <div class="form-group">
                         <label>Evidence/s</label>
-                        <textarea name="ofi_evidences" class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                        <textarea name="ofi_evidences" class="form-control" rows="3" placeholder="Enter ..."><?php echo($audit_report["ofi_evidences"]); ?></textarea>
                       </div>
 
                   
@@ -223,7 +233,7 @@
                     <div id="suggestion-part" class="content" role="tabpanel" aria-labelledby="suggestion-part-trigger">
                     <div class="form-group">
                         <label>Comments / Suggestions</label>
-                        <textarea name="comments" class="form-control" rows="5" placeholder="Enter ..."></textarea>
+                        <textarea name="comments" class="form-control" rows="5" placeholder="Enter ..."><?php echo($audit_report["comments"]); ?></textarea>
                       </div>
 
 

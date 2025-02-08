@@ -12,6 +12,49 @@
 				$offsetString = " offset " . $offset;
 
 				$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
+
+				$myTeam = query("SELECT team_id FROM audit_plan_team_members 
+				WHERE id = ? 
+				GROUP BY team_id", 
+				$_SESSION["dnsc_audit"]["userid"]);
+				$teamIds = array_column($myTeam, "team_id");
+
+				$myTeam = "'" . implode("','", $teamIds) . "'";
+
+
+				$audit_plans = "
+					SELECT 
+						aps.audit_plan,
+						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
+						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
+						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
+					FROM 
+						audit_plan_schedule aps
+					LEFT JOIN 
+						process p ON p.process_id = aps.process_id
+					LEFT JOIN 
+						aps_area aa ON aa.aps_id = aps.aps_id
+					LEFT JOIN 
+						areas a ON a.id = aa.area_id
+					LEFT JOIN 
+						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+						WHERE 
+						aps.team_id IN ($myTeam)
+						group by aps.audit_plan
+					";
+					$audit_plans = query($audit_plans);
+
+					$thePlans = [];
+					foreach($audit_plans as $row):
+						$thePlans[$row["audit_plan"]] = $row;
+					endforeach;
+
+
+
+
+
+
+
 				if($search != ""):
 				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
 				$baseQuery = "select ap.* from audit_plans ap
@@ -20,15 +63,25 @@
 					$baseQuery = "select ap.* from audit_plans ap
 								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
 				endif;
+				
 
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 
 
 
+
+
+
+
+
+
 				$i = 0;
 				foreach($data as $row):
 					$data[$i]["action"] = '<a href="audit_checklist?action=myChecklist&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+					$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
+					$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
+					$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
 					$i++;
 				endforeach;
 				$json_data = array(

@@ -422,8 +422,23 @@ elseif($_POST["action"] == "move_file"):
 			if(!isset($_GET["action"])):
                 render("public/mymanuals_system/mymanuals_page.php",[
                 ]);
+
+            else:
+			
+
+                        $filePath = urldecode($_GET['file']);
+                        $fullPath = $filePath;
+                        
+                        if (file_exists($fullPath)) {
+                            header('Content-Type: application/octet-stream');
+                            header('Content-Disposition: attachment; filename="' . basename($fullPath) . '"');
+                            readfile($fullPath);
+                            exit;
+                        } else {
+                            echo "File not found!";
+                        }
+        endif;
 	
-			endif;
 
 			
 	}

@@ -47,8 +47,18 @@
 					require 'public/survey_system/survey.php';
 				else if ($request == 'survey_form')
 					require 'public/survey_form_system/survey_form.php';
+				
+				
 				else if ($request == 'audit_report')
 					require 'public/audit_report_system/audit_report.php';
+
+				else if ($request == 'audit_report_review')
+					require 'public/audit_report_review_system/audit_report_review.php';
+				else if ($request == 'audit_checklist_review')
+					require 'public/audit_checklist_review_system/audit_checklist_review.php';
+
+
+
 				else if ($request == 'audit_checklist')
 					require 'public/audit_checklist_system/audit_checklist.php';
 				else if ($request == 'consolidated_ar')

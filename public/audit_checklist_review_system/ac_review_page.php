@@ -50,6 +50,32 @@
 
   <div class="row">
     <div class="col-3">
+
+
+    <div class="modal fade" id="modalReview">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Review Audit Report</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_checklist_review">
+                <input type="hidden" name="action" value="review_audit_checklist">
+                <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
+                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">REVIEW THIS REPORT</a>
+
+
     <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>About IAR</strong></h3>
@@ -78,8 +104,6 @@
               <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
               <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
             </form>
-            <br>
-            <br>
     </div>
     <div class="col">
 

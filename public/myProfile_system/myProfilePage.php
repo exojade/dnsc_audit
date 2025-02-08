@@ -54,7 +54,14 @@
 
 
     <section class="content">
-    
+    <style>
+.profile-user-img {
+    width: 200px; /* Set your desired width */
+    height: 200px; /* Set your desired height */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+    border-radius: 50%; /* Ensures a circular shape */
+}
+    </style>
 
 
     <div class="modal fade" id="modalUpdateProfile">
@@ -136,7 +143,12 @@
               </div>
               <div class="card-body box-profile">
                 <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle" src="AdminLTE_new/dist/img/user4-128x128.jpg" alt="User profile picture">
+                  <?php if($_SESSION["dnsc_audit"]["img"] != ""): ?>
+                    <img class="profile-user-img img-fluid img-circle" src="<?php echo($_SESSION["dnsc_audit"]["img"]); ?>" alt="User profile picture">
+                  <?php else: ?>
+                    <img class="profile-user-img img-fluid img-circle" src="hecker.png" alt="User profile picture">
+                  <?php endif; ?>
+                  
                 </div>
 
                 <h3 class="profile-username text-center"><?php echo($myProfile["firstname"] . " " . $myProfile["middlename"] . " " . $myProfile["surname"]); ?></h3>

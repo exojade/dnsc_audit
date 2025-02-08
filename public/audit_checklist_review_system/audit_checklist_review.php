@@ -14,11 +14,6 @@
 	
 				$where = " where type in ('office', 'institute', 'program')";
 	
-		
-
-	
-				
-
 				if($search == ""):
 					$baseQuery = "select * from areas " . $where;
 					$data = query($baseQuery . $limitString . " " . $offsetString);
@@ -50,7 +45,27 @@
 				);
 				echo json_encode($json_data);
 
-		elseif($_POST["action"] == "audit_plan_report_datatable"):
+		elseif($_POST["action"] == "review_audit_checklist"):
+			// dump($_POST);
+
+			query("update audit_checklist set 
+						reviewed_by = ?,
+						review_comments = ?,
+						review_timestamp = ?,
+						audit_checklist_status = 'DONE'
+						where audit_checklist_id = ?
+						", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
+
+
+						$res_arr = [
+							"result" => "success",
+							"title" => "Success",
+							"message" => "Success",
+							"link" => "audit_checklist?action=details&id=".$_POST["audit_checklist_id"],
+							];
+							echo json_encode($res_arr); exit();
+
+		elseif($_POST["action"] == "ac_review_list"):
 
 
 			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
@@ -59,24 +74,48 @@
 				$search = $_POST["search"]["value"];
 
 			$myTeam = query("SELECT team_id FROM audit_plan_team_members 
-					WHERE audit_plan = ? AND id = ? 
-					GROUP BY team_id", 
-					$_POST["interal_audit_id"], $_SESSION["dnsc_audit"]["userid"]);
+					GROUP BY team_id");
 			$teamIds = array_column($myTeam, "team_id");
 
-			$myTeam = "'" . implode("','", $teamIds) . "'";
-			// dump($myTeam);
-
 			
-			$data = query("
+			// dump($_REQUEST);
+
+		
+
+			$myTeam = "'" . implode("','", $teamIds) . "'";
+			$where =" WHERE 
+						aps.team_id IN ($myTeam)";
+			if(isset($_REQUEST["ap"])):
+				if($_REQUEST["ap"] != ""):
+					$where .= " and aps.audit_plan ='".$_REQUEST["ap"]."'";
+
+				endif;
+			endif;
+
+			if(isset($_REQUEST["status"])):
+				if($_REQUEST["status"] != ""):
+					if($_REQUEST["status"] == "CREATE"):
+						$where .= " AND ar.audit_checklist_status IS NULL"; // Handle NULLs
+					else:
+						$where .= " AND ar.audit_checklist_status = '".$_REQUEST["status"]."'";
+					endif;
+				endif;
+			endif;
+
+			$grouper_string = " GROUP BY aps.aps_id, aa.area_id order by audit_checklist_status asc";
+
+			$string_query = "
 					SELECT 
 						aps.*,
 						p.*,
 						aa.*,
-						ar.audit_report_id,
+						ar.audit_checklist_id,
 						ar.timestamp,
 						a.area_name,
-						COALESCE(ar.audit_report_status, 'CREATE') AS audit_report_status
+						COALESCE(ar.audit_checklist_status, 'CREATE') AS audit_checklist_status,
+						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
+						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
+						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
 					FROM 
 						audit_plan_schedule aps
 					LEFT JOIN 
@@ -86,17 +125,27 @@
 					LEFT JOIN 
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
-						audit_report ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
-					WHERE 
-						aps.team_id IN ($myTeam)
-				");
-				// dump($data);
+						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+						$where
+					";
+				// dump($string_query);
+
+			$data = query($string_query . $grouper_string . " limit " . $limit . " offset " . $offset);
+			$all_data = query($string_query . $grouper_string);
+			$count_data = query($string_query);
+				// dump($all_data);
+
+				$audit_plan = query("select * from audit_plans");
+				$AuditPlan = [];
+				foreach($audit_plan as $row):
+					$AuditPlan[$row["audit_plan"]] = $row;
+				endforeach;
+			
 
 
 			  $ApsArea = [];
               $aps_area = query("select aps_area.aps_id,a.id, a.area_name from aps_area
-                                  left join areas a on a.id = aps_area.area_id
-                                  where audit_plan = ?", $_POST["interal_audit_id"]);
+                                  left join areas a on a.id = aps_area.area_id");
               foreach($aps_area as $row):
                 $ApsArea[$row["aps_id"]][$row["id"]] = $row;
               endforeach;
@@ -107,8 +156,7 @@
               $team_members = query("select apt.*,aptm.*, concat(u.firstname, ' ', u.surname, ' ', u.suffix) as fullname from audit_plan_teams apt
                                       left join audit_plan_team_members aptm
                                       on aptm.team_id = apt.team_id
-                                      left join users u on u.id = aptm.id
-                                        where apt.audit_plan = ?", $_POST["interal_audit_id"]);
+                                      left join users u on u.id = aptm.id");
               foreach($team_members as $row):
                 $TeamMembers[$row["team_id"]][$row["id"]] = $row;
               endforeach;
@@ -128,16 +176,15 @@
 								</button>
 								<ul class="dropdown-menu">
 									';
-									if($row["audit_report_id"] != ""):
-										if($row["audit_report_status"] == "DONE"):
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">View Audit Report</a></li>';
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Print Audit Report</a></li>';
+									if($row["audit_checklist_id"] != ""):
+										if($row["audit_checklist_status"] == "DONE"):
+											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_checklist_id"].'">View Audit Report</a></li>';
+											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_checklist_id"].'">Print Audit Report</a></li>';
 										else:
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=update&id='.$row["audit_report_id"].'">Edit Audit Report</a></li>';
+											$action .= '<li><a class="dropdown-item" href="audit_checklist_review?action=review&id='.$row["audit_checklist_id"].'">Review</a></li>';
 										endif;
 
 									else:
-										$action .= '<li><a class="dropdown-item" href="audit_report?action=create&aps_area_id='.$row["tblid"].'">Create Audit Report</a></li>';
 									endif;
 
 							$action.='
@@ -151,12 +198,16 @@
 					$data[$i]["team"] = $teamMembersString;
 					$data[$i]["process_name"] = $row["process_name"];
 					$data[$i]["area_name"] = $row["area_name"];
+					$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["type"];
+					$data[$i]["pending_count"] = $count_data[0]["pending_count"];
+					$data[$i]["done_count"] = $count_data[0]["done_count"];
+					$data[$i]["create_count"] = $count_data[0]["create_count"];
 					$i++;
 				endforeach;
 				$json_data = array(
 					"draw" => $draw + 1,
-					"iTotalRecords" => count($data),
-					"iTotalDisplayRecords" => count($data),
+					"iTotalRecords" => count($all_data),
+					"iTotalDisplayRecords" => count($all_data),
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
@@ -649,7 +700,8 @@ font-size: 12px;
 	else {
 
 		if(!isset($_GET["action"])):
-
+			render("public/audit_checklist_review_system/ac_review_list.php",[
+			]);
 		else:
 
 			if($_GET["action"] == "create"):
@@ -660,8 +712,8 @@ font-size: 12px;
 				render("public/audit_report_system/audit_report_details.php",[
 				]);
 
-			elseif($_GET["action"] == "update"):
-				render("public/audit_report_system/audit_report_update.php",[
+			elseif($_GET["action"] == "review"):
+				render("public/audit_checklist_review_system/ac_review_page.php",[
 				]);
 			endif;
 
