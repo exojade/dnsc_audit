@@ -286,6 +286,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
+  <li class="nav-header">Evaluation</li>
+  <li class="nav-item">
+      <a href="audit_evaluation?action=all" class="nav-link">
+        <i class="nav-icon fas fa-list-alt"></i>
+        <p>
+          Audit Evaluation
+        </p>
+      </a>
+  </li>
   <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>

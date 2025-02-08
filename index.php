@@ -57,6 +57,10 @@
 				else if ($request == 'audit_checklist_review')
 					require 'public/audit_checklist_review_system/audit_checklist_review.php';
 
+				else if ($request == 'notifications')
+					require 'public/notifications_system/notifications.php';
+
+
 
 
 				else if ($request == 'audit_checklist')

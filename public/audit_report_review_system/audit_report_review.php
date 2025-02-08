@@ -60,6 +60,31 @@
 						audit_report_status = 'DONE'
 						where audit_report_id = ?
 						", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_report_id"]);
+			$audit_report = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_report ar
+									left join users u on u.id = ar.user_id
+									 where audit_report_id = ?", $_POST["audit_report_id"]);
+			$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_report[0]["aps_id"]);
+			$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+			foreach($team_members as $row):
+				$Message = [];
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and approved the audit report : " . $_POST["audit_report_id"];
+				$Message["link"]= "audit_report?action=details&id=".$_POST["audit_report_id"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+
+			$users_area = query("select * from users_area where area_id = ?", $audit_report[0]["aps_area"]);
+			foreach($users_area as $row):
+				$Message = [];
+				$Message["message"] = $audit_report[0]["created_by"] . " created an audit report : " . $_POST["audit_report_id"] . " and you may view and conduct an audit evaluation for this auditor.";
+				$Message["link"]= "audit_evaluation?action=create&id=".$_POST["audit_report_id"];
+				$theMessage = serialize($Message);
+				addNotification($row["user_id"], $theMessage, $audit_report[0]["user_id"]);
+			endforeach;
+
+
+
 
 
 						$res_arr = [
@@ -721,8 +746,18 @@ font-size: 12px;
 				]);
 
 			elseif($_GET["action"] == "review"):
-				render("public/audit_report_review_system/ar_review_page.php",[
-				]);
+
+				$audit_report = query("select * from audit_report where audit_report_id = ?", $_GET["id"]);
+				$audit_report = $audit_report[0];
+				if($audit_report["audit_report_status"] == "DONE"):
+					redirect("audit_report?action=details&id=".$_GET["id"]);
+				else:
+					render("public/audit_report_review_system/ar_review_page.php",[
+					]);
+				endif;
+
+
+				
 			endif;
 
 		endif;

@@ -2,13 +2,20 @@
     if($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if($_POST["action"] == "create_folder"):
-           
+        //    dump($_POST);
+
+
+        //    preg_match("#/(?P<firstWord>[^/]+)/#", $_POST['folder'], $matches);
+        //    dump($matches);
             $folderPath = $base_path = "file_manager/manuals/".$_POST['folder']; // Get the full folder path
     //  dump($folderPath);
             if (!file_exists($folderPath)) {
                 // Create folder if it doesn't exist
                 if (mkdir($folderPath, 0777, true)) {
                     echo "success"; // Return success message
+
+
+
                 } else {
                     echo "error"; // Return error message
                 }
@@ -211,6 +218,7 @@ endif;
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';
     $target_dir = "file_manager/manuals/" . $current_path; // Define the target directory
+    dump($current_path);
 
     // Check if the directory exists
     if (!is_dir($target_dir)) {

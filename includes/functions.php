@@ -25,6 +25,12 @@
     return $base_url . '/' . ltrim($path, '/');
 }
 
+function addNotification($receiver_id, $message, $sender_id){
+    query("insert INTO notification (receiver_id, message, created, sender_id) 
+        VALUES(?,?,?,?)", 
+    $receiver_id, $message, time(), $sender_id);
+}
+
 function base_url()
 {
     // Dynamically generate the base URL based on the current server setup

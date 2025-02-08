@@ -289,6 +289,19 @@
 				}
 
 
+		$users = query("select * from users where role_id = 4");
+		foreach($users as $row):
+			$Message = [];
+			$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " created audit report and needs to be reviewed.";
+			$Message["link"] = "audit_report_review?action=review&id=".$ar_id;
+			$theMessage = serialize($Message);
+			addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+		endforeach;
+
+
+		// $users_area = query("select * from users_area");
+
+
 
 		$res_arr = [
 			"result" => "success",

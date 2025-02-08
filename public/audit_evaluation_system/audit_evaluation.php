@@ -196,6 +196,117 @@
 					echo json_encode($json_data);
 
 
+
+
+					elseif($_POST["action"] == "audit_evaluation_list_all"):
+						// dump($_REQUEST);
+						$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
+						$offset = $_POST["start"];
+						$limit = $_POST["length"];
+						$search = $_POST["search"]["value"];
+						$limitString = " limit " . $limit;
+						$offsetString = " offset " . $offset;
+		
+						$AuditPlan = [];
+						$audit_plan = query("select * from audit_plans");
+						foreach($audit_plan as $row):
+							$AuditPlan[$row["audit_plan"]] = $row;
+						endforeach;
+	
+	
+						$AuditReport = [];
+						$audit_report = query("select ar.*,aps.team_id,aps.process_id from audit_report ar left join audit_plan_schedule aps
+												on aps.aps_id = ar.aps_id");
+						foreach($audit_report as $row):
+							$AuditReport[$row["audit_report_id"]] = $row;
+						endforeach;
+	
+					
+						$Area = [];
+						$area = query("select * from areas");
+						foreach($area as $row):
+							$Area[$row["id"]] = $row;
+						endforeach;
+		
+						$Process = [];
+						$process = query("select * from process");
+						foreach($process as $row):
+							$Process[$row["process_id"]] = $row;
+						endforeach;
+		
+						$team = query("SELECT 
+								t.team_id,
+								t.team_number AS team,
+								GROUP_CONCAT(
+									CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+									ORDER BY tm.role = 'LEADER' DESC, u.surname
+									SEPARATOR ', '
+								) AS members
+								FROM 
+									audit_plan_teams t
+								JOIN 
+									audit_plan_team_members tm ON t.team_id = tm.team_id
+								JOIN 
+									users u ON tm.id = u.id
+								GROUP BY 
+									t.team_id
+								ORDER BY 
+									t.team_number
+								");
+						$Team = [];
+						foreach($team as $row):
+							$Team[$row["team_id"]] = $row;
+						endforeach;
+		
+		
+						$myArea = query("select * from users_area where user_id");
+						$areaIds = "'".implode("','", array_column($myArea, 'area_id')) . "'";
+						$where = " where aa.area_id in (".$areaIds.")";
+						$order_string = " order by timestamp desc";
+						// dump($areaIds);
+						// dump($audit_reports);
+						$baseQuery = "select ae.*,aa.area_id, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as evaluated_by from audit_evaluation ae left join aps_area aa
+										on aa.tblid = ae.aps_area_id
+										left join users u on u.id = ae.user_id  " . $where;
+						$data = query($baseQuery . $order_string .  $limitString . " " . $offsetString);
+						$all_data = query($baseQuery  . $order_string);
+						// dump($all_data);
+						$i = 0;
+						foreach($data as $row):
+							$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["type"];
+	
+							$myReport = $AuditReport[$row["audit_report_id"]];
+							$data[$i]["team"] = $Team[$myReport["team_id"]]["members"];
+	
+	
+							$data[$i]["date_created"] =  date('F d, Y', $row["timestamp"]);
+							$data[$i]["process_name"] = $Process[$myReport["process_id"]]["process_name"];
+							$data[$i]["area"] = $Area[$row["area_id"]]["area_name"];
+	
+							$action = '
+								<div class="btn-group btn-block">
+									<button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+										Action
+									</button>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="audit_evaluation?action=details&id='.$row["audit_evaluation_id"].'" >View Details</a></li>
+										<li><a class="dropdown-item" href="audit_evaluation?action=details&id='.$row["audit_evaluation_id"].'" >Download Audit Evaluation</a></li>
+									</ul>
+								</div>
+								';
+		
+							$data[$i]["action"] = $action;
+							$i++;
+						endforeach;
+						$json_data = array(
+							"draw" => $draw + 1,
+							"iTotalRecords" => count($all_data),
+							"iTotalDisplayRecords" => count($all_data),
+							"aaData" => $data
+						);
+						echo json_encode($json_data);
+
+
 		elseif($_POST["action"] == "newEvaluation"):
 			// dump($_POST);
 			$audit_report = query("select * from audit_report where audit_report_id = ?", $_POST["audit_report_id"]);
@@ -228,6 +339,17 @@
 				);
 
 			query("update audit_report set audit_evaluation_id = ? where audit_report_id = ?", $ae, $_POST["audit_report_id"]);
+
+			$users = query("select * from users where role_id = 4");
+			foreach($users as $row):
+				$Message = [];
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " created an audit evaluation : " . $ae . " and you may view and print the evaluation report.";
+				$Message["link"]= "audit_evaluation?action=details&id=".$ae;
+				$theMessage = serialize($Message);
+				addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+
 			$res_arr = [
 				"result" => "success",
 				"title" => "Success",
@@ -662,9 +784,22 @@ font-size: 12px;
 			elseif($_GET["action"] == "process_owners_done"):
 				render("public/audit_evaluation_system/audit_evaluation_list_process_owners_done.php",[
 				]);
+				elseif($_GET["action"] == "all"):
+					render("public/audit_evaluation_system/audit_evaluation_list_all.php",[
+					]);
 			elseif($_GET["action"] == "create"):
-				render("public/audit_evaluation_system/createAuditEvaluation.php",[
-				]);
+
+				$ae = query("select * from audit_evaluation where audit_report_id = ?", $_GET["id"]);
+				if(!empty($ae )):
+					redirect("audit_evaluation?action=details&id=".$ae[0]["audit_evaluation_id"]);
+				else:
+					render("public/audit_evaluation_system/createAuditEvaluation.php",[
+					]);
+				endif;
+			
+
+
+				
 			elseif($_GET["action"] == "details"):
 				render("public/audit_evaluation_system/audit_evaluation_details.php",[
 				]);

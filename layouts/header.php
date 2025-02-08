@@ -110,28 +110,60 @@
 
       <li class="nav-item dropdown">
         <a class="nav-link deym" data-toggle="dropdown" href="#">
-          <i class="far fa-bell" style="color: white;"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
+          <i class="fa fa-bell text-warning"></i>
+
+          <?php $notifications = query("select count(*) as count from notification where receiver_id = ? and read_at is null", $_SESSION["dnsc_audit"]["userid"]); ?>
+          <?php if($notifications[0]["count"] != 0): ?>
+            <span class="badge badge-danger navbar-badge"><?php echo($notifications[0]["count"]); ?></span>
+          <?php endif; ?>
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="max-height: 500px; overflow-y: auto; width:500px !important; max-width: 500px !important;">
+          
+        <?php if($notifications[0]["count"] != 0): ?>
+          <?php $myNotif = query("select * from notification where receiver_id = ? and read_at is null", $_SESSION["dnsc_audit"]["userid"]); ?>
+          <?php 
+          $users = query("select * from users"); 
+          $Users = [];
+
+          foreach($users as $row):
+            if($row["img"] == ""):
+              $row["img"] = "hecker.png";
+            endif;
+            $Users[$row["id"]] = $row;
+          endforeach;
+          ?>
+
+          <?php foreach($myNotif as $row): 
+            $message = unserialize($row["message"]);
+            ?>
+            <a href="notifications?action=read&id=<?php echo($row["notification_id"]); ?>" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="<?php echo($Users[$row["sender_id"]]["img"]); ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+              <div class="media-body">
+                <p class="text-sm"><?php echo($message["message"]); ?></p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
+          <?php endforeach; ?>
+
+        <?php else: ?>
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
+          
+          <div class="media">
+            <div class="media-body text-center">
+              No unread notification!
+            </div>
+          </div>
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+
+        <?php endif; ?>
+          <a href="notifications" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
       </li>
 

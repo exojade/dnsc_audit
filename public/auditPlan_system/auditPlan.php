@@ -523,6 +523,20 @@
 			else;
 
 			endforeach;
+
+			$teams = query("select * from audit_plan_team_members where team_id = ?", $_POST["team_id"]);
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan_id"]);
+			$audit_plan = $audit_plan[0];
+			$Message = [];
+			foreach($teams as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " assigned you to Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+				$Message["link"] = "auditPlan?action=auditorDetails&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+
+
 			$res_arr = [
 				"result" => "success",
 				"title" => "Success",

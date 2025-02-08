@@ -4,72 +4,40 @@
   <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
 
-<style>
-.info-box{
-  min-height:20px;
-}
-
-.info-box .info-box-icon{
-  font-size: 1rem;
-}
-</style>
-
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-5">
-            <h1>Audit Reports</h1>
+          <div class="col-sm-6">
+            <h1>Notifications</h1>
           </div>
-          <div class="col-sm-7">
-          <div class="row">
-          <div class="col-md-4 col-sm-6 col-12">
-            <div class="info-box mb-0">
-              
-
-              <div class="info-box-content">
-                <span class="info-box-text"><b>To Create</b></span>
-              </div>
-              <span class="info-box-icon bg-danger float-right">1</span>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-
-          <div class="col-md-4 col-sm-6 col-12">
-            <div class="info-box mb-0">
-              
-
-              <div class="info-box-content">
-                <span class="info-box-text"><b>Pending</b></span>
-              </div>
-              <span class="info-box-icon bg-warning float-right">1</span>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-
-          <div class="col-md-4 col-sm-6 col-12">
-            <div class="info-box mb-0">
-              
-
-              <div class="info-box-content">
-                <span class="info-box-text"><b>Done</b></span>
-              </div>
-              <span class="info-box-icon bg-success float-right">1</span>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-        
+      
         </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+
+    <div class="modal fade" id="modalAssignedArea">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Assigned Area</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="users">
+                  <input type="hidden" name="action" value="addAssignedArea">
+                    <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="content">
+    </div>
 
 
 
@@ -77,44 +45,16 @@
         <div class="row">
           <div class="col-12">
             <!-- Default box -->
-          
-          <?php
-            $audit_plan = query("select * from audit_plans where audit_plan = ?", $_GET["id"]);
-            $audit_plan = $audit_plan[0];
-          ?>
-
-            
-            <div class="card">
-
-            <div class="card-header bg-success">
-              <div class="row">
-                  <div class="col-9">
-                    <h3 class="card-title"><b><?php echo($audit_plan["type"] . " - " . $audit_plan["year"]); ?></b></h3>
-                  </div>
-                  <div class="col-3">
-                    <form class="generic_form_trigger_no_prompt" data-url="auditPlan">
-                    
-                    <input type="hidden" name="action" value="printAuditPlan">
-                    <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
-
-                      <button type="submit" class="btn btn-sm btn-block btn-default">Print Audit Plan</button>
-                    </form>
-                  </div>
-              </div>
-                
-            </div>
-            
+            <div class="card card-success">
               <!-- /.card-header -->
               <div class="card-body">
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th>Action</th>
-                    <th>Team</th>
-                    <th>Process</th>
-                    <th>Area</th>
-                    <th>Created</th>
-                    <th>Status</th>
+                    <th>#</th>
+                    <th></th>
+                    <th>Notification</th>
+                    <th>Date</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -178,58 +118,57 @@
      });
 
 
+     $('#modalAssignedArea').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'users', //Here you will fetch records 
+            data: {
+                user_id: rowid, action: "modalAssignedArea"
+            },
+            success : function(data){
+                $('#modalAssignedArea .fetched-data').html(data);
+                $("#areaSelect").select2({
+    placeholder: "Select an area", // Placeholder text
+    allowClear: true // Adds a clear button to remove the selection
+});
+                Swal.close();
+                //Show fetched data from database
+            }
+        });
+     });
+
+
 var datatable = 
             $('#ajax_datatable').DataTable({
                 "searching": false,
-                "pageLength": 9999,
+                "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"
                 },
-                "bLengthChange": false,
+                "bLengthChange": true,
                 "ordering": false,
                 'processing': true,
                 'serverSide': true,
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'audit_report',
+                    'url':'notifications',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "audit_plan_report_datatable",
-                        data.interal_audit_id = "<?php echo($_GET["id"]); ?>"
+                        data.action = "notifications_list";
                      }
                 },
                 'columns': [
-                    { data: 'action', "orderable": false },
-                    { 
-        data: 'team', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'process_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { 
-        data: 'area_name', 
-        "orderable": false,
-        render: function(data, type, row) {
-            return data.length > 30 ? data.substring(0, 30) + '...' : data;
-        }
-    },
-    { data: 'timestamp', "orderable": false },
-    { data: 'audit_report_status', "orderable": false },
+                    { data: 'number', "orderable": false },
+                    { data: 'sender_image', "orderable": false },
+                    { data: 'message', "orderable": false  },
+                    { data: 'date', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
-                    $(document).on('click', '.dropdown-toggle', function() {
-    $(this).dropdown('toggle');
-});
+                    
 
                     // Remove the formatting to get integer data for summation
                     // var intVal = function (i) {

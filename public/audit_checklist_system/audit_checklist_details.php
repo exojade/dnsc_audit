@@ -10,14 +10,15 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
+          <div class="col-sm-9">
             <h1>Audit Checklist</h1>
           </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">User Profile</li>
-            </ol>
+          <div class="col-sm-3">
+          <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
+              <input type="hidden" name="action" value="print_audit_checklist">
+              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist</button>
+            </form>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -28,7 +29,12 @@
       <div class="container-fluid">
 
       <?php
-      $checklist = query("select * from audit_checklist where audit_checklist_id = ?", $_GET["id"]);
+      $checklist = query("select ac.*, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as audited_by,
+                        concat(u2.firstname, ' ', u2.middlename, ' ', u2.surname) as reviewed_by
+                        from audit_checklist ac
+                        left join users u on u.id = ac.user_id
+                        left join users u2 on u2.id = ac.reviewed_by
+                        where audit_checklist_id = ?", $_GET["id"]);
       $checklist = $checklist[0];    
       // dump($checklist);  
       $aps_area = query("select * from aps_area aa
@@ -68,20 +74,12 @@
                 <p class="text-muted mb-0"><?php echo($aps_schedule["audit_clause"]); ?></p>
                 <hr>
                 <strong>Auditor</strong>
-                <p class="text-muted mb-0"><?php echo($_SESSION["dnsc_audit"]["fullname"]); ?></p>
-                <hr>
+                <p class="text-muted mb-0"><?php echo($checklist["audited_by"]); ?></p>
                 
               </div>
             </div>
-            <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
-              <input type="hidden" name="action" value="print_audit_checklist">
-              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
-              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
-            </form>
-            <br>
-            <br>
     </div>
-    <div class="col">
+    <div class="col-6">
 
 
     <div class="card card-success">
@@ -120,6 +118,26 @@
         </div>
     </div>
 
+    </div>
+
+    <div class="col-3">
+    <div class="card card-success">
+              <div class="card-header">
+                <h3 class="card-title"><strong>Review Details</strong></h3>
+              </div>
+              <div class="card-body">
+                <strong>Reviewed By</strong>
+                <p class="text-muted mb-0"><?php echo($checklist["reviewed_by"]); ?></p>
+                <hr>
+                <strong>Comments</strong>
+                <p class="text-muted mb-0"><?php echo($checklist["review_comments"]); ?></p>
+                <hr>
+                <strong>Date Reviewed</strong>
+                <p class="text-muted mb-0"><?php echo(date("F d, Y", $checklist["review_timestamp"])); ?></p>
+               
+                
+              </div>
+            </div>
     </div>
   </div>
 <!-- 

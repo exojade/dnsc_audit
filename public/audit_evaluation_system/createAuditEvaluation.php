@@ -76,6 +76,12 @@
                 
               </div>
             </div>
+
+    <form class="generic_form_trigger_no_prompt mb-2" data-url="audit_report">
+      <input type="hidden" name="action" value="print_audit_report">
+      <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+      <button class="btn btn-block btn-primary">Print Audit Report</button>
+    </form>
     </div>
     <div class="col">
 

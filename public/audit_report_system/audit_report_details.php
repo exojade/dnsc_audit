@@ -10,14 +10,15 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
+          <div class="col-sm-9">
             <h1>Audit Report Details</h1>
           </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">User Profile</li>
-            </ol>
+          <div class="col-sm-3">
+          <form class="generic_form_trigger_no_prompt" data-url="audit_report" >
+              <input type="hidden" name="action" value="print_audit_report">
+              <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-info btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
+          </form>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -26,8 +27,12 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <?php $audit_report = query("select ar.*, u.firstname, u.middlename, u.surname from audit_report ar left join users u
-                                    on u.id = ar.user_id where audit_report_id = ?", $_GET["id"]);
+        <?php $audit_report = query("select ar.*, u.firstname, u.middlename, u.surname,
+                                    concat(u2.firstname, ' ', u.middlename, ' ', u.surname) as reviewed_by
+                                    from audit_report ar left join users u
+                                    on u.id = ar.user_id
+                                    left join users u2 on u2.id = ar.reviewed_by
+                                    where audit_report_id = ?", $_GET["id"]);
               $audit_report = $audit_report[0];
               // dump($audit_report);
         ?>
@@ -53,6 +58,8 @@
   <div class="row">
     <div class="col-3">
 
+
+   
     
     <div class="card card-success">
               <div class="card-header">
@@ -75,16 +82,30 @@
                 <p class="text-muted mb-0"><?php echo($audit_report["firstname"] . " " . $audit_report["middlename"]. ' '. $audit_report["surname"]); ?></p>
                 <hr>
 
-                <form class="generic_form_trigger_no_prompt" data-url="audit_report" >
-                  <input type="hidden" name="action" value="print_audit_report">
-                  <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
-
-                  <button type="submit" class="btn btn-outline-info btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
-                </form>
+                
               </div>
             </div>
 
+            <div class="card card-success">
+              <div class="card-header">
+                <h3 class="card-title"><strong>Review Details</strong></h3>
+              </div>
+              <div class="card-body">
+                <strong>Reviewed By</strong>
+                <p class="text-muted mb-0"><?php echo($audit_report["reviewed_by"]); ?></p>
+                <hr>
+                <strong>Comments</strong>
+                <p class="text-muted mb-0"><?php echo($audit_report["review_comments"]); ?></p>
+                <hr>
+                <strong>Date Reviewed</strong>
+                <p class="text-muted mb-0"><?php echo(date("F d, Y", $audit_report["review_timestamp"])); ?></p>
+               
 
+                
+              </div>
+            </div>
+
+            
     </div>
 
     <div class="col">

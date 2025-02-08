@@ -226,6 +226,19 @@
 			  VALUES(?,?,?,?,?,?,?,?,?)", 
 				$ac_id, $aps_area["audit_plan"], $aps_area["aps_id"], $aps_area["area_id"], time(),
 				$_POST["audit_trail"],$_POST["comply"], $_POST["remarks"], $_SESSION["dnsc_audit"]["userid"]);
+
+
+				$users = query("select * from users where role_id = 4");
+				foreach($users as $row):
+					$Message = [];
+					$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " created audit checklist and needs to be reviewed.";
+					$Message["link"] = "audit_checklist_review?action=review&id=".$ac_id;
+					$theMessage = serialize($Message);
+					addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+				endforeach;
+
+
+
 				$res_arr = [
 					"result" => "success",
 					"title" => "Success",

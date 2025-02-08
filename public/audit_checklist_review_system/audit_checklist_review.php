@@ -57,6 +57,20 @@
 						", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
 
 
+						$audit_checklist = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_checklist ar
+									left join users u on u.id = ar.user_id
+									 where audit_checklist_id = ?", $_POST["audit_checklist_id"]);
+			$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_checklist[0]["aps_id"]);
+			$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+			foreach($team_members as $row):
+				$Message = [];
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and approved the audit report : " . $_POST["audit_checklist_id"];
+				$Message["link"]= "audit_checklist?action=details&id=".$_POST["audit_checklist_id"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+
 						$res_arr = [
 							"result" => "success",
 							"title" => "Success",
@@ -178,8 +192,7 @@
 									';
 									if($row["audit_checklist_id"] != ""):
 										if($row["audit_checklist_status"] == "DONE"):
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_checklist_id"].'">View Audit Report</a></li>';
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_checklist_id"].'">Print Audit Report</a></li>';
+											$action .= '<li><a class="dropdown-item" href="audit_checklist?action=details&id='.$row["audit_checklist_id"].'">View Audit Checklist</a></li>';
 										else:
 											$action .= '<li><a class="dropdown-item" href="audit_checklist_review?action=review&id='.$row["audit_checklist_id"].'">Review</a></li>';
 										endif;
