@@ -112,6 +112,7 @@
   $(document).ready(function () {
     let lastMessageId = 0; // Track last message ID for new messages
     let offset = 0; // Offset for loading older messages
+    let theOffset = 0; // Offset for loading older messages
     const limit = 20; // Number of messages to load initially
     const chatBox = $('#chat-box .direct-chat-messages');
     let loadingOldMessages = false;
@@ -154,7 +155,12 @@
                 }
             });
             chatBox.scrollTop(chatBox[0].scrollHeight);
+            theOffset += messages.length; // Increase offset correctly
+            offset = theOffset / 20;
         }
+
+       
+                    // alert(offset);
     });
 }
 
@@ -179,7 +185,9 @@
                     });
 
                     chatBox.scrollTop(chatBox[0].scrollHeight - prevScrollHeight); // Keep scroll position after loading
-                    offset += messages.length; // Increase offset correctly
+                    theOffset += messages.length; // Increase offset correctly
+                    offset = theOffset / 20;
+                    // alert(offset);
                 }
                 loadingOldMessages = false;
             }
@@ -215,7 +223,7 @@
 }
 
     // Start polling
-    setInterval(loadMessages, 2000);
+    // setInterval(loadMessages, 2000);
     loadInitialMessages();
 });
 

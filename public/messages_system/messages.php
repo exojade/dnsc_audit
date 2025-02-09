@@ -7,7 +7,8 @@
             $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 20;
             $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
             $lastId = isset($_POST['last_id']) ? intval($_POST['last_id']) : 0;
-            // dump($lastId);
+            $offset = $offset * 20;
+            // dump($offset);
             if ($lastId > 0) {
         // Fetch only newer messages
         $messages = query("SELECT * FROM messages WHERE message_id > ? ORDER BY message_id DESC", $lastId);
