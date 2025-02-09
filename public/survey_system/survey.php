@@ -130,7 +130,7 @@
 			// $_POST["to"] = intval($_POST["to"]);
 
 			$from_timestamp = strtotime($_POST["year"] . "-" . $_POST["from"] . "-" . "01");
-			$to_timestamp = strtotime($_POST["year"] . "-" . $_POST["to"] . "-" . "01");
+			$to_timestamp = strtotime(date($_POST["year"] . "-" . $_POST["to"] . "-" . "t"));
 			// dump($from_timestamp);
 
 					// dump($_POST);
