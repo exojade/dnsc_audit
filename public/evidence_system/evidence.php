@@ -346,9 +346,8 @@ elseif($_POST["action"] == "upload"):
 
 // Recursive function to get all folders
 elseif($_POST["action"] == "archiveFolder"):
-    // dump($_POST);
     
-    $path = "file_manager/main_drive/2//\\Internal Audit 2024 1st Semester";
+    $path = $_POST["source"];
     preg_match('/file_manager\/main_drive\/([^\/]+)/', $path, $matches);
     $base_path = 'file_manager/archive_drive/'.$matches[1];
     // dump($matches[1]); // Output: 2
@@ -356,6 +355,8 @@ elseif($_POST["action"] == "archiveFolder"):
     $destination = $base_path;
     $destinationPath = $destination . '/' . basename($source);
     $sourcePath = $source;
+    // dump($destinationPath);
+
 
     if (file_exists($sourcePath) && is_dir($destination)) {
         // Try to move the file using rename()

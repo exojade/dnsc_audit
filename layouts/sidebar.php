@@ -152,7 +152,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 
   <li class="nav-item">
       <a href="auditPlan?action=auditorList" class="nav-link">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <i class="nav-icon fas fa-file"></i>
         <p>
           Audit Report
 
@@ -206,7 +206,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 
   <li class="nav-item">
       <a href="audit_checklist" class="nav-link">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <i class="nav-icon fas fa-file"></i>
         <p>
           Audit Checklist
           <?php
