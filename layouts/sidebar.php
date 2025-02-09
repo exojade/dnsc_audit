@@ -14,9 +14,7 @@
   color: #fff !important;
 }
 </style>
-
-
-<aside class="main-sidebar sidebar-dark-primary elevation-4" >
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <div class="user-panel mt-3 pb-3 mb-3 text-center">
         <div class="image" style="display:block;">
@@ -27,10 +25,9 @@
     <!-- Sidebar -->
     <div class="sidebar">
 
-      <nav class="mt-2">
+      <nav>
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+
 
 <?php
 switch ($_SESSION["dnsc_audit"]["role"]) {
@@ -247,6 +244,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     break;
   case 4:
     ?>
+
   <li class="nav-item">
       <a href="index" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -357,6 +355,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     break;
   case 5:
     ?>
+     <li class="nav-header">Main</li>
   <li class="nav-item">
       <a href="index" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -366,7 +365,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
-
+  <li class="nav-item">
+      <a href="messages" class="nav-link">
+        <i class="nav-icon fas fa-comments"></i>
+        <p>
+          Messages
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">Admin</li>
   <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
@@ -400,6 +408,30 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       </a>
   </li>
 
+  
+
+
+
+
+  <li class="nav-item">
+      <a href="process" class="nav-link">
+        <i class="nav-icon fas fa-tasks"></i>
+        <p>
+          Process
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="position" class="nav-link">
+        <i class="nav-icon fas fa-briefcase"></i>
+        <p>
+          Position
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">Human Resource</li>
   <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-poll"></i>
@@ -429,32 +461,10 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
               </li>
             </ul>
           </li>
-
-
-
-
-  <li class="nav-item">
-      <a href="process" class="nav-link">
-        <i class="nav-icon fas fa-building"></i>
-        <p>
-          Process
-          <span class="right badge badge-danger"></span>
-        </p>
-      </a>
-  </li>
-  <li class="nav-item">
-      <a href="position" class="nav-link">
-        <i class="nav-icon fas fa-user"></i>
-        <p>
-          Position
-          <span class="right badge badge-danger"></span>
-        </p>
-      </a>
-  </li>
-
+  <li class="nav-header">File Management</li>
   <li class="nav-item">
       <a href="controlled_forms" class="nav-link">
-        <i class="nav-icon fas fa-user"></i>
+        <i class="nav-icon fas fa-folder"></i>
         <p>
           Controlled Forms
           <span class="right badge badge-danger"></span>
@@ -465,7 +475,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 
   <li class="nav-item">
       <a href="manuals" class="nav-link">
-        <i class="nav-icon fas fa-user"></i>
+        <i class="nav-icon fas fa-folder"></i>
         <p>
           Manuals
           <span class="right badge badge-danger"></span>

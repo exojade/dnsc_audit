@@ -52,15 +52,50 @@
     color:red;
   }
 
+  //
+// Component: Animation
+//
+
+/* .animation {
+  &__shake {
+    animation: shake 500ms !important;
+  }
+  &__wobble {
+    animation: wobble 500ms !important;
+  }
+} */
+.preloader {
+  display: flex;
+  background-color: $main-bg;
+  height: 100vh;
+  width: 100%;
+  transition: height 8000ms linear !important;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: $zindex-preloader;
+}
+
+@include dark-mode () {
+  .preloader {
+    background-color: $dark-main-bg;
+    color: $white;
+  }
+}
+
+
   .navbar-nav>.user-menu .user-image {
     height: 2.1rem !important;
 }
 </style>
 <body class="hold-transition sidebar-mini layout-fixed">
+<div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__shake" src="resources/dnsc-logo.png" alt="AdminLTELogo" height="120" width="130">
+  </div>
 <!-- Site wrapper -->
 <div class="wrapper">
   <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-light navbar-light" >
+  <nav class="main-header navbar navbar-expand navbar-light" >
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">

@@ -60,7 +60,8 @@
 				else if ($request == 'notifications')
 					require 'public/notifications_system/notifications.php';
 
-
+				else if ($request == 'messages')
+					require 'public/messages_system/messages.php';
 
 
 				else if ($request == 'audit_checklist')
