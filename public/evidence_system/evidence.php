@@ -87,7 +87,7 @@ if($current_path == ""):
 
             
             echo('
-            <div class="col-3">');
+            <div class="col-md-3 col-12 col-sm-6">');
             echo("<a href='#' onclick='openFolder(\"$current_path$item/\")'>");
             echo('
             <div class="info-box">
@@ -115,7 +115,7 @@ else:
     if($_SESSION["dnsc_audit"]["role"] != 3):
         echo('
         <div class="row">
-            <div class="col-3">
+            <div class="col-md-3 col-12 col-sm-6">
                 <div class="row">
                     <div class="col">
                         <a href="#" onclick="showCreateFolderModal()" class="btn btn-block btn-sm btn-info mb-2">New Folder</a>
@@ -152,7 +152,7 @@ else:
         // Check if it's a folder
         if (is_dir($item_path)) {
             // For folders, add a class and data-path attribute
-            echo '<div title="'.$item.'" class="col-3 folder-item" data-fullpath="'.$item_path.'" data-path="' . $item . '/">';
+            echo '<div title="'.$item.'" class="col-md-3 col-12 col-sm-6 folder-item" data-fullpath="'.$item_path.'" data-path="' . $item . '/">';
             echo '<div class="info-box">';
             echo '<span class="info-box-icon bg-success"><i class="far fa-folder"></i></span>';
             echo '<div class="info-box-content">';
@@ -163,7 +163,7 @@ else:
         } else {
             // dump($full_path);
             // For files, add a class and data-path attribute
-            echo '<div title="'.$item.'" class="col-3 file-item" data-fullpath="'.$item_path.'" data-path="' .$item_path . '">';
+            echo '<div title="'.$item.'" class="col-md-3 col-12 col-sm-6 file-item" data-fullpath="'.$item_path.'" data-path="' .$item_path . '">';
             echo '<div class="info-box">';
             echo '<span class="info-box-icon bg-info"><i class="far fa-file"></i></span>';
             echo '<div class="info-box-content">';

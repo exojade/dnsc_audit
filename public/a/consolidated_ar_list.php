@@ -3,15 +3,17 @@
   <link rel="stylesheet" href="AdminLTE_new/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
-
+  <?php $ap = query("select * from audit_plans order by year, timestamp"); ?>
+  <?php $pending_aps = query("select * from audit_plans where cons_audit_report_id = '' or cons_audit_report_id is null order by year, timestamp"); ?>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Users</h1>
+            <h1>Consolidated Audit Report List</h1>
           </div>
+  
       
         </div>
       </div><!-- /.container-fluid -->
@@ -21,19 +23,67 @@
     <section class="content">
 
 
-    <div class="modal fade" id="modalAssignedArea">
+    <div class="modal fade" id="modalNewConsoAR">
       <div class="modal-dialog modal-lg">
         <div class="modal-content ">
           <div class="modal-header bg-success">
-              <h3 class="modal-title text-center">Assigned Area</h3>
+              <h3 class="modal-title text-center">New Consolidated Audit Report</h3>
           </div>
           <div class="modal-body">
-              <form class="generic_form_trigger" data-url="users">
-                  <input type="hidden" name="action" value="addAssignedArea">
-                    <div class="fetched-data"></div>
+              <form class="generic_form_trigger" data-url="consolidated_ar">
+                  <input type="hidden" name="action" value="newConsolidated_ar">
+                  <div class="form-group">
+                    <label>Audit Plan</label>
+                    <select required name="audit_plan" class="form-control">
+                    <option  value="" selected disabled>Filter Audit Plan</option>
+                    <?php foreach($ap as $row): ?>
+                      <option value="<?php echo($row["audit_plan"]); ?>"><?php echo($row["type"] . " - " . $row["year"]); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Report Title</label>
+                    <input required type="text" class="form-control" name="report_title" placeholder="Enter..">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <div class="input-group">
+                      <div class="custom-file">
+                        <input required name="fileUpload" type="file" class="custom-file-input" id="exampleInputFile">
+                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                      </div>
+                      <div class="input-group-append">
+                        <span class="input-group-text">Upload</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleInputFile">Comments</label>
+                      <textarea rows="5" placeholder="Comments.." required class="form-control" name="comments"></textarea>
+                  </div>
+                  
+                  
+
+
                   <hr>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
               </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="modal fade" id="modalConsAuditReportDetails">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Consolidated Audit Report Details</h3>
+          </div>
+          <div class="modal-body">
+                  <div class="fetched-data"></div>
           </div>
         </div>
       </div>
@@ -50,30 +100,34 @@
                 <div class="row">
                   <div class="col-4">
                   <div class="form-group">
-                  <label>Role List</label>
-                  <select class="form-control selectFilter" id="roleSelect">
-                    <option value="" selected disabled>Please select role to show</option>
-                    <?php $roles = query("select * from roles"); ?>
-                    <?php foreach($roles as $row): ?>
-                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["role_name"]); ?></option>
+                  <select class="form-control selectFilter" id="apSelect">
+                    <option value="" selected disabled>Filter Audit Plan</option>
+                    
+                    <?php foreach($ap as $row): ?>
+                      <option value="<?php echo($row["audit_plan"]); ?>"><?php echo($row["type"]); ?></option>
                     <?php endforeach; ?>
                   </select>
 
                 </div>
                   </div>
+
+                  <div class="col-sm-8">
+            <a href="#" data-toggle="modal" data-target="#modalNewConsoAR" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>New Consolidated Audit Report</a>
+          </div>
                 </div>
                 
               </div>
               <!-- /.card-header -->
-              <div class="card-body table-responsive">
+              <div class="card-body">
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th width="15%">Action</th>
-                    <th>Fullname</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Area</th>
+                    <th>Cons. Audit Report</th>
+                    <th>Title</th>
+                    <th>Audit Plan</th>
+                    <th>Year</th>
+                    <th>AP Status</th>
+                    <th>Date Created</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -104,7 +158,12 @@
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.print.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<script src="AdminLTE_new/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
   <script>
+
+$(function () {
+  bsCustomFileInput.init();
+});
             function preview() {
                 frame.src = URL.createObjectURL(event.target.files[0]);
             }
@@ -119,17 +178,17 @@
 
 
 
-    $('#medicalRecordModal').on('show.bs.modal', function (e) {
+    $('#modalConsAuditReportDetails').on('show.bs.modal', function (e) {
         var rowid = $(e.relatedTarget).data('id');
         Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
         $.ajax({
             type : 'post',
-            url : 'medical', //Here you will fetch records 
+            url : 'consolidated_ar', //Here you will fetch records 
             data: {
-                checkupId: rowid, action: "medicalRecordModal"
+                cons_audit_report_id: rowid, action: "modalConsAuditReportDetails"
             },
             success : function(data){
-                $('#medicalRecordModal .fetched-data').html(data);
+                $('#modalConsAuditReportDetails .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
             }
@@ -137,31 +196,9 @@
      });
 
 
-     $('#modalAssignedArea').on('show.bs.modal', function (e) {
-        var rowid = $(e.relatedTarget).data('id');
-        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
-        $.ajax({
-            type : 'post',
-            url : 'users', //Here you will fetch records 
-            data: {
-                user_id: rowid, action: "modalAssignedArea"
-            },
-            success : function(data){
-                $('#modalAssignedArea .fetched-data').html(data);
-                $("#areaSelect").select2({
-    placeholder: "Select an area", // Placeholder text
-    allowClear: true // Adds a clear button to remove the selection
-});
-                Swal.close();
-                //Show fetched data from database
-            }
-        });
-     });
-
-
 var datatable = 
             $('#ajax_datatable').DataTable({
-                "searching": true,
+                "searching": false,
                 "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"
@@ -173,18 +210,19 @@ var datatable =
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'users',
+                    'url':'consolidated_ar',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "usersList";
+                        data.action = "consolidated_ar_list";
                      }
                 },
                 'columns': [
-                    { data: 'action', "orderable": false },
-                    { data: 'fullname', "orderable": false  },
-                    { data: 'username', "orderable": false  },
-                    { data: 'role_name', "orderable": false  },
-                    { data: 'assigned_area', "orderable": false  },
+                    { data: 'cons_report', "orderable": false  },
+                    { data: 'title', "orderable": false  },
+                    { data: 'type', "orderable": false },
+                    { data: 'year', "orderable": false  },
+                    { data: 'ap_status', "orderable": false  },
+                    { data: 'date_created', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;
@@ -216,8 +254,8 @@ var datatable =
 
   $('.selectFilter').on('change', function() {
     // alert("change");
-            var roleSelect = $('#roleSelect').val();
-            datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
+            var apSelect = $('#apSelect').val();
+            datatable.ajax.url('consolidated_ar?action=consolidated_ar_list&audit_plan=' + apSelect).load();
   });
 
 </script>

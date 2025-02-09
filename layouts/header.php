@@ -68,7 +68,7 @@
       </li>
     </ul>
 
-    <h5 style="
+    <h5 class="d-none d-sm-block" style="
     padding: .5rem 1rem !important; margin: 0 !important;"><span class="text-white"><?php echo($_SESSION["dnsc_audit"]["fullname"]); ?> | </span> <?php echo($_SESSION["dnsc_audit"]["role_name"]); ?></h5>
     <!-- <ul class="navbar-nav ml-auto">
       <li class="nav-item">

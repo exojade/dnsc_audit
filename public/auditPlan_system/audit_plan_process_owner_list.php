@@ -10,75 +10,33 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Users</h1>
+            <h1>Audit Plan List</h1>
+          </div>
+          <div class="col-sm-6">
           </div>
       
         </div>
       </div><!-- /.container-fluid -->
     </section>
-
     <!-- Main content -->
     <section class="content">
-
-
-    <div class="modal fade" id="modalAssignedArea">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content ">
-          <div class="modal-header bg-success">
-              <h3 class="modal-title text-center">Assigned Area</h3>
-          </div>
-          <div class="modal-body">
-              <form class="generic_form_trigger" data-url="users">
-                  <input type="hidden" name="action" value="addAssignedArea">
-                    <div class="fetched-data"></div>
-                  <hr>
-                <button type="submit" class="btn btn-primary float-right">Submit</button>
-              </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
             <!-- Default box -->
             <div class="card">
-              <div class="card-header">
-                <div class="row">
-                  <div class="col-4">
-                  <div class="form-group">
-                  <label>Role List</label>
-                  <select class="form-control selectFilter" id="roleSelect">
-                    <option value="" selected disabled>Please select role to show</option>
-                    <?php $roles = query("select * from roles"); ?>
-                    <?php foreach($roles as $row): ?>
-                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["role_name"]); ?></option>
-                    <?php endforeach; ?>
-                  </select>
 
-                </div>
-                  </div>
-                </div>
-                
-              </div>
               <!-- /.card-header -->
-              <div class="card-body table-responsive">
+              <div class="card-body">
                 <table id="ajax_datatable" class="table table-bordered table-striped" >
                   <thead>
                   <tr>
-                    <th width="15%">Action</th>
-                    <th>Fullname</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Area</th>
+                    <th>Action</th>
+                    <th>Audit Plan</th>
+                    <th>Year</th>
+                    <th>Status</th>
                   </tr>
                   </thead>
-                  <tbody>
-                 
-                  </tbody>
                 </table>
               </div>
               <!-- /.card-body -->
@@ -137,28 +95,6 @@
      });
 
 
-     $('#modalAssignedArea').on('show.bs.modal', function (e) {
-        var rowid = $(e.relatedTarget).data('id');
-        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
-        $.ajax({
-            type : 'post',
-            url : 'users', //Here you will fetch records 
-            data: {
-                user_id: rowid, action: "modalAssignedArea"
-            },
-            success : function(data){
-                $('#modalAssignedArea .fetched-data').html(data);
-                $("#areaSelect").select2({
-    placeholder: "Select an area", // Placeholder text
-    allowClear: true // Adds a clear button to remove the selection
-});
-                Swal.close();
-                //Show fetched data from database
-            }
-        });
-     });
-
-
 var datatable = 
             $('#ajax_datatable').DataTable({
                 "searching": true,
@@ -173,18 +109,17 @@ var datatable =
                 'serverMethod': 'post',
                 
                 'ajax': {
-                    'url':'users',
+                    'url':'auditPlan',
                      'type': "POST",
                      "data": function (data){
-                        data.action = "usersList";
+                        data.action = "audit_plan_process_owner_list";
                      }
                 },
                 'columns': [
                     { data: 'action', "orderable": false },
-                    { data: 'fullname', "orderable": false  },
-                    { data: 'username', "orderable": false  },
-                    { data: 'role_name', "orderable": false  },
-                    { data: 'assigned_area', "orderable": false  },
+                    { data: 'type', "orderable": false  },
+                    { data: 'year', "orderable": false  },
+                    { data: 'status', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

@@ -90,7 +90,17 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       </a>
   </li> -->
 
+  <li class="nav-header">Audit Related</li>
 
+  <li class="nav-item">
+      <a href="auditPlan?action=process_owner_list" class="nav-link">
+        <i class="nav-icon fas fa-table"></i>
+        <p>
+          Audit Plans
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
   
 
   <li class="nav-item">
@@ -115,7 +125,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
             </a>
           </li>
         </ul>
-      </li>
+    </li>
     <?php
     break;
   case 3:

@@ -37,6 +37,52 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+		
+		elseif($_POST["action"] == "audit_plan_process_owner_list"):
+			// dump($_POST);
+
+
+			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
+			$offset = $_POST["start"];
+			$limit = $_POST["length"];
+			$search = $_POST["search"]["value"];
+
+			$limitString = " limit " . $limit;
+			$offsetString = " offset " . $offset;
+
+			$myArea = query("SELECT area_id FROM users_area 
+					WHERE user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+			$area_id = array_column($myArea, "area_id");
+			$area_id = implode(",", $area_id);
+
+			$audit_plan = query("select * from audit_plans");
+			$AuditPlans = [];
+			foreach($audit_plan as $row):
+				$AuditPlans[$row["audit_plan"]] = $row;
+			endforeach;
+
+			$where = " where area_id in ($area_id)";
+			$baseQuery = "select * from aps_area" . $where . " group by audit_plan order by audit_plan desc";
+			$data = query($baseQuery . $limitString . $offsetString);
+			$all_data = query($baseQuery);
+			// dump($area_id);
+			$i = 0;
+			foreach($data as $row):
+				$data[$i]["action"] = '<a href="auditPlan?action=process_owner_list&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+				$data[$i]["type"] = $AuditPlans[$row["audit_plan"]]["type"];
+				$data[$i]["year"] = $AuditPlans[$row["audit_plan"]]["year"];
+				$data[$i]["status"] = $AuditPlans[$row["audit_plan"]]["status"];
+				$i++;
+			endforeach;
+			$json_data = array(
+				"draw" => $draw + 1,
+				"iTotalRecords" => count($all_data),
+				"iTotalDisplayRecords" => count($all_data),
+				"aaData" => $data
+			);
+			echo json_encode($json_data);
+
+
 
 			elseif($_POST["action"] == "auditPlanAuditorDatatable"):
 					// dump($_REQUEST);
@@ -205,6 +251,131 @@
 
 			echo($html);
 
+		elseif($_POST["action"] == "timelineProcessOwnerDatatable"):
+			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
+			$offset = $_POST["start"];
+			$limit = $_POST["length"];
+			$search = $_POST["search"]["value"];
+
+			$limitString = " limit " . $limit;
+			$offsetString = " offset " . $offset;
+
+
+			$myArea = query("SELECT area_id FROM users_area 
+					WHERE user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+			$area_id = array_column($myArea, "area_id");
+			$area_id = implode(",", $area_id);
+
+			$aps_area = query("select * from aps_area where area_id in ($area_id) and audit_plan = ? group by aps_id", $_POST["audit_plan"]);
+			$aps_id = array_column($aps_area, "aps_id");
+			$aps_id = "'".implode("','", $aps_id)."'";
+
+
+
+			$where = " where aps_id in ($aps_id)";
+			$baseQuery = "select * from audit_plan_schedule" . $where;
+
+			$aps_position = query("select * from aps_position ap
+									left join position p on p.position_id = ap.position_id");
+			$aps_area = query("select * from aps_area aa
+									left join areas a on a.id = aa.area_id");
+			$Position = [];
+			$Area = [];
+			foreach($aps_position as $row):
+				$Position[$row["aps_id"]][$row["position_id"]] = $row;
+			endforeach;
+
+			$Process = [];
+			$process = query("select * from process");
+			foreach($process as $row):
+				$Process[$row["process_id"]] = $row;
+			endforeach;
+
+
+			$team = query("SELECT 
+					t.team_id,
+					t.team_number AS team,
+					GROUP_CONCAT(
+						CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+						ORDER BY tm.role = 'LEADER' DESC, u.surname
+						SEPARATOR ', '
+					) AS members
+					FROM 
+						audit_plan_teams t
+					JOIN 
+						audit_plan_team_members tm ON t.team_id = tm.team_id
+					JOIN 
+						users u ON tm.id = u.id
+					where t.audit_plan = ?
+					GROUP BY 
+						t.team_id
+					ORDER BY 
+						t.team_number
+					", $_POST["audit_plan"]);
+			$Team = [];
+			foreach($team as $row):
+				$Team[$row["team_id"]] = $row;
+			endforeach;
+
+
+
+			foreach($aps_area as $row):
+				$Area[$row["aps_id"]][$row["id"]] = $row;
+			endforeach;
+
+			// dump($Position);
+
+
+
+			$data = query($baseQuery . $limitString . " " . $offsetString);
+			$all_data = query($baseQuery);
+
+			$i = 0;
+			foreach($data as $row):
+				// $data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+				// $data[$i]["time"] = date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"]));
+				$area = [];
+				if(isset($Area[$row["aps_id"]])):
+					foreach($Area[$row["aps_id"]] as $a):
+						$area[] = $a["area_name"];
+					endforeach;
+				endif;
+
+		$data[$i]["card"] = 
+			'
+		  <div class="card card-widget" >
+		  <div class="card-header bg-info">
+			<div class="user-block">
+					  <span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+			</div>
+		  </div>
+		  <div class="card-body">
+
+
+		  <dl class="row">
+			  <dt class="col-sm-3">Process</dt>
+			  <dd class="col-sm-9">'.$Process[$row["process_id"]]["process_name"].'</dd>
+			  <dt class="col-sm-3">Area</dt>
+			  <dd class="col-sm-9">'.implode(",", $area).'</dd>
+			  <dt class="col-sm-3">Audit Clause</dt>
+			  <dd class="col-sm-9">'.$row["audit_clause"].'</dd>
+			  <dt class="col-sm-3">Audit Team</dt>
+			  <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+			</dl>
+		  
+		  </div>
+	  
+		</div>
+				';
+				$i++;
+			endforeach;
+			$json_data = array(
+				"draw" => $draw + 1,
+				"iTotalRecords" => count($all_data),
+				"iTotalDisplayRecords" => count($all_data),
+				"aaData" => $data
+			);
+			echo json_encode($json_data);
 		elseif($_POST["action"] == "timelineDatatable"):
 			// dump($_POST);
 			$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
@@ -458,8 +629,16 @@
 				echo json_encode($res_arr); exit();
 
 		elseif($_POST["action"] == "addSchedule"):
+			
 			// dump($_POST);
+
 			$aps_id = create_trackid("APS");
+			$Area = [];
+			$area = query("select * from areas");
+			foreach($area as $row):
+				$Area[$row["id"]] = $row;
+			endforeach;
+
 			// dump($aps_id);
 
 
@@ -535,6 +714,15 @@
 				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
 			endforeach;
 
+			$area = implode(",", $_POST["area_id"]);
+			// dump($area);
+			$users_area = query("select * from users_area where area_id in ($area)");
+			foreach($users_area as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " included your office (".$Area[$row["area_id"]]["area_name"].") for audit under Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+				$Message["link"] = "auditPlan?action=process_owner_list&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["user_id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
 
 
 			$res_arr = [
@@ -1001,6 +1189,17 @@
 				elseif($_GET["action"] == "auditorList"):
 						render("public/auditPlan_system/auditPlan_auditorList.php",[
 						]);
+
+
+				elseif($_GET["action"] == "process_owner_list"):
+					if(!isset($_GET["id"])):
+						render("public/auditPlan_system/audit_plan_process_owner_list.php",[
+						]);
+					else:
+						render("public/auditPlan_system/audit_plan_process_owner_details.php",[
+						]);
+					endif;
+					
 
 					
 				endif;
