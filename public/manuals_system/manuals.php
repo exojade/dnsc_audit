@@ -218,7 +218,7 @@ endif;
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';
     $target_dir = "file_manager/manuals/" . $current_path; // Define the target directory
-    dump($current_path);
+    // dump($current_path);
 
     // Check if the directory exists
     if (!is_dir($target_dir)) {

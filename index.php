@@ -63,6 +63,9 @@
 				else if ($request == 'messages')
 					require 'public/messages_system/messages.php';
 
+				else if ($request == 'archives')
+					require 'public/archives_system/archives.php';
+
 
 				else if ($request == 'audit_checklist')
 					require 'public/audit_checklist_system/audit_checklist.php';

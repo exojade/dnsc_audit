@@ -29,7 +29,7 @@
                 <h3 class="card-title ">Chat Box</h3>
               </div>
               <div class="card-body bg-light" id="chat-box" >
-                <div class="direct-chat-messages" style="min-height: 65vh; max-height: 65vh; overflow-y: auto;">
+                <div class="direct-chat-messages" style="min-height: 55vh; max-height: 55vh; overflow-y: auto;">
              
                 </div>
               </div>
@@ -160,7 +160,6 @@
 
     // Load older messages when scrolling up
     chatBox.on('scroll', function () {
-      console.log("awit");
     if (chatBox.scrollTop() === 0 && !loadingOldMessages) {
         loadingOldMessages = true;
         $.ajax({

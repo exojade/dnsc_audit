@@ -3,6 +3,36 @@
 <script src="AdminLTE_new/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 
 <script>
+<?php
+
+            $Area = [];
+            $area=query("select * from areas where type in ('office', 'institute', 'program')");
+            foreach($area as $row):
+                $Area[] = $row["id"];
+            endforeach;
+            // dump($Area);
+            // dump($_SESSION);
+            $base_path = "file_manager/main_drive";
+
+            // Ensure base path exists
+            if (!is_dir($base_path)) {
+                mkdir($base_path, 0777, true);
+            }
+            $requiredFolders = $Area;
+            $existingFolders = array_filter(glob($base_path . '/*'), 'is_dir');
+            $existingFolderNames = array_map('basename', $existingFolders);
+            foreach ($requiredFolders as $folder) {
+                $folderPath = $base_path . "/" . $folder;
+                if (!in_array($folder, $existingFolderNames)) {
+                    mkdir($folderPath, 0777, true);
+                    // echo "Created: $folderPath <br>";
+                } else {
+                    // echo "Exists: $folderPath <br>";
+                }
+            }
+
+?>
+
 
 $(document).on('click', '.deym', function() {
     $(this).dropdown('toggle');

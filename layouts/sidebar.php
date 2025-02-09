@@ -38,6 +38,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     break;
   case 2:
     ?>
+<li class="nav-header">Main</li>
   <li class="nav-item">
       <a href="index" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -47,6 +48,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-header">File Management</li>
   <li class="nav-item">
       <a href="evidence?action=myEvidence" class="nav-link">
         <i class="nav-icon fas fa-folder"></i>
@@ -72,6 +74,17 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-folder"></i>
         <p>
           Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
+  <li class="nav-item">
+      <a href="archives?action=myArchives" class="nav-link">
+        <i class="nav-icon fas fa-archive"></i>
+        <p>
+          Archives
           <span class="right badge badge-danger"></span>
         </p>
       </a>

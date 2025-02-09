@@ -4,11 +4,11 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <!-- <div class="col-sm-6">
-            <h1>Evidences</h1>
+            <h1>archivess</h1>
           </div> -->
           <div class="col-sm-12">
             <ol class="breadcrumb" id="breadcrumb" style="font-size: 180%; color: #000;">
-              <li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">Evidence</a></li>
+              <li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">archives</a></li>
             </ol>
           </div>
         </div>
@@ -21,8 +21,7 @@
 
     <div id="context-menu" class="dropdown-menu" style="display: none;">
         <a class="dropdown-item" href="#" onclick="showMoveDialog()">Move</a>
-        <!-- <a class="dropdown-item" href="#" onclick="showCopyDialog()">Copy</a> -->
-        <a class="dropdown-item" href="#" onclick="Archive()">Archive</a>
+        <a class="dropdown-item" href="#" onclick="showCopyDialog()">Copy</a>
         <a class="dropdown-item" href="#" onclick="deleteFolder()">Delete</a>
     </div>
 
@@ -104,7 +103,7 @@
     // Function to load files and folders
     function loadFiles(folder = "") {
         $.ajax({
-            url: "evidence",
+            url: "archives",
             type: "post",
             data: { 
 
@@ -150,7 +149,7 @@
     function showMoveDialog() {
         // Fetch all folders inside the base directory
         $.ajax({
-            url: 'evidence', 
+            url: 'archives', 
             type: 'POST',
             data: {
                 action: 'get_folder_structure',
@@ -175,7 +174,7 @@
     // Function to update breadcrumb
     function updateBreadcrumb(folder) {
         let pathSegments = folder.split("/").filter(segment => segment !== "");
-        let breadcrumbHtml = `<li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">Evidences</a></li>`;
+        let breadcrumbHtml = `<li class="breadcrumb-item"><a href="#" onclick="loadFiles('')">Archives</a></li>`;
 
         let path = "";
         pathSegments.forEach((segment, index) => {
@@ -217,7 +216,7 @@
         }
 
         $.ajax({
-            url: "evidence",
+            url: "archives",
             type: "post",
             data: { 
                 action: "create_folder",
@@ -245,7 +244,7 @@
     // Function to download a file when double-clicked
     function downloadFile(filePath) {
         const encodedFilePath = encodeURIComponent(filePath);
-        window.location.href = "evidence?action=download&file=" + encodedFilePath;
+        window.location.href = "archives?action=download&file=" + encodedFilePath;
     }
 
     $(document).ready(function () {
@@ -298,7 +297,7 @@ $(document).on("submit", "#fileUploadForm", function(event) {
 
     // Make AJAX request to upload the file
     $.ajax({
-        url: 'evidence',  // Adjust this to your PHP script's URL
+        url: 'archives',  // Adjust this to your PHP script's URL
         type: 'POST',
         data: formData,
         contentType: false,
@@ -317,7 +316,7 @@ $(document).on("submit", "#fileUploadForm", function(event) {
 function moveToFolder(folder) {
     // Perform the move action here
     $.ajax({
-        url: 'evidence', // Your server-side PHP file
+        url: 'archives', // Your server-side PHP file
         type: 'POST',
         data: {
             action: 'move_file',  // Action type
@@ -381,7 +380,7 @@ function deleteFolder() {
   },
               imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif");?>', showConfirmButton: false });
               $.ajax({
-                  url: 'evidence', // Your server-side PHP file
+                  url: 'archives', // Your server-side PHP file
                   type: 'POST',
                   data: {
                       action: 'deleteFolder',  // Action type
@@ -400,71 +399,6 @@ function deleteFolder() {
     });
     // Perform the move action here
     
-}
-
-
-
-function Archive() {
-
-
-Swal.fire({
-      title: "Alert Warning!",
-      showClass: {
-  popup: `
-    animate__animated
-    animate__bounceIn
-    animate__faster
-  `
-},
-hideClass: {
-  popup: `
-    animate__animated
-    animate__bounceOut
-    animate__faster
-  `
-},
-      text: "Are you sure you want to archive this?",
-      // type: 'info',
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'Cancel'
-  }).then((result) => {
-      if (result.value) {
-          Swal.fire({ title: 'Please wait...', 
-            showClass: {
-  popup: `
-    animate__animated
-    animate__bounceIn
-    animate__faster
-  `
-},
-hideClass: {
-  popup: `
-    animate__animated
-    animate__bounceOut
-    animate__faster
-  `
-},
-            imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif");?>', showConfirmButton: false });
-            $.ajax({
-                url: 'evidence',
-                type: 'POST',
-                data: {
-                    action: 'archiveFolder',
-                    source: selectedPath,
-                },
-                success: function(response) {
-                    Swal.fire("Success!", response, "success");
-                    $('#moveCopyModal').modal('hide');
-                    loadFiles(currentPath);
-                },
-                error: function() {
-                    alert('An error occurred while moving the file.');
-                }
-            });
-      }
-  });
 }
 
 </script>

@@ -3,7 +3,7 @@
 
         if($_POST["action"] == "create_folder"):
            
-            $folderPath = $base_path = "file_manager/main_drive/".$_POST['folder']; // Get the full folder path
+            $folderPath = $base_path = "file_manager/archive_drive/".$_POST['folder']; // Get the full folder path
     //  dump($folderPath);
             if (!file_exists($folderPath)) {
                 // Create folder if it doesn't exist
@@ -19,7 +19,7 @@
 
 		elseif($_POST["action"] == "access_folder"):
             // phpinfo();
-            $base_path = "file_manager/main_drive/";
+            $base_path = "file_manager/archive_drive/";
             if($_SESSION["dnsc_audit"]["role"] != 3):
                 $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
                 where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
@@ -183,7 +183,7 @@ endif;
 
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';
-    $target_dir = "file_manager/main_drive/" . $current_path; // Define the target directory
+    $target_dir = "file_manager/archive_drive/" . $current_path; // Define the target directory
 
     // Check if the directory exists
     if (!is_dir($target_dir)) {
@@ -253,7 +253,7 @@ elseif($_POST["action"] == "upload"):
             closedir($directory);
             return $folders;
         }
-        $rootDir = 'file_manager/main_drive';
+        $rootDir = 'file_manager/archive_drive';
         $rootFolders = getRootDirectories($rootDir);
         // dump($rootFolders);
 
@@ -261,14 +261,14 @@ elseif($_POST["action"] == "upload"):
                             where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
             $MyArea = [];
             foreach($myArea as $row):
-                $MyArea["file_manager/main_drive//".$row["area_id"]] = $row;
+                $MyArea["file_manager/archive_drive//".$row["area_id"]] = $row;
             endforeach;
             // dump($MyArea);
         function getFolderStructure($dir, $myAllowedRoot) {
 
             
 
-            $rootDir = 'file_manager/main_drive';
+            $rootDir = 'file_manager/archive_drive';
         $rootFolders = getRootDirectories($rootDir);
             $folders = [];
             $directory = opendir($dir);
@@ -279,7 +279,7 @@ elseif($_POST["action"] == "upload"):
                     
 
                     // dump($folders);
-                    // echo(is_dir("file_manager/main_drive//2/Internal Audit 2024 1st Semester"));
+                    // echo(is_dir("file_manager/archive_drive//2/Internal Audit 2024 1st Semester"));
                     if (is_dir($path)) {
 
                         
@@ -316,7 +316,7 @@ elseif($_POST["action"] == "upload"):
             closedir($directory);
             return $folders;
         }
-        $base_path = 'file_manager/main_drive/';
+        $base_path = 'file_manager/archive_drive/';
 
 
 
@@ -345,36 +345,14 @@ elseif($_POST["action"] == "upload"):
     echo '</table>';
 
 // Recursive function to get all folders
-elseif($_POST["action"] == "archiveFolder"):
-    // dump($_POST);
-    
-    $path = "file_manager/main_drive/2//\\Internal Audit 2024 1st Semester";
-    preg_match('/file_manager\/main_drive\/([^\/]+)/', $path, $matches);
-    $base_path = 'file_manager/archive_drive/'.$matches[1];
-    // dump($matches[1]); // Output: 2
-    $source = isset($_POST['source']) ? $_POST['source'] : '';
-    $destination = $base_path;
-    $destinationPath = $destination . '/' . basename($source);
-    $sourcePath = $source;
 
-    if (file_exists($sourcePath) && is_dir($destination)) {
-        // Try to move the file using rename()
-        if (rename($sourcePath, $destinationPath)) {
-            echo 'File moved successfully!';
-        } else {
-            echo 'Failed to move the file.';
-        }
-    } else {
-        echo 'Invalid source or destination.';
-    }
 
 
 
 
 elseif($_POST["action"] == "move_file"):
 
-    $base_path = 'file_manager/main_drive/';
-    // dump($_POST);
+    $base_path = 'file_manager/archive_drive/';
     // dump($_POST);
 // Handle the move file request
     $source = isset($_POST['source']) ? $_POST['source'] : ''; // The selected file
@@ -383,7 +361,7 @@ elseif($_POST["action"] == "move_file"):
     // Get full file paths
     $sourcePath = $source;
     $destinationPath = $destination . '/' . basename($source);
-    dump($destination);
+    // dump($destination);
 
     // Check if the source file exists and the destination folder is valid
     if (file_exists($sourcePath) && is_dir($destination)) {
@@ -472,9 +450,9 @@ elseif($_POST["action"] == "move_file"):
 				render("public/users_system/users_list.php",[
 				]);
 			else:
-				if($_GET["action"] == "myEvidence"):
+				if($_GET["action"] == "myArchives"):
 			
-					render("public/evidence_system/evidence_form.php",[
+					render("public/archives_system/archives_form.php",[
 					]);
 
                     elseif($_GET["action"] == "download"):
