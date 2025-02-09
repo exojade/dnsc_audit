@@ -89,14 +89,30 @@
 			];
 			echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "getAuditPlanSchedules"):
+			$schedule_date = query("SELECT 
+    aps.audit_plan,
+    CONCAT(ap.type, '-', ap.year) as event_title,
+    MIN(schedule_date) AS start_date,
+    MAX(schedule_date) AS end_date
+FROM 
+    audit_plan_schedule aps
+    LEFT JOIN audit_plans ap
+    ON ap.audit_plan = aps.audit_plan
+GROUP BY 
+    audit_plan");
+	// dump($schedule_date);
+	echo json_encode($schedule_date);	
+
 
 		endif;
-		
+
+
 
 	
     }
 	else {
-		
+		render("public/dashboard_system/dashboard_admin.php",[]);
 		// if(isset($_SESSION["dnsc_audit"]["accessToken"])):
 		// 	// dump($google);
 		// 	// $client = new Client();
@@ -122,41 +138,41 @@
 		// endif;
 
 
-		$role = $_SESSION["dnsc_audit"]["role"];
-		switch ($role) {
-			case 1:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 2:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 3:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 4:
-				render("public/dashboard_system/dashboard_leadAuditor.php",[]);
-				break;
-			case 5:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 6:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 7:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			case 8:
-				render("public/dashboard_system/dashboard_admin.php",[]);
-				break;
-			default:
-				echo "Invalid day entered.";
-		}
+		// $role = $_SESSION["dnsc_audit"]["role"];
+		// switch ($role) {
+		// 	case 1:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 2:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 3:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 4:
+		// 		render("public/dashboard_system/dashboard_leadAuditor.php",[]);
+		// 		break;
+		// 	case 5:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 6:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 7:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	case 8:
+		// 		render("public/dashboard_system/dashboard_admin.php",[]);
+		// 		break;
+		// 	default:
+		// 		echo "Invalid day entered.";
+		// }
 		
-		if($role == "admin" || $role == "DOCTOR"){
-			render("public/dashboard_system/dashboard_admin.php",[]);
-		}
-		else if($role == "CLIENT"){
-			render("public/dashboard_system/dashboard_client.php",[]);
-		}
+		// if($role == "admin" || $role == "DOCTOR"){
+		// 	render("public/dashboard_system/dashboard_admin.php",[]);
+		// }
+		// else if($role == "CLIENT"){
+		// 	render("public/dashboard_system/dashboard_client.php",[]);
+		// }
 	}
 ?>

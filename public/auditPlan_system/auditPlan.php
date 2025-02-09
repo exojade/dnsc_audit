@@ -387,7 +387,7 @@
 				$offsetString = " offset " . $offset;
 
 				$where = " where audit_plan = '".$_POST["audit_plan"]."'";
-				$baseQuery = "select * from audit_plan_schedule" . $where;
+				$baseQuery = "select * from audit_plan_schedule" . $where . " ORDER BY schedule_date asc, from_time asc";
 
 				$aps_position = query("select * from aps_position ap
 										left join position p on p.position_id = ap.position_id");
@@ -424,7 +424,7 @@
 						GROUP BY 
 							t.team_id
 						ORDER BY 
-							t.team_number
+							t.team_number 
 						", $_POST["audit_plan"]);
 				$Team = [];
 				foreach($team as $row):
@@ -455,7 +455,8 @@
 						endforeach;
 					endif;
 
-			$data[$i]["card"] = 
+			if($row["plan_type"] == "INDIVIDUAL"):
+				$data[$i]["card"] = 
 				'
               <div class="card card-widget" >
               <div class="card-header">
@@ -487,6 +488,32 @@
           
             </div>
 					';
+			else:
+				$data[$i]["card"] = '
+				
+				<div class="card card-widget" >
+              <div class="card-header">
+                <div class="user-block">
+                  		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+							
+                
+                </div>
+				<form class="generic_form_trigger">
+								<button class="btn btn-danger btn-sm float-right">Delete</button>
+							</form>
+								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
+              </div>
+              <div class="card-body text-center">
+			<b>'.$row["fixed_title"].'</b>
+              
+              </div>
+          
+            </div>
+				
+				';
+			endif;
+
+			
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -623,6 +650,38 @@
 				"result" => "success",
 				"title" => "Success",
 				"message" => "Audit Plan Team successfully added",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
+
+		elseif($_POST["action"] == "addFixedSchedule"):
+
+			$aps_id = create_trackid("APS");
+			// dump($_POST);
+			if (query("insert INTO audit_plan_schedule 
+				(aps_id, audit_plan,from_time, to_time,schedule_date,plan_type,fixed_title) 
+				VALUES(?,?,?,?,?,?,?)", 
+				$aps_id, $_POST["audit_plan_id"], 
+				date("H:i", strtotime($_POST["fromTime"])), 
+				date("H:i", strtotime($_POST["toTime"])), 
+				$_POST["schedule_date"],
+				"FIXED", $_POST["fixed_title"]) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Schedule successfully added!",
 				"link" => "refresh",
 				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
 				];
@@ -786,7 +845,8 @@
 			$daySchedule = query("select schedule_date from audit_plan_schedule where audit_plan = ? group by schedule_date", $_POST["audit_plan_id"]);
 			$theSchedule = query("select * from audit_plan_schedule 
 									aps left join process p on p.process_id = aps.process_id 
-									where aps.audit_plan = ?", $_POST["audit_plan_id"]);
+									where aps.audit_plan = ? order by schedule_date asc, from_time asc", $_POST["audit_plan_id"]);
+			// dump($theSchedule);
 
 			$teams = query("select * from audit_plan_team_members aptm
 								left join users u on u.id = aptm.id where audit_plan = ?
@@ -809,6 +869,7 @@
 			foreach($theSchedule as $row):
 				$TheSchedule[$row["schedule_date"]][$row["aps_id"]] = $row;
 			endforeach;
+			// dump($TheSchedule);
 
 			$team = query("SELECT 
 			t.team_id,
@@ -847,10 +908,10 @@
 						'mode' => 'utf-8',
 						'format' => 'A4-L', // 'A4-L' sets the orientation to landscape
 						'debug' => true,
-						'margin_top' => 4,
+						'margin_top' => 50,
 						'margin_left' => 3,
 						'margin_right' => 3,
-						'margin_bottom' => 2,
+						'margin_bottom' => 30,
 						'margin_footer' => 1,
 						'default_font' => 'helvetica'
 					]);
@@ -866,6 +927,7 @@
 							style="width:100%; height: auto; max-height: 130px;">
 						</div>
 					</div>
+			
 					');
 
 					$mpdf->SetHTMLFooter('
@@ -935,17 +997,6 @@
 					}
 
 					</style>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					
-
-		
 					<h4 class="text-center"><b>Audit Plan</b></h4>
 
 					<table class="table" style="margin-top: 10px;">
@@ -1044,17 +1095,6 @@
 
 					</style>
 
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-
-
-
 					<table class="table" style="margin-top: 10px;">
 					<tbody>
 						<tr>
@@ -1068,42 +1108,55 @@
 					</tbody>';
 					$day = 1;
 					foreach($daySchedule as $row):
+						// dump($TheSchedule);
 						$html.='
 						<tr>
-							<td colspan="5">Day '.$day.' - '.date("F d, Y", strtotime($row["schedule_date"])).'</td>
+							<td colspan="5"><b>Day '.$day.' - '.date("F d, Y", strtotime($row["schedule_date"])).'</b></td>
 						</tr>
 						';
 
 						if(isset($TheSchedule[$row["schedule_date"]])):
+							// dump($TheSchedule[$row["schedule_date"]]);
 							foreach($TheSchedule[$row["schedule_date"]] as $sched):
-								$html.='
-								<tr>
-									<td width="15%">'.date("g:i A", strtotime($sched["from_time"])) . "-" . date("g:i A", strtotime($sched["to_time"])).'</td>
-									<td>'.$sched["process_name"].'</td>
-									<td>'.$sched["audit_clause"].'</td>
-									<td>';
-									$i=0;
-									foreach($Teams[$sched["team_id"]] as $myteam):
-										// dump($myteam);
-										if($i != 0):
-											$html.='<br>';
-										endif;
-										$html.=$myteam["firstname"] . " " . $myteam["surname"];
-										$i++;
-									endforeach;
-									$html.='</td>
-									<td>';
-									$i=0;
-									foreach($ApsPosition[$sched["aps_id"]] as $myPosition):
-										if($i != 0):
-											$html.='<br>';
-										endif;
-										$html.=$myPosition["position_name"];
-										$i++;
-									endforeach;
-									$html.='</td>
-								</tr>
-								';
+								// if()
+								if($sched["plan_type"] == "INDIVIDUAL"):
+									$html.='
+									<tr>
+										<td width="15%">'.date("g:i A", strtotime($sched["from_time"])) . "-" . date("g:i A", strtotime($sched["to_time"])).'</td>
+										<td>'.$sched["process_name"].'</td>
+										<td>'.$sched["audit_clause"].'</td>
+										<td>';
+										$i=0;
+										foreach($Teams[$sched["team_id"]] as $myteam):
+											// dump($myteam);
+											if($i != 0):
+												$html.='<br>';
+											endif;
+											$html.=$myteam["firstname"] . " " . $myteam["surname"];
+											$i++;
+										endforeach;
+										$html.='</td>
+										<td>';
+										$i=0;
+										foreach($ApsPosition[$sched["aps_id"]] as $myPosition):
+											if($i != 0):
+												$html.='<br>';
+											endif;
+											$html.=$myPosition["position_name"];
+											$i++;
+										endforeach;
+										$html.='</td>
+									</tr>
+									';
+								else:
+									$html.='
+									<tr>
+										<td width="15%">'.date("g:i A", strtotime($sched["from_time"])) . "-" . date("g:i A", strtotime($sched["to_time"])).'</td>
+										<td colspan="4" class="text-center"><b>'.$sched["fixed_title"].'</b></td>
+									</tr>
+									';
+								endif;
+								
 
 							endforeach;
 						endif;

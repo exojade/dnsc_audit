@@ -198,6 +198,71 @@
       </div>
     </div>
 
+
+
+    <div class="modal fade" id="modalAddFixedSchedule">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Add Fixed Schedule</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                <input type="hidden" name="action" value="addFixedSchedule">
+                <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">
+      
+                <div class="form-group">
+                  <label>Fixed Schedule Title</label>
+                  <input required type="text" class="form-control" name="fixed_title" placeholder="Ex. Continuation of Meetings">
+                </div>
+
+
+
+                <div class="form-group">
+                  <label>Schedule Date</label>
+                  <input required type="date" class="form-control" name="schedule_date">
+                </div>
+
+
+                <div class="row">
+                    <div class="col-6">
+                    <div class="bootstrap-timepicker">
+                      <div class="form-group">
+                        <label>From:</label>
+                        <div class="input-group date" id="fromtimepickerFixed" data-target-input="nearest">
+                      <input name="fromTime" type="text" class="form-control datetimepicker-input" data-target="#fromtimepickerFixed"/>
+                      <div class="input-group-append" data-target="#fromtimepickerFixed" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+                      </div>
+                      </div>
+                      </div>
+                    </div>
+
+                    </div>
+                    <div class="col-6">
+                    <div class="bootstrap-timepicker">
+                      <div class="form-group">
+                        <label>To:</label>
+                        <div class="input-group date" id="totimepickerFixed" data-target-input="nearest">
+                      <input name="toTime" type="text" class="form-control datetimepicker-input" data-target="#totimepickerFixed"/>
+                      <div class="input-group-append" data-target="#totimepickerFixed" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+                      </div>
+                      </div>
+                      </div>
+                    </div>
+
+                    </div>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="modalUpdateInfo">
       <div class="modal-dialog modal-lg">
         <div class="modal-content ">
@@ -294,6 +359,7 @@
                   </div>
                   <div class="tab-pane" id="timeline">
                     <a href="#" data-toggle="modal" data-target="#modalAddSchedule" class="btn btn-success btn-sm">Add Audit Schedule</a>
+                    <a href="#" data-toggle="modal" data-target="#modalAddFixedSchedule" class="btn btn-warning btn-sm">Add Fixed Schedule</a>
                     <hr>
 
                     <table id="timelineDatatable" style="width: 100% !important;">
@@ -357,6 +423,18 @@ $('#fromtimepicker').datetimepicker({
     })
 
     $('#totimepicker').datetimepicker({
+      format: 'LT',
+      stepping: 30,
+      defaultDate: moment("05:00 PM", "hh:mm A")
+    })
+
+    $('#fromtimepickerFixed').datetimepicker({
+      format: 'LT',
+      stepping: 30,
+      defaultDate: moment("08:00 AM", "hh:mm A")
+    })
+
+    $('#totimepickerFixed').datetimepicker({
       format: 'LT',
       stepping: 30,
       defaultDate: moment("05:00 PM", "hh:mm A")

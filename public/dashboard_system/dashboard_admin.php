@@ -117,22 +117,24 @@
 
         <div class="row">
           <div class="col-12 col-md-12">
-
-
           <div class="card">
               <div class="card-header d-flex p-0">
-                <h3 class="card-title p-3 text-success"><b>Pages</b></h3>
-                <ul class="nav nav-pills ml-auto p-2">
+                <!-- <h3 class="card-title p-3 text-success"><b>Pages</b></h3> -->
+                <ul class="nav nav-pills p-2">
                   <li class="nav-item"><a class="nav-link active" href="#tab_2" data-toggle="tab">Announcements</a></li>
                   <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Calendar</a></li>
                 </ul>
               </div><!-- /.card-header -->
-              <div class="card-body" style="max-height:50vh; overflow-y: auto;">
+              <div class="card-body">
                 <div class="tab-content">
                   <div class="tab-pane active" id="tab_2">
+                    <?php if($_SESSION["dnsc_audit"]["role"] == 5 || $_SESSION["dnsc_audit"]["role"] == 1 ): ?>
                   <a href="#" data-toggle="modal" class="btn btn-success" data-target="#newAnnouncement">New Annoucement</a>
+                  
                   <br>
                   <br>
+                  <?php endif; ?>
+                  <div  style="max-height:45vh; overflow-y: auto; overflow-x: hidden;">
                   <table id="ajaxDatatable" width="100%;">
                   <thead>
                   <tr>
@@ -140,11 +142,12 @@
                   </tr>
                   </thead>
                 </table>
+                    </div>
                   </div>
                   <!-- /.tab-pane -->
                   <div class="tab-pane" id="tab_3">
                     <div class="row">
-                      <div class="col-8">
+                      <div class="col-12">
                         <div id="calendar"></div>
                       </div>
                       <div class="col-4">
@@ -204,43 +207,50 @@ $(document).ready(function () {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         events: function(fetchInfo, successCallback, failureCallback) {
-            // Fetch both holidays and database events
-            $.when(
-                $.ajax({ url: 'https://date.nager.at/api/v3/PublicHolidays/2025/PH', method: 'GET' }),
-                $.ajax({ url: 'get_events.php', method: 'GET' })
-            ).done(function(holidaysResponse, dbEventsResponse) {
-                var holidays = holidaysResponse[0].map(function(holiday) {
-                    return {
-                        title: holiday.localName,
-                        start: holiday.date,
-                        allDay: true,
-                        color: '#ff5733' // Red color for holidays
-                    };
-                });
+    // Fetch both holidays and database events
+    $.when(
+        $.ajax({ url: 'https://date.nager.at/api/v3/PublicHolidays/2025/PH', method: 'GET' }),
+        $.ajax({ url: 'index', data: { action: "getAuditPlanSchedules" }, method: 'POST' })
+    ).done(function(holidaysResponse, dbEventsResponse) {
+        // Map holidays to event format
+        var holidays = holidaysResponse[0].map(function(holiday) {
+            return {
+                title: holiday.localName,
+                start: holiday.date,
+                allDay: true,
+                color: '#ff5733' // Red color for holidays
+            };
+        });
+        // console.log(dbEventsResponse);
 
-                var dbEvents = holidaysResponse[0].map(function(holiday) {
-                    return {
-                        title: holiday.localName,
-                        start: holiday.date,
-                        allDay: true,
-                        color: '#ff5733' // Red color for holidays
-                    };
-                });
+        // Map database events to event format
+        var dbEvents = JSON.parse(dbEventsResponse[0]).map(function(event) {
+            return {
+                title: event.event_title, // Ensure you use the correct key from the backend
+                start: event.start_date,  // Make sure these keys match your backend
+                end: (function() {
+        // Create a Date object from the end_date
+        var endDate = new Date(event.end_date);
+        
+        // Add 1 day (24 hours in milliseconds)
+        endDate.setDate(endDate.getDate() + 1);
+        
+        // Format the date back to string (assuming you want the same format as backend)
+        return endDate.toISOString().split('T')[0];  // Example format: 'YYYY-MM-DD'
+    })(),      // Make sure these keys match your backend
+                allDay: true,
+                color: '#3498db',
+                url: 'auditPlan?action=details&id=' + event.audit_plan
+                // Blue color for custom events
+            };
+        });
 
-                // var dbEvents = dbEventsResponse[0].map(function(event) {
-                //     return {
-                //         title: event.title,
-                //         start: event.start,
-                //         allDay: true,
-                //         color: '#3498db' // Blue color for custom events
-                //     };
-                // });
-
-                successCallback([...holidays, ...dbEvents]); // Merge both event sources
-            }).fail(function() {
-                failureCallback();
-            });
-        }
+        // Merge holidays and database events
+        successCallback([...holidays, ...dbEvents]);
+    }).fail(function() {
+        failureCallback();
+    });
+}
     });
 
     // Render calendar only when the tab is shown
