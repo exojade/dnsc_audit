@@ -57,20 +57,23 @@ sort($files);
 $sorted_items = array_merge($folders, $files);
 if($current_path == ""):
 
-    echo('
-    <div class="row">
-        <div class="col-3">
-            <div class="row">
-                <div class="col">
-                    <a href="#" onclick="showCreateFolderModal()" class="btn btn-block btn-sm btn-info mb-2">New Folder</a>
-                </div>
-                <div class="col">
-                    <a href="#" onclick="showFileUploadModal()" class="btn btn-block btn-sm btn-info mb-2">File Upload</a>
+    if($_SESSION["dnsc_audit"]["role"] == 1 || $_SESSION["dnsc_audit"]["role"] == 5):
+        echo('
+        <div class="row">
+            <div class="col-3">
+                <div class="row">
+                    <div class="col">
+                        <a href="#" onclick="showCreateFolderModal()" class="btn btn-block btn-sm btn-info mb-2">New Folder</a>
+                    </div>
+                    <div class="col">
+                        <a href="#" onclick="showFileUploadModal()" class="btn btn-block btn-sm btn-info mb-2">File Upload</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    ');
+        ');
+    endif;
+ 
 
     echo('<div class="row">');
 
@@ -116,7 +119,7 @@ if($current_path == ""):
 echo("</div>");
 
 else:
-
+    if($_SESSION["dnsc_audit"]["role"] == 1 || $_SESSION["dnsc_audit"]["role"] == 5):
         echo('
         <div class="row">
             <div class="col-3">
@@ -131,6 +134,7 @@ else:
             </div>
         </div>
         ');
+    endif;
     
 
     if(empty($sorted_items)):

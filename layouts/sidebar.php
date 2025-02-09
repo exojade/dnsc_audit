@@ -461,7 +461,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
                 </a>
               </li>
               <li class="nav-item">
-                <a href="users?action=pending_users" class="nav-link">
+                <a href="survey?action=graph" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Graph</p>
                 </a>

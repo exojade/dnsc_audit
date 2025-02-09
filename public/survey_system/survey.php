@@ -124,6 +124,75 @@
 				];
 				echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "lineChart"):
+
+			// $_POST["from"] = intval($_POST["from"]);
+			// $_POST["to"] = intval($_POST["to"]);
+
+			$from_timestamp = strtotime($_POST["year"] . "-" . $_POST["from"] . "-" . "01");
+			$to_timestamp = strtotime($_POST["year"] . "-" . $_POST["to"] . "-" . "01");
+			// dump($from_timestamp);
+
+					// dump($_POST);
+					$Month = [];
+					$months = getMonths();
+					foreach($months as $row):
+						$Month[$row["id"]] = $row;
+					endforeach;
+					// dump($Month);
+			
+					// dump($Month);
+					$where = "where timestamp between $from_timestamp and $to_timestamp";
+					if(isset($_POST["office"])):
+						if($_POST["office"] != ""):
+							$where .= " and office_id = '".$_POST["office"]."'";
+						endif;
+					endif;
+					$TheFinalCount = [];
+					$BarCount = [];
+					$barChartCount = query("
+					SELECT
+						 MONTH(FROM_UNIXTIME(timestamp)) AS month, 
+						COUNT(*) AS count
+					FROM
+						survey
+						$where
+						GROUP BY month 
+					ORDER BY
+						month ASC;
+					");
+					
+					foreach($barChartCount as $row):
+						$BarCount[$row["month"]] = $row;
+					endforeach;
+					// dump($barChartCount);
+					// du
+
+					$j=0;
+					$totalCount = 0;
+					for($i = intval($_POST["from"]); $i<=intval($_POST["to"]); $i++):
+						$TheFinalCount[$j]["name"] = $Month[$i]["name"];
+						if(isset($BarCount[$i])):
+							$TheFinalCount[$j]["count"] = $BarCount[$i]["count"];
+						else:
+							$TheFinalCount[$j]["count"] = 0;
+						endif;
+						$totalCount += $TheFinalCount[$j]["count"];
+						$j++;
+					endfor;
+
+					$myDisease = "All";
+					if($_POST["office"] != ""):
+						$theDisease = query("select * from office where office_id = ?", $_POST["office"]);
+						$myDisease = $theDisease[0]["office_name"];
+					endif;
+			
+					$json_data = array(
+						"dataset" => $TheFinalCount,
+						"disease" => $myDisease,
+						"totalCount" => $totalCount,
+					);
+					echo json_encode($json_data);
 
 
 		endif;
@@ -133,8 +202,7 @@
 	else {
 
 			if(!isset($_GET["action"])):
-				$users = query("select * from users");
-				render("public/users_system/users_list.php",[
+				render("public/404_system/404form.php",[
 				]);
 			else:
 				if($_GET["action"] == "edit_form"):
@@ -143,6 +211,9 @@
 				elseif($_GET["action"] == "feedback"):
 					render("public/survey_system/surveyFeedback.php",[
 					]);
+					elseif($_GET["action"] == "graph"):
+						render("public/survey_system/surveyGraph.php",[
+						]);
 				endif;
 			endif;
 
