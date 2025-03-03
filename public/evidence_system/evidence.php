@@ -118,12 +118,18 @@ else:
             <div class="col-md-3 col-12 col-sm-6">
                 <div class="row">
                     <div class="col">
-                        <a href="#" onclick="showCreateFolderModal()" class="btn btn-block btn-sm btn-info mb-2">New Folder</a>
+                        <a href="#" onclick="showCreateFolderModal()" class="btn btn-block  btn-info mb-2">New Folder</a>
                     </div>
                     <div class="col">
-                        <a href="#" onclick="showFileUploadModal()" class="btn btn-block btn-sm btn-info mb-2">File Upload</a>
+                        <a href="#" onclick="showFileUploadModal()" class="btn btn-block  btn-info mb-2">File Upload</a>
                     </div>
                 </div>
+            </div>
+     
+            <div class="col-md-9">
+                <select id="search-input" class="form-control float-right" >
+                    <option value="">Search files...</option>
+                </select>
             </div>
         </div>
         ');
@@ -180,6 +186,75 @@ else:
 
 
 endif;
+
+elseif($_POST["action"] == "search_files"):
+    $query = trim($_POST["query"]);
+
+    $folders = query("select * from users_area where user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+    $allowed_dirs = [];
+    foreach($folders as $f):
+        $allowed_dirs[] = "file_manager/main_drive/".$f["area_id"] . "/";
+    endforeach;
+    // dump($allowed_dirs);
+    
+    
+    // $allowed_dirs = ["file_manager/main_drive/"]; // Allowed root directories
+
+
+
+
+    
+
+
+
+
+    $results = [];
+
+    function searchFiles($dir, $query, &$results, $baseDir) {
+        $baseDir = 'file_manager/main_drive/';
+        if (!is_dir($dir)) return;
+
+        $items = scandir($dir);
+        foreach ($items as $item) {
+            if ($item === "." || $item === "..") continue;
+
+            $fullPath = $dir . $item;
+            $isFolder = is_dir($fullPath);
+            $relativePath = str_replace($baseDir, "", $fullPath); // Trim base directory
+            $parentFolder = str_replace($baseDir, "", dirname($fullPath)); // Trim parent directory
+            // dump($parentFolder);
+
+            // Match file/folder names
+            if (stripos($item, $query) !== false) {
+                $results[] = [
+                    "name" => $item,
+                    "path" => $relativePath,
+                    "parent_folder" => $isFolder ? $relativePath : $parentFolder,
+                    "is_folder" => $isFolder
+                ];
+            }
+
+            // If it's a folder, search inside it
+            if ($isFolder) {
+                searchFiles($fullPath . "/", $query, $results, $baseDir);
+            }
+        }
+    }
+
+    foreach ($allowed_dirs as $dir) {
+        // dump($dir);
+        searchFiles($dir, $query, $results, $dir);
+    }
+
+    echo json_encode($results);
+    exit;
+
+
+/**
+ * Recursively search for files and folders inside a directory.
+ */
+
+
 
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';

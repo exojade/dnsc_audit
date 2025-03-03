@@ -39,7 +39,6 @@ $(document).on('click', '.deym', function() {
 });
 
 
-  
 $(document).on('submit', '.generic_form_trigger', function(e) {
     e.preventDefault(); // Prevent the default form submission
 

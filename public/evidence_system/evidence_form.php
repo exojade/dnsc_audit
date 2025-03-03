@@ -1,3 +1,8 @@
+<link rel="stylesheet" href="AdminLTE_new/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="AdminLTE_new/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
+
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -90,6 +95,7 @@
 </div>
 </section>
 </div>
+<script src="AdminLTE_new/plugins/select2/js/select2.full.min.js"></script>
 <?php require("layouts/footer.php") ?>
 
 
@@ -100,7 +106,9 @@
     let currentPath = ""; // To track the directory
     let selectedFile = ""; // To store selected file or folder path
     let selectedPath = "";
-
+    function openFile(filePath) {
+    alert("Opening: " + filePath);
+}
     // Function to load files and folders
     function loadFiles(folder = "") {
         $.ajax({
@@ -122,6 +130,45 @@
                 $("#file-list").html(response);
                 currentPath = folder;
                 updateBreadcrumb(folder);
+
+
+                $("#search-input").select2({
+        placeholder: "Search files...",
+        allowClear: true,
+        minimumInputLength: 2, // Start searching after 2 characters
+        ajax: {
+            url: "evidence", // Backend PHP script
+            type: "POST",
+            dataType: "json",
+            delay: 250, // Reduce request spam
+            data: function(params) {
+                return {
+                    action: "search_files",
+                    query: params.term // Search term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data, function(item) {
+                        return {
+                            id: item.parent_folder, // Full file path
+                            text: item.name, // Display name
+                            icon: item.is_folder ? "📂" : "📄" // Folder or file emoji
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
+    // When a file is selected
+    $("#search-input").on("select2:select", function(e) {
+        let filePath = e.params.data.id;
+        // console.log();
+        // openFile(filePath);
+        openMasterFolder(filePath)
+    });
             }
         });
     }
@@ -129,6 +176,10 @@
     // Function to open folder on double-click
     function openFolder(folder) {
         loadFiles(currentPath + folder + "/");
+    }
+
+    function openMasterFolder(folder) {
+        loadFiles(folder + "/");
     }
 
     // Function to handle right-click context menu

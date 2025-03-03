@@ -307,7 +307,7 @@
 			"result" => "success",
 			"title" => "Success",
 			"message" => "Success",
-			"link" => "users?action=users_list",
+			"link" => "auditPlan?action=auditorDetails&id=".$aps_area["audit_plan"],
 			];
 			echo json_encode($res_arr); exit();
 

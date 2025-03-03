@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="AdminLTE_new/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 <link rel="stylesheet" href="AdminLTE_new/plugins/summernote/summernote-bs4.min.css">
 <link rel="stylesheet" href="AdminLTE_new/plugins/fullcalendar/main.css">
+<!-- <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> -->
+<link rel="stylesheet" href="AdminLTE_new/plugins/fontawesome-free/css/all.min.css">
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -54,69 +56,55 @@
       </div>
 
       <div class="row">
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-cog"></i></span>
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>150</h3>
 
-              <div class="info-box-content">
-                <span class="info-box-text">CPU Traffic</span>
-                <span class="info-box-number">
-                  10
-                  <small>%</small>
-                </span>
+                <p>New Orders</p>
               </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-thumbs-up"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Likes</span>
-                <span class="info-box-number">41,410</span>
+              <div class="icon">
+                <i class="fa fa-users"></i>
               </div>
-              <!-- /.info-box-content -->
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <!-- /.info-box -->
           </div>
-          <!-- /.col -->
+          <!-- ./col -->
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>53<sup style="font-size: 20px">%</sup></h3>
 
-          <!-- fix for small devices only -->
-          <div class="clearfix hidden-md-up"></div>
-
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Sales</span>
-                <span class="info-box-number">760</span>
+                <p>Bounce Rate</p>
               </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-users"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">New Members</span>
-                <span class="info-box-number">2,000</span>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
               </div>
-              <!-- /.info-box-content -->
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <!-- /.info-box -->
           </div>
-          <!-- /.col -->
+          <!-- ./col -->
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>44</h3>
+
+                <p>User Registrations</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+      
         </div>
 
         <div class="row">
-          <div class="col-12 col-md-12">
+          <div class="col-8 col-md-8">
           <div class="card">
               <div class="card-header d-flex p-0">
                 <!-- <h3 class="card-title p-3 text-success"><b>Pages</b></h3> -->
@@ -160,6 +148,55 @@
                 </div>
                 <!-- /.tab-content -->
               </div><!-- /.card-body -->
+            </div>
+            </div>
+
+            <div class="col-4">
+            <div class="card">
+              <div class="card-header bg-success">
+                <h5 class="card-title"><b>Survey Summary</b></h5>
+
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+
+                <?php $surveys = query("SELECT 
+    o.office_id,
+    o.office_name,
+    COUNT(s.survey_id) AS survey_count,
+    (SELECT COUNT(*) FROM survey) AS total_surveys,
+    ROUND((COUNT(s.survey_id) / (SELECT COUNT(*) FROM survey) * 100)) AS percentage
+FROM office o
+LEFT JOIN survey s ON o.office_id = s.office_id
+GROUP BY o.office_id, o.office_name
+ORDER BY survey_count DESC"); ?>
+                  <div class="col-md-12">
+                    <p class="text-center">
+                      <strong><?php echo($surveys[0]["total_surveys"]); ?> Survey Respondents</strong>
+                    </p>
+
+          
+
+<?php foreach($surveys as $row): ?>
+  <div class="progress-group">
+                      <b><?php echo($row["office_name"]); ?></b>
+                      <span class="float-right"><?php echo($row["survey_count"]); ?></span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" style="width: <?php echo($row["percentage"]); ?>%"></div>
+                      </div>
+                    </div>
+<?php endforeach; ?>
+
+
+                    
+                    <!-- /.progress-group -->
+
+                    
+                  </div>
+                </div>
+              </div>
+             
             </div>
             </div>
 

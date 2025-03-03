@@ -93,17 +93,19 @@
 	
 					$limitString = " limit " . $limit;
 					$offsetString = " offset " . $offset;
+					// dump($_POST);
 	
 					$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
 
 					$myTeam = query("SELECT team_id FROM audit_plan_team_members 
 					WHERE id = ? 
 					GROUP BY team_id", 
-					$_SESSION["dnsc_audit"]["userid"]);
+					$_POST["interal_audit_id"]);
+					// dump($myTeam);
 					$teamIds = array_column($myTeam, "team_id");
 
 					$myTeam = "'" . implode("','", $teamIds) . "'";
-
+					// dump($myTeam);
 					$audit_plans = "
 					SELECT 
 						aps.audit_plan,
@@ -131,6 +133,7 @@
 					foreach($audit_plans as $row):
 						$thePlans[$row["audit_plan"]] = $row;
 					endforeach;
+					// dump($thePlans);
 
 
 
@@ -150,6 +153,7 @@
 					endif;
 	
 					$data = query($baseQuery . $limitString . " " . $offsetString);
+					// dump($baseQuery);
 					$all_data = query($baseQuery);
 	
 	
@@ -157,9 +161,18 @@
 					$i = 0;
 					foreach($data as $row):
 						$data[$i]["action"] = '<a href="auditPlan?action=auditorDetails&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
-						$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
-						$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
-						$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
+						
+						$data[$i]["create_count"] = 0;
+						$data[$i]["pending_count"] = 0;
+						$data[$i]["done_count"] = 0;
+
+						if(isset($thePlans[$row["audit_plan"]])):
+							$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
+							$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
+							$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
+						endif;
+						
+						
 						
 						$i++;
 					endforeach;

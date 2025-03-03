@@ -34,6 +34,134 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
   case 1:
     ?>
 
+<li class="nav-header">Main</li>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="messages" class="nav-link">
+        <i class="nav-icon fas fa-comments"></i>
+        <p>
+          Messages
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">Admin</li>
+  <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Users
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>All Users</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="users?action=pending_users" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pending</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+  <li class="nav-item">
+      <a href="area" class="nav-link">
+        <i class="nav-icon fas fa-building"></i>
+        <p>
+          Area
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  
+
+
+
+
+  <li class="nav-item">
+      <a href="process" class="nav-link">
+        <i class="nav-icon fas fa-tasks"></i>
+        <p>
+          Process
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="position" class="nav-link">
+        <i class="nav-icon fas fa-briefcase"></i>
+        <p>
+          Position
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">Human Resource</li>
+  <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-poll"></i>
+              <p>
+              Survey
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="survey?action=feedback" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Feedback</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="survey?action=graph" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Graph</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="survey?action=edit_form" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Edit Form</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+  <li class="nav-header">File Management</li>
+  <li class="nav-item">
+      <a href="controlled_forms" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
+  <li class="nav-item">
+      <a href="manuals" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Manuals
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
     <?php
     break;
   case 2:
@@ -500,13 +628,56 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     <?php
     break;
   case 6:
-    render("public/dashboard_system/dashboard_admin.php",[]);
+    // render("public/dashboard_system/dashboard_admin.php",[]);
+    ?>
+<li class="nav-header">Main</li>
+<li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+<li class="nav-header">Human Resource</li>
+  <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-poll"></i>
+              <p>
+              Survey
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="survey?action=feedback" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Feedback</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="survey?action=graph" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Graph</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="survey?action=edit_form" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Edit Form</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+    <?php
+    
     break;
   case 7:
-    render("public/dashboard_system/dashboard_admin.php",[]);
+    // render("public/dashboard_system/dashboard_admin.php",[]);
     break;
   case 8:
-    render("public/dashboard_system/dashboard_admin.php",[]);
+    // render("public/dashboard_system/dashboard_admin.php",[]);
     break;
   default:
     echo "Invalid day entered.";
