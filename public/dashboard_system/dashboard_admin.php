@@ -181,7 +181,7 @@ ORDER BY survey_count DESC"); ?>
 <?php foreach($surveys as $row): ?>
   <div class="progress-group">
                       <b><?php echo($row["office_name"]); ?></b>
-                      <span class="float-right"><?php echo($row["survey_count"]); ?></span>
+                      <span class="float-right"><b><?php echo($row["survey_count"]); ?></b></span>
                       <div class="progress progress-sm">
                         <div class="progress-bar bg-success" style="width: <?php echo($row["percentage"]); ?>%"></div>
                       </div>
