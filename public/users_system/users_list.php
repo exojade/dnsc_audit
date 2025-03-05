@@ -91,7 +91,6 @@
     <!-- /.content -->
   </div>
 
-  <script src="AdminLTE/bower_components/select2/dist/js/select2.full.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="AdminLTE_new/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
