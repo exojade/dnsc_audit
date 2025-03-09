@@ -48,7 +48,7 @@
 				foreach($data as $row):
 					$data[$i]["action"] = '
 					<div class="btn-group btn-block">
-						<a href="#" data-toggle="modal" data-target="#modalUpdateProcess" data-id="'.$row["position_id"].'" class="btn btn-sm btn-warning">Update</a>
+						<a href="#" data-toggle="modal" data-target="#modalUpdate" data-id="'.$row["position_id"].'" class="btn btn-sm btn-warning">Update</a>
 						<a href="#" data-toggle="modal" data-target="#modalAssignedArea" data-id="'.$row["position_id"].'" class="btn btn-sm btn-info">Assign Area</a>
 					</div>';
 
@@ -74,7 +74,31 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+				
+		elseif($_POST["action"] == "modalUpdate"):
+			// dump($_POST);
+			$position = query("select * from position where position_id = ?", $_POST["position_id"]);
+			$position = $position[0];
+			$hint = '';
+			$hint .='
+				<input type="hidden" name="position_id" value="'.$position["position_id"].'">
+				<div class="form-group">
+					<label>Position Name</label>
+					<input class="form-control" type="text" name="position_name" value="'.$position["position_name"].'">
+				</div>
+			';
+			echo($hint);
 
+
+		elseif($_POST["action"] == "updatePosition"):
+			query("update position set position_name = ? where position_id = ?", $_POST["position_name"], $_POST["position_id"]);
+			$res_arr = [
+				"result" => "success",
+				"title" => "Update Position",
+				"message" => "Success on updating position details.",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
 		elseif($_POST["action"] == "addPosition"):
 			// dump($_POST);
 

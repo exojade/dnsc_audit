@@ -31,7 +31,7 @@
                 <table id="ajax_datatable" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Action</th>
+                    <th width="8%">Action</th>
                     <th>Area Name</th>
                     <th>Description</th>
                     <th>Type</th>

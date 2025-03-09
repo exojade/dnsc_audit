@@ -75,10 +75,30 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "modalUpdateProcess"):
+
+			$process = query("select * from process where process_id = ?", $_POST["process_id"]);
+			$process = $process[0];
+			$hint = '';
+
+			$hint .='
+				<input type="hidden" name="process_id" value="'.$process["process_id"].'">
+				<div class="form-group">
+					<label>Process Name</label>
+					<input class="form-control" type="text" name="process_name" value="'.$process["process_name"].'">
+				</div>
+			';
+			echo($hint);
+		elseif($_POST["action"] == "updateProcess"):
+			query("update process set process_name = ? where process_id = ?", $_POST["process_name"], $_POST["process_id"]);
+			$res_arr = [
+				"result" => "success",
+				"title" => "Update Process",
+				"message" => "Success on updating process details.",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
 		elseif($_POST["action"] == "addProcess"):
-			// dump($_POST);
-
-
 			query("insert INTO process (process_name) 
 			VALUES(?)", 
 			$_POST["processName"]);

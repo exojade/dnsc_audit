@@ -206,6 +206,25 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-item">
+      <a href="quality_policy" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Quality Policy
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="system_control" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          System Control
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
 
 
   <li class="nav-item">
@@ -619,6 +638,26 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-folder"></i>
         <p>
           Manuals
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="quality_policy" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Quality Policy
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="system_control" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          System Control
           <span class="right badge badge-danger"></span>
         </p>
       </a>

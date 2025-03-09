@@ -73,7 +73,15 @@ $sorted_items = array_merge($folders, $files);
 if($current_path == ""):
 
 
-    echo('<div class="row">');
+    echo('<div class="row">
+    <div class="col-md-12">
+                <select id="search-input" class="form-control float-right" >
+                    <option value="">Search files...</option>
+                </select>
+            </div>
+            <br>
+            <br>
+    ');
 
     foreach ($sorted_items as $item) {
         
@@ -201,7 +209,11 @@ elseif($_POST["action"] == "search_files"):
     // $allowed_dirs = ["file_manager/main_drive/"]; // Allowed root directories
 
 
-
+    $area = query("select * from areas");
+    $Area = [];
+    foreach($area as $row):
+        $Area[$row["id"]] = $row;
+    endforeach;
 
     
 
@@ -210,7 +222,7 @@ elseif($_POST["action"] == "search_files"):
 
     $results = [];
 
-    function searchFiles($dir, $query, &$results, $baseDir) {
+    function searchFiles($dir, $query, &$results, $baseDir, $area_array) {
         $baseDir = 'file_manager/main_drive/';
         if (!is_dir($dir)) return;
 
@@ -222,12 +234,17 @@ elseif($_POST["action"] == "search_files"):
             $isFolder = is_dir($fullPath);
             $relativePath = str_replace($baseDir, "", $fullPath); // Trim base directory
             $parentFolder = str_replace($baseDir, "", dirname($fullPath)); // Trim parent directory
-            // dump($parentFolder);
+            // dump($relativePath);
+
+            $firstWord = explode("/", $parentFolder)[0];
+            $parts = explode("/", $parentFolder);
+            
+            $remainingString = $area_array[$firstWord]["area_name"]."/".implode("/", array_slice($parts, 1));
 
             // Match file/folder names
             if (stripos($item, $query) !== false) {
                 $results[] = [
-                    "name" => $item,
+                    "name" => $item . " (".$remainingString.")",
                     "path" => $relativePath,
                     "parent_folder" => $isFolder ? $relativePath : $parentFolder,
                     "is_folder" => $isFolder
@@ -236,14 +253,14 @@ elseif($_POST["action"] == "search_files"):
 
             // If it's a folder, search inside it
             if ($isFolder) {
-                searchFiles($fullPath . "/", $query, $results, $baseDir);
+                searchFiles($fullPath . "/", $query, $results, $baseDir, $area_array);
             }
         }
     }
 
     foreach ($allowed_dirs as $dir) {
         // dump($dir);
-        searchFiles($dir, $query, $results, $dir);
+        searchFiles($dir, $query, $results, $dir, $Area);
     }
 
     echo json_encode($results);
@@ -334,12 +351,13 @@ elseif($_POST["action"] == "upload"):
 
         $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
                             where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+        // dump($myArea);
             $MyArea = [];
             foreach($myArea as $row):
                 $MyArea["file_manager/main_drive//".$row["area_id"]] = $row;
             endforeach;
             // dump($MyArea);
-        function getFolderStructure($dir, $myAllowedRoot) {
+        function getFolderStructure($dir, $myAllowedRoot, $depth = 0) {
 
             
 
@@ -356,15 +374,17 @@ elseif($_POST["action"] == "upload"):
                     // dump($folders);
                     // echo(is_dir("file_manager/main_drive//2/Internal Audit 2024 1st Semester"));
                     if (is_dir($path)) {
-
                         
+                        $isRoot = false;
+                        $folderName = $file;// dump($myAllowedRoot);
+                        
+                    $prefix = $isRoot ? "" : str_repeat("<span style='margin-left: 25px;'></span>", $depth) . " ";
                     $folders[$path]["path"] = $path;
-                    $folders[$path]["name"] = $file;
-                    $subfolders = getFolderStructure($path, $myAllowedRoot); // Recurse into subdirectories
+                    $folders[$path]["name"] = $prefix . $file;
+                    $subfolders = getFolderStructure($path, $myAllowedRoot, $depth + 1); // Recurse into subdirectories
                     $folders = array_merge($folders, $subfolders);
                         // $bool = 0;
                         foreach($rootFolders as $f):
-                            
                             if(compareDirectories($f, $path)):
                                 // dump($myAllowedRoot);
                                 if(!isset($myAllowedRoot[$path])):
@@ -372,27 +392,23 @@ elseif($_POST["action"] == "upload"):
                                 else:
                                     $folders[$path]["path"] = $path;
                                     $folders[$path]["name"] = $myAllowedRoot[$path]["area_name"] . " (Root Folder)";
+                                    $isRoot = true;
                                 endif;
                             endif;
-                            
-                            
                         endforeach;
-                        
-
-                        // echo($path . "<br>");
-                        
-
                     }
                     
                 }
                
             }
+            // dump($folders);
         
             closedir($directory);
+            // dump($folders);
+
             return $folders;
         }
         $base_path = 'file_manager/main_drive/';
-
 
 
 // Get the folder structure for modal (including subfolders)
@@ -403,11 +419,13 @@ elseif($_POST["action"] == "upload"):
     $folders = getFolderStructure($directory, $MyArea);
     // dump($folders);
 
+    // dump($folders);
+
     // Output folder structure for modal
     echo '<table class="table">';
     echo '<thead><tr><th>Path</th><th>Action</th></tr></thead>';
     echo '<tbody>';
-
+    // dump($folders);
     foreach ($folders as $folderPath) {
         // dump($folderPath);
         echo '<tr>';
@@ -459,7 +477,7 @@ elseif($_POST["action"] == "move_file"):
     // Get full file paths
     $sourcePath = $source;
     $destinationPath = $destination . '/' . basename($source);
-    dump($destination);
+    // dump($destination);
 
     // Check if the source file exists and the destination folder is valid
     if (file_exists($sourcePath) && is_dir($destination)) {

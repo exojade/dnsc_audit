@@ -55,13 +55,7 @@
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
 	
-				$where = " where type in ('office', 'institute', 'program')";
-	
-		
-
-	
-				
-
+				$where = " where type in ('office', 'institute')";
 				if($search == ""):
 					$baseQuery = "select * from areas " . $where;
 					$data = query($baseQuery . $limitString . " " . $offsetString);
@@ -81,7 +75,6 @@
 					$data[$i]["action"] = '
 					<div class="btn-group btn-block">
 						<a href="#" data-toggle="modal" data-target="#modalUpdateArea" data-id="'.$row["id"].'" class="btn btn-sm btn-warning">Update</a>
-						<a href="#" data-id="'.$row["id"].'" class="btn btn-sm btn-info">Select</a>
 					</div>';
 					$i++;
 				endforeach;

@@ -77,6 +77,11 @@
 				else if ($request == 'controlled_forms')
 					require 'public/controlled_forms_system/controlled_forms.php';
 
+				else if ($request == 'system_control')
+					require 'public/system_control_system/system_control.php';
+				else if ($request == 'quality_policy')
+					require 'public/quality_policy_system/quality_policy.php';
+
 				else if ($request == 'manuals')
 					require 'public/manuals_system/manuals.php';
 

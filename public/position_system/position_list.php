@@ -63,6 +63,24 @@
       </div>
     </div>
 
+    <div class="modal fade" id="modalUpdate">
+      <div class="modal-dialog">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Position</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="position">
+                  <input type="hidden" name="action" value="updatePosition">
+                    <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
         <div class="row">
           <div class="col-12">
@@ -132,6 +150,24 @@
                     placeholder: "Select an area", // Placeholder text
                     allowClear: true // Adds a clear button to remove the selection
                 });
+                Swal.close();
+                //Show fetched data from database
+            }
+        });
+     });
+
+
+     $('#modalUpdate').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'position', //Here you will fetch records 
+            data: {
+                position_id: rowid, action: "modalUpdate"
+            },
+            success : function(data){
+                $('#modalUpdate .fetched-data').html(data);
                 Swal.close();
                 //Show fetched data from database
             }

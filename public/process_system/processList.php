@@ -66,6 +66,24 @@
       </div>
     </div>
 
+    <div class="modal fade" id="modalUpdateProcess">
+      <div class="modal-dialog">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Process</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="process" data-title="Update Process" data-message="Are you sure you want to continue?">
+                  <input type="hidden" name="action" value="updateProcess">
+                    <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
         <div class="row">
           <div class="col-12">
@@ -135,6 +153,24 @@
     placeholder: "Select an area", // Placeholder text
     allowClear: true // Adds a clear button to remove the selection
 });
+                Swal.close();
+                //Show fetched data from database
+            }
+        });
+     });
+
+
+     $('#modalUpdateProcess').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'process', //Here you will fetch records 
+            data: {
+                process_id: rowid, action: "modalUpdateProcess"
+            },
+            success : function(data){
+                $('#modalUpdateProcess .fetched-data').html(data);
                 Swal.close();
                 //Show fetched data from database
             }

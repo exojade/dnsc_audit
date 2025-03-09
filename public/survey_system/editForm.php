@@ -11,7 +11,7 @@
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>
-              Edit Survery Form
+              Edit Survey Form
             </h1>
           </div>
       
@@ -45,11 +45,50 @@
                   <button type="submit" class="btn btn-primary">Submit</button>
               </form>
             </div>
-      
           </div>
-          <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
+      </div>
+
+      <div class="modal fade" id="modalUpdateQuestion">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header bg-warning">
+              <h4 class="modal-title">Update Question / Criteria</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            <form class="generic_form_trigger" data-url="survey">
+                <input type="hidden" name="action" value="updateQuestion">
+                        <div class="fetched-data"></div>
+                   <hr>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modalUpdateOffice">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header bg-warning">
+              <h4 class="modal-title">Update Office</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            <form class="generic_form_trigger" data-url="survey">
+                <input type="hidden" name="action" value="updateOffice">
+                        <div class="fetched-data"></div>
+                   <hr>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
 
 
@@ -123,8 +162,8 @@
                   <?php $criteria = query("select * from survey_questionnaire"); ?>
                   <thead>
                   <tr>
-                    <th width="15%">Action</th>
-                    <th>Question</th>
+                    <th width="10%">Action</th>
+                    <th width="60%">Question</th>
                     <th>Status</th>
                   </tr>
                   </thead>
@@ -132,10 +171,15 @@
                     <?php foreach($criteria as $row): ?>
                       <tr>
                         <td>
+                        <form class="generic_form_trigger" data-url="survey" style="display: inline;" data-title="Delete Question" data-message="Are you sure you want to delete this question?">
                             <div class="btn-group btn-block">
-                              <a href="#" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>  
-                              <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>  
+                                <input type="hidden" name="action" value="deleteQuestion" >
+                                <input type="hidden" name="questionnaire_id" value="<?php echo($row["questionnaire_id"]); ?>">
+                                <a data-id="<?php echo($row["questionnaire_id"]); ?>" data-target="#modalUpdateQuestion" data-toggle="modal" href="#" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>  
+                                <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>  
                             </div>
+                            </form>
+
                         </td>
                         <td><?php echo($row["question"]); ?></td>
                         <td><?php echo($row["active_status"]); ?></td>
@@ -163,8 +207,8 @@
                 <table class="table table-bordered table-striped datatable" >
                   <thead>
                   <tr>
-                    <th width="15%">Action</th>
-                    <th>Office</th>
+                    <th width="10%">Action</th>
+                    <th width="60%">Office</th>
                     <th>Status</th>
                   </tr>
                   </thead>
@@ -172,10 +216,14 @@
                     <?php foreach($office as $row): ?>
                       <tr>
                         <td>
+                        <form class="generic_form_trigger" data-url="survey" style="display: inline;" data-title="Delete Office" data-message="Are you sure you want to delete this office?">
                             <div class="btn-group btn-block">
-                              <a href="#" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>  
+                            <input type="hidden" name="action" value="deleteOffice" >
+                            <input type="hidden" name="office_id" value="<?php echo($row["office_id"]) ?>" >
+                              <a href="#" data-id="<?php echo($row["office_id"]) ?>" data-toggle="modal" data-target="#modalUpdateOffice" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>  
                               <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>  
                             </div>
+                        </form>
                         </td>
                         <td><?php echo($row["office_name"]); ?></td>
                         <td><?php echo($row["active_status"]); ?></td>
@@ -219,22 +267,41 @@
 
 
 
-    $('#medicalRecordModal').on('show.bs.modal', function (e) {
+    $('#modalUpdateQuestion').on('show.bs.modal', function (e) {
         var rowid = $(e.relatedTarget).data('id');
         Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
         $.ajax({
             type : 'post',
-            url : 'medical', //Here you will fetch records 
+            url : 'survey', //Here you will fetch records 
             data: {
-                checkupId: rowid, action: "medicalRecordModal"
+                id: rowid, action: "modalUpdateQuestion"
             },
             success : function(data){
-                $('#medicalRecordModal .fetched-data').html(data);
+                $('#modalUpdateQuestion .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
             }
         });
      });
+
+     $('#modalUpdateOffice').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'survey', //Here you will fetch records 
+            data: {
+                id: rowid, action: "modalUpdateOffice"
+            },
+            success : function(data){
+                $('#modalUpdateOffice .fetched-data').html(data);
+                Swal.close();
+                // $(".select2").select2();//Show fetched data from database
+            }
+        });
+     });
+
+     
 
 
      $('#modalAssignedArea').on('show.bs.modal', function (e) {

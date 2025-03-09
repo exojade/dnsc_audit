@@ -194,7 +194,112 @@
 					);
 					echo json_encode($json_data);
 
+		elseif($_POST["action"] == "modalUpdateQuestion"):
+			// dump($_POST);
 
+			$survey = query("select * from survey_questionnaire where questionnaire_id = ?", $_POST["id"]);
+			$survey = $survey[0];
+
+			$hint = '';
+
+			$status = ["ACTIVE", "INACTIVE"];
+			$hint .= '
+				<input type="hidden" name="questionnaire_id" value="'.$_POST["id"].'">
+				<div class="form-group">
+					<label>Questionnaire</label>
+					<input type="text" class="form-control" name="question" value="' . $survey["question"] . '">
+				</div>
+
+				<div class="form-group">
+					<label>Active Status</label>
+					<select name="active_status" class="form-control">';
+					foreach ($status as $row) {
+						$selected = ($row == $survey["active_status"]) ? ' selected' : '';
+						$hint .= '<option value="' . $row . '"' . $selected . '>' . $row . '</option>';
+					}
+
+			$hint .= '
+					</select>
+				</div>
+			';
+
+
+			echo($hint);
+
+		elseif($_POST["action"] == "modalUpdateOffice"):
+				// dump($_POST);
+	
+				$office = query("select * from office where office_id = ?", $_POST["id"]);
+				$office = $office[0];
+	
+				$hint = '';
+	
+				$status = ["ACTIVE", "INACTIVE"];
+				$hint .= '
+					<input type="hidden" name="office_id" value="'.$_POST["id"].'">
+					<div class="form-group">
+						<label>Office Name</label>
+						<input type="text" class="form-control" name="office_name" value="' . $office["office_name"] . '">
+					</div>
+					<div class="form-group">
+						<label>Active Status</label>
+						<select name="active_status" class="form-control">';
+						foreach ($status as $row) {
+							$selected = ($row == $office["active_status"]) ? ' selected' : '';
+							$hint .= '<option value="' . $row . '"' . $selected . '>' . $row . '</option>';
+						}
+						$hint .= '
+							</select>
+						</div>
+					';
+				echo($hint);
+		elseif($_POST["action"] == "updateQuestion"):
+			// dump($_POST);
+			query("update survey_questionnaire set question = ?, active_status = ? where questionnaire_id = ?",
+					$_POST["question"], $_POST["active_status"], $_POST["questionnaire_id"]
+			);
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Success on Updating Questionnaire",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
+
+			elseif($_POST["action"] == "updateOffice"):
+				// dump($_POST);
+				query("update office set office_name = ?, active_status = ? where office_id = ?",
+						$_POST["office_name"], $_POST["active_status"], $_POST["office_id"]
+				);
+				$res_arr = [
+					"result" => "success",
+					"title" => "Success",
+					"message" => "Success on Updating Office",
+					"link" => "refresh",
+					];
+					echo json_encode($res_arr); exit();
+
+		elseif($_POST["action"] == "deleteQuestion"):
+			// dump($_POST);
+			query("delete from survey_questionnaire where questionnaire_id = ?", $_POST["questionnaire_id"]);
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Success on Deleting Questionnaire",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
+
+			elseif($_POST["action"] == "deleteOffice"):
+				// dump($_POST);
+				query("delete from office where office_id = ?", $_POST["office_id"]);
+				$res_arr = [
+					"result" => "success",
+					"title" => "Success",
+					"message" => "Success on Deleting Office",
+					"link" => "refresh",
+					];
+					echo json_encode($res_arr); exit();
 		endif;
 		
 		
