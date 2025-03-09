@@ -91,6 +91,20 @@
 				}
 
 			query("update audit_plans set cons_audit_report_id = ? where audit_plan = ?" , $cons_ar_id, $_POST["audit_plan"]);
+
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan"]);
+			$audit_plan = $audit_plan[0];
+
+
+			$users = query("select * from users where role_id in (5,1)");
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " submitted Consolidated Audit Report under Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+				$Message["link"] = "consolidated_ar";
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+
 			
 				$res_arr = [
 					"result" => "success",

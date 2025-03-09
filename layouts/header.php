@@ -114,6 +114,34 @@
    
     </ul> -->
 
+    <?php
+function timeAgo($timestamp) {
+  $time_difference = time() - $timestamp;
+
+  if ($time_difference < 1) {
+      return 'Just now';
+  }
+
+  $condition = array( 
+      12 * 30 * 24 * 60 * 60 => 'year',
+      30 * 24 * 60 * 60 => 'month',
+      24 * 60 * 60 => 'day',
+      60 * 60 => 'hour',
+      60 => 'minute',
+      1 => 'second'
+  );
+
+  foreach ($condition as $secs => $str) {
+      $d = $time_difference / $secs;
+
+      if ($d >= 1) {
+          $t = round($d);
+          return $t . ' ' . $str . ($t > 1 ? 's' : '') . ' ago';
+      }
+  }
+}
+    ?>
+
 
     <ul class="navbar-nav ml-auto">
       <!-- Navbar Search -->
@@ -155,7 +183,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="max-height: 500px; overflow-y: auto; width:500px !important; max-width: 500px !important;">
           
         <?php if($notifications[0]["count"] != 0): ?>
-          <?php $myNotif = query("select * from notification where receiver_id = ? and read_at is null", $_SESSION["dnsc_audit"]["userid"]); ?>
+          <?php $myNotif = query("select * from notification where receiver_id = ? and read_at is null order by created desc", $_SESSION["dnsc_audit"]["userid"]); ?>
           <?php 
           $users = query("select * from users"); 
           $Users = [];
@@ -170,6 +198,7 @@
 
           <?php foreach($myNotif as $row): 
             $message = unserialize($row["message"]);
+            $timeAgo = timeAgo($row["created"]);
             ?>
             <a href="notifications?action=read&id=<?php echo($row["notification_id"]); ?>" class="dropdown-item">
             <!-- Message Start -->
@@ -178,7 +207,7 @@
             alt="User Avatar" class="img-size-50 mr-3 img-circle">
               <div class="media-body">
                 <p class="text-sm"><?php echo($message["message"]); ?></p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> <?php echo($timeAgo); ?></p>
               </div>
             </div>
             <!-- Message End -->

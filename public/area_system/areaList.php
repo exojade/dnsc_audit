@@ -13,11 +13,71 @@
             <h1>Area</h1>
           </div>
           <div class="col-sm-6">
-            <a href="#" data-toggle="modal" data-target="addNewArea" class="btn btn-success float-right">Add Area</a>
+            <a href="#" data-toggle="modal" data-target="#modalAddArea" class="btn btn-success float-right">Add Area</a>
           </div>
         </div>
       </div>
     </section>
+
+    <div class="modal fade" id="modalAddArea">
+      <div class="modal-dialog">
+        <div class="modal-content ">
+          <div class="modal-header bg-success">
+              <h3 class="modal-title text-center">Add Area</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="area">
+                  <input type="hidden" name="action" value="addArea">
+                  <div class="form-group">
+                    <label>Area Name</label>
+                    <input type="text" name="area_name" required class="form-control" placeholder="Enter Area Name">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Area Description</label>
+                    <textarea class="form-control" name="description" placeholder="Enter Description"></textarea>
+                  </div>
+
+                  <?php $type = ["office", "institute"] ?>
+
+                  <div class="form-group">
+                    <label>Area Type</label>
+                    <select class="form-control" required name="type">
+                      <option value="" selected disabled>Select Type Here</option>
+                      <?php foreach($type as $row): ?>
+                        <option value="<?php echo($row); ?>"><?php echo($row); ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="modalUpdateArea">
+      <div class="modal-dialog">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Area</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="area">
+                  <input type="hidden" name="action" value="updateArea">
+                      <div class="fetched-data"></div>
+                  <hr>
+                <button type="submit" class="btn btn-primary float-right">Save</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -27,7 +87,7 @@
                 <h3 class="card-title">Office / Academics</h3>
               </div>
               <div class="card-body">
-                <table id="ajax_datatable" class="table table-bordered table-striped">
+                <table id="ajax_datatable" class="table table-bordered table-striped" style="width: 100%;">
                   <thead>
                   <tr>
                     <th width="8%">Action</th>
@@ -89,6 +149,24 @@
             },
             success : function(data){
                 $('#medicalRecordModal .fetched-data').html(data);
+                Swal.close();
+                // $(".select2").select2();//Show fetched data from database
+            }
+        });
+     });
+
+
+     $('#modalUpdateArea').on('show.bs.modal', function (e) {
+        var rowid = $(e.relatedTarget).data('id');
+        Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
+        $.ajax({
+            type : 'post',
+            url : 'area', //Here you will fetch records 
+            data: {
+                id: rowid, action: "modalUpdateArea"
+            },
+            success : function(data){
+                $('#modalUpdateArea .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
             }

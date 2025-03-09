@@ -165,6 +165,35 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-item">
+      <a href="quality_policy" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Quality Policy
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="system_control" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          System Control
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="archives?action=myArchives" class="nav-link">
+        <i class="nav-icon fas fa-archive"></i>
+        <p>
+          Archives
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
 
     <?php
     break;
@@ -408,7 +437,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     break;
   case 4:
     ?>
-
+<li class="nav-header">Main</li>
   <li class="nav-item">
       <a href="index" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>

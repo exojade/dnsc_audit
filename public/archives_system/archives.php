@@ -71,7 +71,7 @@ $base_path = "file_manager/archive_drive/";
                     $MyArea[$row["area_id"]] = $row;
                 endforeach;
 
-            elseif($_SESSION["dnsc_audit"]["role"] == 5):
+            elseif($_SESSION["dnsc_audit"]["role"] == 5 || $_SESSION["dnsc_audit"]["role"] == 1):
                 $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id");
                 $MyArea = [];
                 foreach($myArea as $row):
@@ -166,7 +166,7 @@ echo("</div>");
 
 else:
 
-    if($_SESSION["dnsc_audit"]["role"] != 3 && $_SESSION["dnsc_audit"]["role"] != 5):
+    if($_SESSION["dnsc_audit"]["role"] != 3 && $_SESSION["dnsc_audit"]["role"] != 5 && $_SESSION["dnsc_audit"]["role"] != 1):
         echo('
         <div class="row">
             <div class="col-md-3 col-12 col-sm-6">
@@ -237,7 +237,7 @@ endif;
 
 elseif($_POST["action"] == "search_files"):
     $query = trim($_POST["query"]);
-    if($_SESSION["dnsc_audit"]["role"] == 5):
+    if($_SESSION["dnsc_audit"]["role"] == 5 || $_SESSION["dnsc_audit"]["role"] == 1):
         $folders = query("select id as area_id from areas");
     else:
         $folders = query("select * from users_area where user_id = ?", $_SESSION["dnsc_audit"]["userid"]);

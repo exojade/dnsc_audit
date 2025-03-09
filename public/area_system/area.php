@@ -1,48 +1,29 @@
 <?php
     if($_SERVER["REQUEST_METHOD"] === "POST") {
 
-		if($_POST["action"] == "addUser"):
+		if($_POST["action"] == "addArea"):
 
-			// dump($_FILES);
-			$fullname = $_POST["username"];
-			$fullname = str_replace(' ', '_', $fullname);
-			$target_pdf = "uploads/users/";
-
-			if($_FILES["profile_image"]["size"] != 0){
-				
-				$path_parts = pathinfo($_FILES["profile_image"]["name"]);
-				$extension = $path_parts['extension'];
-				$target = $target_pdf . "fullname" . "." . $extension;
-				
-                    if(!move_uploaded_file($_FILES['profile_image']['tmp_name'], $target)){
-                        echo("FAMILY Do not have upload files");
-                        exit();
-                    }
-			}
-			$user_id = create_uuid("USR");
-			if (query("insert INTO users (user_id, username, password, role, 
-						fullname,status, gender,address) 
-			  VALUES(?,?,?,?,?,?,?,?)", 
-				$user_id, $_POST["username"], crypt('!1234#',''), $_POST["role"], strtoupper($_POST["fullname"]),
-				"active",$_POST["gender"], $_POST["address"],) === false)
+			// dump($_POST);
+// 
+			if (query("insert INTO areas (area_name, area_description, type, created_at, updated_at) 
+			  VALUES(?,?,?,?,?)", 
+				$_POST["area_name"], $_POST["description"], $_POST["type"], date("Y-m-d H:i:s"), date("Y-m-d H:i:s")) === false)
 				{
 					$res_arr = [
 						"result" => "failed",
 						"title" => "Failed",
-						"message" => "User already Registered",
-						"link" => "users?action=users_list",
+						"message" => "Area already Registered",
+						"link" => "refresh",
 						];
 						echo json_encode($res_arr); exit();
 				}
-
-			query("update users set profile_image = '".$target."'
-				where user_id = '".$user_id."'");	
+			
 
 		$res_arr = [
 			"result" => "success",
 			"title" => "Success",
-			"message" => "Success",
-			"link" => "users?action=users_list",
+			"message" => "Add Area Successfully",
+			"link" => "refresh",
 			];
 			echo json_encode($res_arr); exit();
 		elseif($_POST["action"] == "areaList"):
@@ -86,6 +67,51 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "modalUpdateArea"):
+			// dump($_POST);
+			$type = ["office", "institute"];
+
+			$area = query("select * from areas where id = ?", $_POST["id"]);
+			$area=$area[0];
+			$hint = '
+			<input type="hidden" name="id" value="'.$_POST["id"].'">
+			 <div class="form-group">
+                    <label>Area Name</label>
+                    <input type="text" name="area_name" value="'.$area["area_name"].'" required class="form-control" placeholder="Enter Area Name">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Area Description</label>
+                    <textarea class="form-control" name="description" placeholder="Enter Description">'.$area["area_description"].'</textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Area Type</label>
+                    <select class="form-control" required name="type">
+                      <option value="'.$area["type"].'" selected>'.$area["type"].'</option>';
+
+
+                     foreach($type as $row):
+                        $hint.='<option value="'.$row.'">'.$row.'</option>';
+                   endforeach;
+				   $hint.='
+                    </select>
+                  </div>
+			';
+
+			echo($hint);
+
+		elseif($_POST["action"] == "updateArea"):
+			// dump($_POST);
+			query("update areas set area_name = ?, area_description = ?, type = ? where id = ?", $_POST["area_name"], $_POST["description"], $_POST["type"], $_POST["id"]);
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Area updated successfully!",
+				"link" => "refresh",
+				];
+				echo json_encode($res_arr); exit();
+			
 		elseif($_POST["action"] == "getProcesses"):
 			// dump($_POST);
 
