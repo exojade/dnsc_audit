@@ -27,7 +27,7 @@
 		elseif($_POST["action"] == "access_folder"):
             // phpinfo();
             $Area = [];
-            $area=query("select * from areas where type in ('office', 'institute', 'program')");
+            $area=query("select * from areas where type in ('office', 'institute')");
             foreach($area as $row):
                 $Area[] = $row["id"];
             endforeach;

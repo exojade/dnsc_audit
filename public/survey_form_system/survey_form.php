@@ -22,6 +22,16 @@ require("includes/google_class.php");
 			query("insert INTO survey (office_id, name, email_address,survey_result,remarks,timestamp,contact_number) 
 			VALUES(?,?,?,?,?,?,?)", 
 			$_POST["office"], $_POST["fullname"], $_POST["email_address"], $SurveyResult, $_POST["comments"], time(), $_POST["contact_number"]);
+
+			$users = query("select * from users where role_id in (5,6,1)");
+			foreach($users as $row):
+				$Message = [];
+				$Message["message"] = "📝 A new survey response has been submitted. Review the feedback now!";
+				$Message["link"] = "survey?action=feedback";
+				$theMessage = serialize($Message);
+				addNotification($row["id"], $theMessage, "");
+			endforeach;
+
 			
 			$res_arr = [
 				"result" => "success",
@@ -30,6 +40,8 @@ require("includes/google_class.php");
 				"link" => "refresh",
 				];
 				echo json_encode($res_arr); exit();
+
+			
 
 
 		endif;

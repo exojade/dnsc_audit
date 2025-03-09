@@ -61,7 +61,23 @@ foreach ($requiredFolders as $folder) {
 $base_path = "file_manager/archive_drive/";
 
             
-            if($_SESSION["dnsc_audit"]["role"] != 3):
+            if($_SESSION["dnsc_audit"]["role"] == 3 ):
+    
+
+                $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
+                where a.id = ?", $_POST["root"]);
+                $MyArea = [];
+                foreach($myArea as $row):
+                    $MyArea[$row["area_id"]] = $row;
+                endforeach;
+
+            elseif($_SESSION["dnsc_audit"]["role"] == 5):
+                $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id");
+                $MyArea = [];
+                foreach($myArea as $row):
+                    $MyArea[$row["area_id"]] = $row;
+                endforeach;
+            else:
                 $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
                 where ua.user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
                 $MyArea = [];
@@ -69,13 +85,6 @@ $base_path = "file_manager/archive_drive/";
                     $MyArea[$row["area_id"]] = $row;
                 endforeach;
                 
-            else:
-                $myArea = query("select ua.*,a.area_name from users_area ua left join areas a on a.id = ua.area_id
-                where a.id = ?", $_POST["root"]);
-                $MyArea = [];
-                foreach($myArea as $row):
-                    $MyArea[$row["area_id"]] = $row;
-                endforeach;
             endif;
            
             // dump($base_path);
@@ -111,6 +120,15 @@ sort($files);
 
 // Merge the folders and files
 $sorted_items = array_merge($folders, $files);
+
+echo('
+                <select id="search-input" class="form-control float-right" >
+                    <option value="">Search files...</option>
+                </select>
+        
+            <br>');
+
+
 if($current_path == ""):
 
 
@@ -141,19 +159,14 @@ if($current_path == ""):
             </div>
             
             ');
-
-        
-           
         endif;
-    
-        
     }
 
 echo("</div>");
 
 else:
 
-    if($_SESSION["dnsc_audit"]["role"] != 3):
+    if($_SESSION["dnsc_audit"]["role"] != 3 && $_SESSION["dnsc_audit"]["role"] != 5):
         echo('
         <div class="row">
             <div class="col-md-3 col-12 col-sm-6">
@@ -221,6 +234,80 @@ else:
 
 
 endif;
+
+elseif($_POST["action"] == "search_files"):
+    $query = trim($_POST["query"]);
+    if($_SESSION["dnsc_audit"]["role"] == 5):
+        $folders = query("select id as area_id from areas");
+    else:
+        $folders = query("select * from users_area where user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
+    endif;
+    $allowed_dirs = [];
+    foreach($folders as $f):
+        $allowed_dirs[] = "file_manager/archive_drive/".$f["area_id"] . "/";
+    endforeach;
+    // dump($allowed_dirs);
+    
+    
+    // $allowed_dirs = ["file_manager/main_drive/"]; // Allowed root directories
+
+
+    $area = query("select * from areas");
+    $Area = [];
+    foreach($area as $row):
+        $Area[$row["id"]] = $row;
+    endforeach;
+
+    
+
+
+
+
+    $results = [];
+
+    function searchFiles($dir, $query, &$results, $baseDir, $area_array) {
+        $baseDir = 'file_manager/archive_drive/';
+        if (!is_dir($dir)) return;
+
+        $items = scandir($dir);
+        foreach ($items as $item) {
+            if ($item === "." || $item === "..") continue;
+
+            $fullPath = $dir . $item;
+            $isFolder = is_dir($fullPath);
+            $relativePath = str_replace($baseDir, "", $fullPath); // Trim base directory
+            $parentFolder = str_replace($baseDir, "", dirname($fullPath)); // Trim parent directory
+            // dump($relativePath);
+
+            $firstWord = explode("/", $parentFolder)[0];
+            $parts = explode("/", $parentFolder);
+            
+            $remainingString = $area_array[$firstWord]["area_name"]."/".implode("/", array_slice($parts, 1));
+
+            // Match file/folder names
+            if (stripos($item, $query) !== false) {
+                $results[] = [
+                    "name" => $item . " (".$remainingString.")",
+                    "path" => $relativePath,
+                    "parent_folder" => $isFolder ? $relativePath : $parentFolder,
+                    "is_folder" => $isFolder
+                ];
+            }
+
+            // If it's a folder, search inside it
+            if ($isFolder) {
+                searchFiles($fullPath . "/", $query, $results, $baseDir, $area_array);
+            }
+        }
+    }
+
+    foreach ($allowed_dirs as $dir) {
+        // dump($dir);
+        searchFiles($dir, $query, $results, $dir, $Area);
+    }
+
+    echo json_encode($results);
+    exit;
 
 elseif($_POST["action"] == "upload"):
     $current_path = isset($_POST['current_path']) ? $_POST['current_path'] : '';

@@ -101,6 +101,20 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "updateChecklist"):
+			// dump($_POST);
+
+			query("update audit_checklist set audit_trail = ?, comply = ?, remarks = ? where audit_checklist_id = ?" ,$_POST["audit_trail"], $_POST["comply"],
+					$_POST["remarks"], $_POST["audit_checklist_id"]);
+
+		$res_arr = [
+			"result" => "success",
+			"title" => "Success",
+			"message" => "Checklist updated successfully",
+			"link" => "refresh",
+			];
+			echo json_encode($res_arr); exit();
+
 		elseif($_POST["action"] == "audit_plan_checklist_datatable"):
 			// dump($_POST);
 
@@ -184,7 +198,7 @@
 						else:
 							$data[$i]["action"] = '
 									<div class="btn-block btn-group">
-										<a href="audit_checklist?action=create&aps_area_id='.$row["tblid"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
+										<a href="audit_checklist?action=update&id='.$row["audit_checklist_id"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
 										<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
 									</div>
 							
@@ -252,7 +266,7 @@
 					"result" => "success",
 					"title" => "Success",
 					"message" => "Checklist created successfully",
-					"link" => "audit_checklist?action=checklistDetails&id=".$ac_id,
+					"link" => "audit_checklist?action=update&id=".$ac_id,
 					];
 					echo json_encode($res_arr); exit();
 
@@ -621,6 +635,9 @@ font-size: 12px;
 
 			elseif($_GET["action"] == "details"):
 				render("public/audit_checklist_system/audit_checklist_details.php",[
+				]);
+			elseif($_GET["action"] == "update"):
+				render("public/audit_checklist_system/audit_checklist_update.php",[
 				]);
 			endif;
 

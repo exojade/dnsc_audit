@@ -158,8 +158,6 @@
 						audit_report ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
 						$where
 					
-					
-					
 					";
 				// dump($string_query);
 

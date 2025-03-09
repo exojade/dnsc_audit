@@ -174,7 +174,8 @@
             <a href="notifications?action=read&id=<?php echo($row["notification_id"]); ?>" class="dropdown-item">
             <!-- Message Start -->
             <div class="media">
-              <img src="<?php echo($Users[$row["sender_id"]]["img"]); ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+            <img src="<?php echo isset($Users[$row["sender_id"]]) ? $Users[$row["sender_id"]]["img"] : 'hecker.png'; ?>"  
+            alt="User Avatar" class="img-size-50 mr-3 img-circle">
               <div class="media-body">
                 <p class="text-sm"><?php echo($message["message"]); ?></p>
                 <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>

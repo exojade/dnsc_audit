@@ -55,8 +55,7 @@
 
 				$i = 0;
 				foreach($data as $row):
-
-					if($row["role_id"] == 2):
+					if($row["role_id"] == 2 || $row["role_id"] == 7):
 						$data[$i]["action"] = '
 							<div class="btn-group btn-block">
 							<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-warning btn-sm">Update</a>
@@ -68,8 +67,6 @@
 							<a href="#" data-toggle="modal" data-target="#modalUpdate" class="btn btn-warning btn-sm">Update</a>
 						';
 					endif;
-
-
 					$assigned_area = "";
 					$AssignedAreas = [];
 					if(isset($UsersArea[$row["id"]])):
@@ -96,7 +93,6 @@
 		elseif($_POST["action"] == "addAssignedArea"):
 			
 			if(isset($_POST["area_id"])):
-
 				query("delete from users_area where user_id = ?", $_POST["user_id"]);
 				foreach($_POST["area_id"] as $row):
 					query("insert INTO users_area (area_id, user_id) 
@@ -104,6 +100,28 @@
 					$row,$_POST["user_id"]);
 					
 				endforeach;
+
+				$assigned_area = query("select area_name from users_area ua 
+										left join areas a on a.id = ua.area_id
+										where ua.user_id = ?
+										", $_POST["user_id"]);
+				$area_names = array_column($assigned_area, 'area_name');
+				// dump($area_names);
+				$assigned_area = implode(", ", $area_names);
+				// dump($assigned_area);
+
+				$users = query("select * from users where id = ?",$_POST["user_id"]);
+
+
+				foreach($users as $row):
+					$Message = [];
+					$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " assigned you this/these areas : " . $assigned_area;
+					$Message["link"] = "myProfile";
+					$theMessage = serialize($Message);
+					addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+				endforeach;
+
+
 			endif;
 			$res_arr = [
 				"result" => "success",
@@ -241,13 +259,91 @@
 			// dump($_POST);
 			query("update users set role_id = ? where id = ?", $_POST["role_id"], $_POST["id"]);
 
-			$res_arr = [
-				"result" => "success",
-				"title" => "Success",
-				"message" => "Success on Role Assignment!",
-				"link" => "refresh",
-				];
-				echo json_encode($res_arr); exit();
+			$user = query("select * from users where id = ?", $_POST["id"]);
+			$user = $user[0];
+
+
+			$message = "<html><body>";
+					$message.= "
+					
+					Hi ".$user["firstname"]. " " . $user["surname"] . ",
+					<br><br>
+					Your account has been approved by the system admin. You may now log in to the system using the link below:
+					<br><br>
+					";
+					$message .= "<a href='".base_url() . "'>".base_url() . "</a>";
+					$message.="
+					<br><br>
+					If you have any questions, feel free to reach out.
+					<br><br>
+					Best regards,<br>
+					[Document Tracking and Audit System] Admin
+					<br><br>
+					Let me know if you want any changes!
+					";
+                    
+                    $message .= "</body></html>";
+						$mail = new PHPMailer();
+						try {
+							$mail->isSMTP();
+							$mail->SMTPAuth = true;
+							$mail->SMTPSecure = "ssl";
+							$mail->Host = "smtp.gmail.com";
+							$mail->Port = "465";
+							$mail->isHTML();
+							$mail->Username = "bosspanabo2020@gmail.com";
+							$mail->Password = "uxjwfplwregzmccz";
+							$mail->SetFrom("no-reply@panabocity.gov.ph");
+							$mail->Subject = "Verify Account";
+							$mail->Body = $message;
+							$mail->AddAddress($user["username"]);
+							$mail->Send();
+
+							// $mail->SMTPDebug = 4;
+						    // $mail->Debugoutput = 'html';
+							// $mail->isSMTP();
+							// $mail->SMTPAuth = false;
+							// $mail->SMTPSecure = "ssl";
+							// $mail->Host = "smtp.hostinger.com";
+							// $mail->Port = "465";
+							// $mail->isHTML();
+							// $mail->Username = "dnsc_qms@daitign.org";
+							// $mail->IsSendMail();
+							// $mail->Password = "myp@55wordOnline";
+							// $mail->SetFrom("dnsc_qms@daitign.org");
+							// $mail->Subject = "Verify Account";
+							// $mail->Body = $message;
+							// $mail->AddAddress($user["username"]);
+							// $mail->Send();
+                            $res_arr = [
+								"result" => "success",
+								"title" => "Success",
+								"message" => "Success on Role Assignment!",
+								"link" => "refresh",
+								];
+								echo json_encode($res_arr); exit();
+								} catch (phpmailerException $e) {
+									$res_arr = [
+										"result" => "success",
+										"title" => "Success",
+										"message" => $e->errorMessage(),
+										"link" => "refresh",
+										// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+										];
+										echo json_encode($res_arr); exit();
+								} catch (Exception $e) {
+			
+									$res_arr = [
+										"result" => "success",
+										"title" => "Success",
+										"message" => $e->getMessage(),
+										"link" => "refresh",
+										// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+										];
+										echo json_encode($res_arr); exit();
+								}
+
+			
 
 
 		elseif($_POST["action"] == "addPosition"):

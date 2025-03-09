@@ -116,8 +116,7 @@
 				endif;
 			endif;
 
-			$grouper_string = " GROUP BY aps.aps_id, aa.area_id order by audit_checklist_status asc";
-
+			$grouper_string = " GROUP BY aps.aps_id, aa.area_id order by audit_checklist_status desc, timestamp desc";
 			$string_query = "
 					SELECT 
 						aps.*,
@@ -141,6 +140,7 @@
 					LEFT JOIN 
 						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
 						$where
+						
 					";
 				// dump($string_query);
 

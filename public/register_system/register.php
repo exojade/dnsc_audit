@@ -105,6 +105,42 @@
 							$mail->Body = $message;
 							$mail->AddAddress($_POST["email_address"]);
 							$mail->Send();
+
+
+
+                            
+
+
+
+
+                            // $mail->SMTPDebug = 4;
+						    // $mail->Debugoutput = 'html';
+							// $mail->isSMTP();
+							// $mail->SMTPAuth = false;
+							// $mail->SMTPSecure = "ssl";
+							// $mail->Host = "smtp.hostinger.com";
+							// $mail->Port = "465";
+							// $mail->isHTML();
+							// $mail->Username = "dnsc_qms@daitign.org";
+							// $mail->IsSendMail();
+							// $mail->Password = "myp@55wordOnline";
+							// $mail->SetFrom("dnsc_qms@daitign.org");
+							// $mail->Subject = "Verify Account";
+							// $mail->Body = $message;
+							// $mail->AddAddress($_POST["email_address"]);
+							// $mail->Send();
+
+
+                            $users = query("select * from users where role_id in (1,5)");
+                            foreach($users as $row):
+                                $Message = [];
+                                $Message["message"] = "🚀 New registration alert! Someone just signed up. [".$_POST["firstname"]. " " . $_POST["lastname"] ."] Please review and verify their account.";
+                                $Message["link"] = "users?action=pending_users";
+                                $theMessage = serialize($Message);
+                                addNotification($row["id"], $theMessage, $user_id);
+                            endforeach;
+
+
                             $res_arr = [
                                 "result" => "success",
                                 "title" => "Success",

@@ -12,21 +12,20 @@
           <div class="col-sm-6">
             <h1>Area</h1>
           </div>
-      
+          <div class="col-sm-6">
+            <a href="#" data-toggle="modal" data-target="addNewArea" class="btn btn-success float-right">Add Area</a>
+          </div>
         </div>
-      </div><!-- /.container-fluid -->
+      </div>
     </section>
-
     <section class="content">
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
-            <!-- Default box -->
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">Office / Academics</h3>
               </div>
-              <!-- /.card-header -->
               <div class="card-body">
                 <table id="ajax_datatable" class="table table-bordered table-striped">
                   <thead>

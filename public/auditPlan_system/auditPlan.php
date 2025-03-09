@@ -53,7 +53,7 @@
 			$myArea = query("SELECT area_id FROM users_area 
 					WHERE user_id = ?", $_SESSION["dnsc_audit"]["userid"]);
 			$area_id = array_column($myArea, "area_id");
-			$area_id = implode(",", $area_id);
+			$area_id = "'".implode(",", $area_id) . "'";
 
 			$audit_plan = query("select * from audit_plans");
 			$AuditPlans = [];
@@ -62,6 +62,7 @@
 			endforeach;
 
 			$where = " where area_id in ($area_id)";
+			// dump($where);
 			$baseQuery = "select * from aps_area" . $where . " group by audit_plan order by audit_plan desc";
 			$data = query($baseQuery . $limitString . $offsetString);
 			$all_data = query($baseQuery);

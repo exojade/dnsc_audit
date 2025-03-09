@@ -57,17 +57,26 @@
 
       <div class="row">
           <div class="col-lg-4 col-6">
+          <?php
+            function countFiles($directory) {
+                $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS));
+                return iterator_count($files);
+            }
+
+            $manualsPath = "file_manager/manuals"; // Adjust path if needed
+            $totalFiles = countFiles($manualsPath);
+          ?>
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>150</h3>
+                <h3><?php echo($totalFiles); ?></h3>
 
-                <p>New Orders</p>
+                <p>Process Manual</p>
               </div>
               <div class="icon">
-                <i class="fa fa-users"></i>
+                <i class="fa fa-archive"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="manuals" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -75,14 +84,19 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                <h3><?php
+     
+            $manualsPath = "file_manager/quality_policy"; // Adjust path if needed
+            $totalFiles = countFiles($manualsPath);
+            echo($totalFiles);
+          ?></h3>
 
-                <p>Bounce Rate</p>
+                <p>Quality Policy</p>
               </div>
               <div class="icon">
-                <i class="ion ion-stats-bars"></i>
+                <i class="fa fa-archive"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="quality_policy" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -90,14 +104,19 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>44</h3>
+              <h3><?php
+     
+     $manualsPath = "file_manager/system_control"; // Adjust path if needed
+     $totalFiles = countFiles($manualsPath);
+     echo($totalFiles);
+   ?></h3>
 
-                <p>User Registrations</p>
+                <p>System Control</p>
               </div>
               <div class="icon">
-                <i class="ion ion-person-add"></i>
+                <i class="fa fa-archive"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="system_control" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
       

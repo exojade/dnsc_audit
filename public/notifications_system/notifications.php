@@ -39,7 +39,10 @@
 			foreach($data as $row):
 				$message=unserialize($row["message"]);
 				$data[$i]["number"] = $i + 1;
-				$data[$i]["sender_image"] = '<img style="width:50px; height:auto; display:block; margin:0 auto;" class="user-image img-circle elevation-2" src="'.$Users[$row["sender_id"]]["img"].'" alt="User profile picture">';
+				$data[$i]["sender_image"] = '<img style="width:50px; height:auto; display:block; margin:0 auto;" 
+class="user-image img-circle elevation-2" 
+src="' . (isset($Users[$row["sender_id"]]) ? $Users[$row["sender_id"]]["img"] : 'hecker.png') . '" 
+alt="User profile picture">';
 				$data[$i]["message"] = '<a href="notifications?action=read&id='.$row["notification_id"].'">'.$message["message"].'</a>';
 				$data[$i]["date"] = date("F d, Y", $row["created"]);
 				$i++;

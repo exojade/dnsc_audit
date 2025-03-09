@@ -16,12 +16,16 @@
 </style>
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <div class="user-panel mt-3 pb-3 mb-3 text-center">
+    <a href="#" class="brand-link border-bottom border-white">
+      <img src="<?= asset("resources/dnsc-logo.png"); ?>" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light"><b>DNSC QMS-ISO</b></span>
+    </a>
+
+    <!-- <div class="user-panel mt-3 pb-3 mb-3 text-center">
         <div class="image" style="display:block;">
-            <!-- <img style="width: 5rem;" src="resources/panabologo.png" class="img-circle elevation-2" alt="User Image"> -->
             <img style="width: 10rem;" src="<?= asset("resources/dnsc-logo.png"); ?>" class="img-circle" alt="User Image">
         </div>
-      </div>
+      </div> -->
     <!-- Sidebar -->
     <div class="sidebar">
 
@@ -663,6 +667,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       </a>
   </li>
 
+  <li class="nav-item">
+      <a href="archives?action=myArchives" class="nav-link">
+        <i class="nav-icon fas fa-archive"></i>
+        <p>
+          Archives
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
 
     <?php
     break;
@@ -714,6 +728,78 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
     break;
   case 7:
     // render("public/dashboard_system/dashboard_admin.php",[]);
+    ?>
+<li class="nav-header">Main</li>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-header">File Management</li>
+  <li class="nav-item">
+      <a href="evidence?action=myEvidence" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Evidences
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="mymanuals" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Manuals
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="controlled_forms" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Controlled Forms
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="quality_policy" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          Quality Policy
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="system_control" class="nav-link">
+        <i class="nav-icon fas fa-folder"></i>
+        <p>
+          System Control
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
+  <li class="nav-item">
+      <a href="archives?action=myArchives" class="nav-link">
+        <i class="nav-icon fas fa-archive"></i>
+        <p>
+          Archives
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+    <?php
     break;
   case 8:
     // render("public/dashboard_system/dashboard_admin.php",[]);
