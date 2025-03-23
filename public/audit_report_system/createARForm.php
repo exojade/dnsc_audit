@@ -124,7 +124,7 @@
                     <div class="step" data-target="#suggestion-part">
                       <button type="button" class="step-trigger" role="tab" aria-controls="suggestion-part" id="suggestion-part-trigger">
                         <span class="bs-stepper-circle">C</span>
-                        <span class="bs-stepper-label">Comments / Suggestions</span>
+                        <span class="bs-stepper-label">POSITIVE FINDING</span>
                       </button>
                     </div>
                    
@@ -141,7 +141,7 @@
                   <tbody>
                     <th width="50%">Questions</th>
                     <th width="15%">Rate</th>
-                    <th width="35%">Comments</th>
+                    <th width="35%">Evidence or Notes Sheet Ref. #,ISO Clauses</th>
 
                     <?php $i=1; foreach($questions as $row): ?>
 
@@ -151,10 +151,9 @@
                           
                         <select name="<?php echo($i); ?>_question" required class="form-control">
                           <option selected disabled value=""></option>
-                          <option value="4">4</option>
-                          <option value="3">3</option>
-                          <option value="2">2</option>
-                          <option value="1">1</option>
+                          <option value="Y">Yes</option>
+                          <option value="N">No</option>
+                          <option value="N/A">N/A</option>
                         </select>
                       </th>
                       <th>
@@ -194,6 +193,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Type</label>
+                        <select class="form-control">
+                          <option selected disabled value="">Select Type here!</option>
+                          <option value="Major">Major</option>
+                          <option value="Minor">Minor</option>
+                          
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label>Requirements</label>
                         <textarea name="ofi_requirements" class="form-control" rows="3" placeholder="Enter ..."></textarea>
                       </div>
@@ -207,32 +216,17 @@
                         <label>Evidence/s</label>
                         <textarea name="ofi_evidences" class="form-control" rows="3" placeholder="Enter ..."></textarea>
                       </div>
-
-                  
-
-
-
              
                       <button class="btn btn-info btn-previous">Previous</button>
                       <button class="btn btn-info btn-next">Next</button>
                     </div>
-
-
-
-
                     <div id="suggestion-part" class="content" role="tabpanel" aria-labelledby="suggestion-part-trigger">
                     <div class="form-group">
-                        <label>Comments / Suggestions</label>
+                        <label>C. POSITIVE FINDING.</label>
                         <textarea name="comments" class="form-control" rows="5" placeholder="Enter ..."></textarea>
                       </div>
-
-
-                   
                       <button class="btn btn-info btn-previous" >Previous</button>
                       <button type="submit" class="btn btn-primary">Submit</button>
-
-
-             
                       
                     </div>
 

@@ -313,8 +313,14 @@
 
 		elseif($_POST["action"] == "print_audit_report"):
 			// dump($_POST);
-			$audit_report = query("select ar.*, u.firstname, u.middlename, u.surname from audit_report ar left join users u
-                                    on u.id = ar.user_id where audit_report_id = ?", $_POST["audit_report_id"]);
+			$audit_report = query("select ar.*,
+			concat(u.firstname, ' ' ,u.middlename, ' ', u.surname) as prepared_by,
+									concat(u2.firstname, ' ' ,u2.middlename, ' ', u2.surname) as reviewed_by,
+			
+			u.firstname, u.middlename, u.surname from audit_report ar left join users u
+                                    on u.id = ar.user_id
+									left join users u2 on u2.id = ar.reviewed_by
+									where audit_report_id = ?", $_POST["audit_report_id"]);
 			$audit_report = $audit_report[0];
 			$aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
@@ -438,18 +444,7 @@
 					}
 
 					</style>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					
-
-		
-					<h4 class="text-center"><b>Internal Audit Report</b></h4>
-
-				<br>
-			<style>
+					<style>
                                             .p-2 {
                                                 padding: 3px;
                                             }
@@ -509,6 +504,18 @@ font-size: 12px;
 						font-size:9px;
 					}
 					</style>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					
+
+		
+					<h4 class="text-center"><b>Internal Audit Report</b></h4>
+
+				<br>
+			
 
 
 					
@@ -595,20 +602,137 @@ font-size: 12px;
 										<p style="font-size: 11px; padding-left: 50px; margin:0px;"><b>OFI = Opportunity for Improvement</b></p>
 					<br>
 					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-                                            <tr>
-												<td class="p-2 nw"><b>OFI (Improvement)</b><br><br>'.$audit_report["ofi_improvement"].'</td>
-                                            </tr>
-											<tr>
-												<td class="p-2 nw"><b>OFI (Possible Non-conformance in the Future):</b><br><br>'.$audit_report["ofi_nonconformance"].'</td>
-                                            </tr>
-                                        </table>
+												<tr>
+													<td class="p-2 nw" style="border-bottom: 0px; word-wrap: break-word; white-space: normal;"><b>OFI (Improvement):</b></td>
+												</tr>
+												<tr>
+													<td class="p-2 nw" style="border-top: 0px;"><div style="min-height: 200px;">
+       '.$audit_report["ofi_improvement"].'</div>
+												</tr>
+												<tr>
+													<td class="p-2 nw" style="border-bottom: 0px; word-wrap: break-word; white-space: normal;"><b>OFI (Possible Non-conformance in the Future)</b></td>
+												</tr>
+												<tr>
+													<td class="p-2 nw" style="border-top: 0px;"><div style="min-height: 200px;">
+       '.$audit_report["ofi_nonconformance"].'</div>
+												</tr>
+											</table>
 <br>
-										<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
+										
+
+
+
+					';
+					$mpdf->WriteHTML($html);
+					$mpdf->AddPage();
+					$html2 = '
+					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
+					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
+					<style>
+					.table, th, td, thead, tbody{
+						border: 1px solid black !important;
+						padding: 8px !important;
+					}
+					h5{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 15px !important;
+						font-weight: 800;
+					}
+
+					h4{
+						margin:0px !important;
+						padding:0px !important;
+						margin-bottom: 4px !important
+						font-size: 100px !important;
+						font-weight: 800;
+						color:#000 !important;
+					}
+
+
+
+					b{
+						font-weight: bold;
+					}
+
+					</style>
+					<style>
+                                            .p-2 {
+                                                padding: 3px;
+                                            }
+                                            .u {
+                                                border-bottom: 1px solid black;
+                                            }
+                                            .nw {
+                                                white-space:nowrap;
+                                            }
+                                            .w {
+                                                width: 350;
+                                            }
+                                            th,td {
+                                                font-size: 12px;
+                                            }
+											p{
+font-size: 12px;
+				}
+                                            .tbl {
+                                                width: 100%;
+                                                border-collapse: collapse;
+                                            }
+                                            .tbl tr th {
+                                            }
+                                            .tbl tr td {
+                                                border: 0px inset grey;
+                                                padding: 3px;
+                                            }
+
+											
+											.tbl2{
+												width: 100%;
+                                                border-collapse: collapse;
+											}
+
+											.tbl2 tr td {
+                                                border: 1px solid black;
+                                                padding: 7px;
+												height: 100%;
+                                            }
+
+                                            .center {
+                                                text-align: center;
+                                            }
+                                            .grey {
+                                                background-color: lightgrey;
+                                            }
+                                        </style>
+			
+
+					<style>
+					dt{
+						font-size:9px;
+					
+					}
+						dl{
+						font-size:9px;
+					}
+					</style>
+					';
+
+					$html2.='
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
                         
 											<tr>
 												<td width="20%" style="text-align: center;"><b>CAR FORM #</b></td>
 												<td width="60%" style="text-align: center;"><b>Describe finding as you want it to appear in the CAR Form System</b></td>
-												<td width="20%"></td>
+												<td width="20%" style="text-align: center;"><b>Type<br>(Major / Minor)</b></td>
                                             </tr>
 											<tr>
 												<td></td>
@@ -626,14 +750,104 @@ font-size: 12px;
 												<td></td>
                                             </tr>
 											</table>
+											
+											<br>
+											<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
+												<tr>
+													<td class="p-2 nw" style="border-bottom: 0px; word-wrap: break-word; white-space: normal;"><b>C. POSITIVE FINDING. Summary of positive findings during the conduct of audit. This may also include any possible suggested enhancement for improvement that was not included in the OFI.</b></td>
+												</tr>
+												<tr>
+													<td class="p-2 nw" style="border-top: 0px;"><div style="min-height: 200px;">
+       '.$audit_report["review_comments"].'</div>
+												</tr>
+											</table>
+<br>
+	    <p class="text-justify"><b>D. Review Audit Report and Submit 
+All auditors on the audit team must submit their audit reports for summary and review by the Lead Auditor.  Lead Auditor: review the completeness of this report prior to submitting it to the QMC. Be sure findings show objective evidence, that everything is written clearly, and that all checklist questions are answered.
+</b></p>
+											
+											';
+				$html2.='
+				<style>
+					.tbl3 tr td{
+						border: 0px !important;
+						padding-bottom: 20px !important;
+
+				}
+				</style>
+				<br>
+				<table class="tbl2 tbl3" style="font-size: 12px; padding-top: 10px; border:0px;">
+                                            <tr>
+												<td width="40%">
+												<b>Audit Report prepared by:</b>
+												</td>
+												<td class="p-2 nw" width="50%">
+												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
+											<tr>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["prepared_by"].'</td>
+				
+											</tr>
+											<tr>
+												<td class="p-2 nw text-center">Internal Auditor / Date</td>
+											</tr>
+                                        </table>
+												</td>
+												<td width="10%">
+												</td>
+
+											
+                                       
+                                            </tr>
+											<tr>
+												<td width="40%">
+												<b>Audit Report Conformed by:</b>
+												</td>
+												<td class="p-2 nw" width="50%">
+												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
+											<tr>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["prepared_by"].'</td>
+				
+											</tr>
+											<tr>
+												<td class="p-2 nw text-center" >Internal Auditor / Date</td>
+											</tr>
+                                        </table>
+												</td>
+												<td width="10%">
+												</td>
+
+											
+                                       
+                                            </tr>
+											<tr>
+												<td width="40%">
+												<b>Audit Report reviewed by:</b>
+												</td>
+												<td class="p-2 nw" width="50%">
+												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
+											<tr>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["reviewed_by"].'</td>
+				
+											</tr>
+											<tr>
+												<td class="p-2 nw text-center" >Internal Lead Auditor/Team Leader/Date</td>
+											</tr>
+                                        </table>
+												</td>
+												<td width="10%">
+												</td>
+
+											
+                                       
+                                            </tr>
+                                        </table>
+				';
 
 
 
-					';
+											// dump($html2);
+					$mpdf->WriteHTML($html2);
 					
-					
-
-					$mpdf->WriteHTML($html);
 
 					
 
