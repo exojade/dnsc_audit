@@ -147,10 +147,10 @@
       </div>
 
       <div class="form-group">
-                    <label for="exampleInputFile">Profile Image <span class="text-danger">*</span></label>
+                    <label for="exampleInputFile">Profile Image</label>
                     <div class="input-group">
                       <div class="custom-file">
-                        <input required accept="image/*"  name="profileImage" type="file" class="custom-file-input" id="exampleInputFile">
+                        <input accept="image/*"  name="profileImage" type="file" class="custom-file-input" id="exampleInputFile">
                         <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                       </div>
                    

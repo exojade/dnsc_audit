@@ -286,12 +286,30 @@
             <div class="alert alert-warning alert-dismissible">
               <h5><i class="icon fas fa-exclamation-triangle"></i>   <?php echo($auditPlan["status"]); ?></h5>
             </div>
-            <div class="card card-success card-outline">
+            <div class="card card-success">
+            <div class="card-header bg-success">
+                <h5 class="card-title"><b><?php echo($auditPlan["audit_plan"]); ?></b></h5>
+              </div>
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center"><?php echo($auditPlan["type"]); ?></h3>
                 <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
                 <hr>
-                <a href="#" class="btn btn-warning btn-block"><b>Update Status</b></a>
+                  
+                <?php if($auditPlan["status"] == "SUBMITTED"): ?>
+                  <form class="generic_form_trigger" data-url="auditPlan" data-title="Revert to Edit Audit Plan" data-message="Audit Plan not yet reviewed. If revert, you can update the details of this plan and can resubmit it again.">
+                  <input type="hidden" name="action" value="revertSubmittedPlan">
+                  <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                  <button type="submit" class="btn btn-danger btn-block"><b>Revert to Edit</b></button>
+                </form>
+                <?php else: ?>
+                  <form class="generic_form_trigger" data-url="auditPlan" data-title="Submit Audit Plan" data-message="Are you sure you want this to be reviewed?">
+                  <input type="hidden" name="action" value="submitAuditPlan">
+                  <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                  <button type="submit" class="btn btn-warning btn-block"><b>Submit for Review</b></button>
+                </form>
+                <?php endif; ?>
+
+                
                 <form class="generic_form_trigger_no_prompt mt-2" data-url="auditPlan">
                   <input type="hidden" name="action" value="printAuditPlan">
                   <input type="hidden" name="audit_plan_id" value="<?php echo($_GET["id"]); ?>">

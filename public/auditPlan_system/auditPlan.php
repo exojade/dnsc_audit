@@ -560,39 +560,83 @@
 				];
 				echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "submitAuditPlan"):
+			// dump($_POST);
+			query("update audit_plans set status = 'SUBMITTED' where audit_plan = ?", $_POST["id"]);
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+			$audit_plan = $audit_plan[0];
+			$users = query("select * from users where role_id = 5");
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " submitted you to Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Submitted for Review",
+				"link" => "auditPlan?action=details&id=".$_POST["id"],
+			];
+			echo json_encode($res_arr);
+			exit();
 
 
 
 		elseif($_POST["action"] == "newPlan"):
 			// dump($_POST);
-
-			if (query("insert INTO audit_plans 
-						(
-                            type, introduction, audit_objectives, reference_standard,
-                            audit_methodologies, year, status, created_by, timestamp
-                            ) 
-                    VALUES(?,?,?,?,?,?,?,?,?)", 
-                    $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
-					$_POST["audit_methodologies"], $_POST["year"], "ONGOING", $_SESSION["dnsc_audit"]["userid"], time()) === false)
-                    {
-                        $res_arr = [
-                            "result" => "failed",
-                            "title" => "Failed",
-                            "message" => "Failed on saving deduction table",
-                            "link" => "loans_management?action=list",
-                            ];
-                            echo json_encode($res_arr); exit();
-                    }
+			try {
 
 
-					$res_arr = [
-						"result" => "success",
-						"title" => "Success",
-						"message" => "Audit plan created successfully!",
-						"link" => "refresh",
-						// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
-						];
-						echo json_encode($res_arr); exit();
+				$typeMapping = [
+					"1st Internal Quality Audit" => "1IQA", // 1st Internal Quality Audit
+					"2nd Internal Quality Audit" => "2IQA"  // 2nd Internal Quality Audit
+				];
+				$audit_plan_id = "AP-" . $_POST["year"] . "-" . $typeMapping[$_POST["type"]];
+				// dump($audit_plan_id);
+				// Execute the query
+				$result = query("INSERT INTO audit_plans 
+									(audit_plan, type, introduction, audit_objectives, reference_standard,
+									 audit_methodologies, year, status, created_by, timestamp) 
+								VALUES(?,?,?,?,?,?,?,?,?,?)", 
+								$audit_plan_id, $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
+								$_POST["audit_methodologies"], $_POST["year"], "FOR REVIEW", $_SESSION["dnsc_audit"]["userid"], time());
+			
+				// Check if query() function encountered an error
+				// if (!$result) {
+				// 	throw new Exception("Query execution failed.", mysqli_errno($conn)); // Capture MySQL error code
+				// }
+			
+				// Success response
+				$res_arr = [
+					"result" => "success",
+					"title" => "Success",
+					"message" => "Audit plan created successfully!",
+					"link" => "auditPlan?action=details&id=".$audit_plan_id,
+				];
+				echo json_encode($res_arr);
+				exit();
+			
+			} catch (Exception $e) {
+				$errorCode = $e->getCode();
+			
+				// Check if it's a duplicate entry error (MySQL error code 1062)
+				if ($errorCode == 1062) {
+					$message = "Duplicate Type and Year";
+				} else {
+					$message = "An unexpected error occurred: " . $e->getMessage();
+				}
+			
+				// Error response
+				$res_arr = [
+					"result" => "failed",
+					"title" => "Creating Audit Plan Failed",
+					"message" => $message,
+					"link" => "refresh",
+				];
+				echo json_encode($res_arr);
+				exit();
+			}
 
 		elseif($_POST["action"] == "addTeam"):
 			// dump($_POST);

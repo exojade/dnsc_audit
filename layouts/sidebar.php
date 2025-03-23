@@ -830,9 +830,38 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
   </li>
     <?php
     break;
-  case 8:
-    // render("public/dashboard_system/dashboard_admin.php",[]);
-    break;
+  case 8: ?>
+  <li class="nav-header">Main</li>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Dashboard
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-header">Audit Plans</li>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Audit Plan List
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="index" class="nav-link">
+        <i class="nav-icon fas fa-check"></i>
+        <p>
+          Approve Audit Plan
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+    <?php break;
   default:
     echo "Invalid day entered.";
 }

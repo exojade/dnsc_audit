@@ -57,6 +57,8 @@
                     <th>Audit Plan</th>
                     <th>Year</th>
                     <th>Status</th>
+                    <th>QAD Status</th>
+                    <th>CMT Status</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -145,6 +147,8 @@ var datatable =
                     { data: 'type', "orderable": false  },
                     { data: 'year', "orderable": false  },
                     { data: 'status', "orderable": false  },
+                    { data: 'qad_status', "orderable": false  },
+                    { data: 'cmt_status', "orderable": false  },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

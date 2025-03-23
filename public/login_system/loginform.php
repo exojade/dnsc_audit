@@ -89,29 +89,33 @@
     <h2 class="login-box-msg text-center text-success"><b>Welcome!</b></h2>
 
     <form class="generic_form_no_trigger" data-url="login" autocomplete="off">
-      <div class="form-group has-feedback">
-      <label>Username</label>
+    <div class="form-group has-feedback">
+        <label>Username</label>
         <input type="text" class="form-control" placeholder="Username" name="username" required="required">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
-      </div>
-      <div class="form-group has-feedback">
-      <label>Password</label>
-        <input type="password" class="form-control" placeholder="Password" name="password" required="required">
-        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-      </div>
-   
-        <!-- /.col -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-success ">Log in</button>
-</div>
-          <hr>
-          <!-- <button type="submit" class="btn btn-success btn-block ">Log in</button> -->
-           <div class="text-center">
-            <a href="<?= base_url(); ?>/survey_form" class="btn btn-primary">Answer Survery Here</a>
+    </div>
+    
+    <div class="form-group has-feedback">
+        <label>Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="password" placeholder="Password" name="password" required="required">
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="fa fa-eye-slash" id="togglePassword" style="cursor: pointer;"></i>
+                </span>
             </div>
-          <hr>
-        <!-- /.col -->
-    </form>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Log in</button>
+    </div>
+    <hr>
+    <div class="text-center">
+        <a href="<?= base_url(); ?>/survey_form" class="btn btn-primary">Answer Survey Here</a>
+    </div>
+    <hr>
+</form>
     <div class="text-center">
     <a href="<?= base_url(); ?>/register">Register</a>
 </div>
@@ -279,6 +283,22 @@ $(document).on('submit', '.generic_form_no_trigger', function(e) {
 });
 
 
+</script>
+
+<script>
+    $(document).ready(function() {
+        $("#togglePassword").click(function() {
+            let passwordField = $("#password");
+            let icon = $(this);
+            if (passwordField.attr("type") === "password") {
+                passwordField.attr("type", "text");
+                icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            } else {
+                passwordField.attr("type", "password");
+                icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            }
+        });
+    });
 </script>
 </body>
 
