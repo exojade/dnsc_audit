@@ -185,6 +185,136 @@
 					);
 					echo json_encode($json_data);
 
+
+		elseif($_POST["action"] == "modalUpdateTeam"):
+			// dump($_POST);
+
+			$users = query("select * from users where role_id = 3");
+			$team = query("select * from audit_plan_teams where team_id = ?", $_POST["team_id"]);
+			$team = $team[0];
+
+			$leader = query("select * from audit_plan_team_members aptm
+							left join users u on u.id = aptm.id
+							where team_id = ? and role = 'LEADER'", $_POST["team_id"]);
+			$leader = $leader[0];
+			$members = query("select * from audit_plan_team_members aptm
+								left join users u on u.id = aptm.id
+								where team_id = ? and role = 'MEMBER'", $_POST["team_id"]);
+
+
+			
+
+			$html = '';
+
+			$html .= '
+
+				<input type="hidden" name="team_id" value="'.$team["team_id"].'">
+
+
+				<div class="form-group">
+					<label>Team #</label>
+					<input name="team_number" type="text" value="'.$team["team_number"].'" class="form-control">
+				</div>';
+
+			$html.='
+				<div class="form-group">
+					<label>Team Leader</label>
+					<select name="team_leader" style="width: 100%;" class="modalSelect2 form-control">
+			';
+			foreach ($users as $u) {
+				$selected = ($u['id'] == $leader['id']) ? 'selected' : '';
+				$html .= '<option value="'.$u['id'].'" '.$selected.'>'.$u['firstname'] . ' ' . $u["surname"].'</option>';
+			}
+			$html .= '
+					</select>
+				</div>
+			';
+
+
+			$html .= '
+				<div class="form-group">
+					<label>Members</label>
+					<select name="team_members[]" multiple style="width: 100%;" class="modalSelect2 form-control">
+			';
+
+			foreach ($users as $u) {
+				// Skip the leader
+				// if ($u['id'] == $leader['id']) {
+				// 	continue;
+				// }
+
+				// Check if the user is a member
+				$selected = '';
+				foreach ($members as $m) {
+					if ($m['id'] == $u['id']) {
+						$selected = 'selected';
+						break;
+					}
+				}
+
+				$html .= '<option value="'.$u['id'].'" '.$selected.'>'.$u['firstname'] . ' ' . $u["surname"].'</option>';
+			}
+
+			$html .= '
+					</select>
+				</div>
+			';
+
+
+			echo($html);
+
+		elseif($_POST["action"] == "updateTeam"):
+			// dump($_POST);
+
+			query("update audit_plan_teams set team_number = ? where team_id = ?", $_POST["team_number"], $_POST["team_id"]);
+			$team = query("select * from audit_plan_teams where team_id = ?", $_POST["team_id"]);
+			$team = $team[0];
+			// dump($team);
+
+			query("delete from audit_plan_team_members where team_id = ?", $_POST["team_id"]);
+
+			if (query("insert INTO audit_plan_team_members
+					(team_id, id,role, audit_plan) 
+					VALUES(?,?,?,?)", 
+					$team["team_id"], $_POST["team_leader"], "LEADER", $team["audit_plan"]) === false)
+					{
+						$res_arr = [
+							"result" => "failed",
+							"title" => "Failed",
+							"message" => "Failed on saving deduction table",
+							"link" => "loans_management?action=list",
+							];
+							echo json_encode($res_arr); exit();
+					}
+
+			foreach($_POST["team_members"] as $row):
+				if (query("insert INTO audit_plan_team_members 
+				(team_id, id,role, audit_plan) 
+				VALUES(?,?,?,?)", 
+				$team["team_id"], $row, "MEMBER", $team["audit_plan"]) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			endforeach;
+
+
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Updating or records done successfully!",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
+
+
+
 		elseif($_POST["action"] == "teamDatatable"):
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
 				$offset = $_POST["start"];
@@ -210,7 +340,15 @@
 
 				$i = 0;
 				foreach($data as $row):
-
+					$data[$i]["action"] = '
+					<form class="generic_form_trigger" data-url="auditPlan">
+						<input type="hidden" name="action" value="deleteTeam">
+						<div class="btn-group btn-block">
+							<a href="#" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpdateTeam" data-id="'.$row["team_id"].'">Update</a>
+							<button class="btn btn-danger btn-sm">Remove</button>
+						</div>
+					</form>
+				';
 					$fullnamesWithRoles = array_map(function($item) {
 						return $item['fullname'] . " (" . $item['role'] . ")";
 					}, $Team_Members[$row["team_id"]]);
@@ -220,6 +358,7 @@
 
 
 					$data[$i]["team_members"] = $teamMembers;
+				
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -482,7 +621,7 @@
 				<form class="generic_form_trigger">
 								<button class="btn btn-danger btn-sm float-right">Delete</button>
 							</form>
-								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
+								<a href="#" data-toggle="modal" data-target="#modalUpdateSchedule" data-id="'.$row["aps_id"].'" class="btn btn-sm btn-warning float-right mr-1">Update</a>
               </div>
               <div class="card-body">
 
@@ -538,7 +677,184 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "modalUpdateSchedule"):
+			// dump($_POST);
+			$processes = query("select * from process");
+			
+			$aps = query("select aps.*,p.process_name from audit_plan_schedule aps
+							left join process p on p.process_id = aps.process_id		
+							where aps_id = ?", $_POST["aps_id"]);
+			$aps_area = query("select * from aps_area where aps_id = ?", $_POST["aps_id"]);
+			$aps_position = query("select * from aps_position where aps_id = ?", $_POST["aps_id"]);
+			$aps = $aps[0];
 
+
+
+			$team = query("SELECT 
+				t.team_id,
+				t.team_number AS team,
+				GROUP_CONCAT(
+					CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+					ORDER BY tm.role = 'LEADER' DESC, u.surname
+					SEPARATOR ', '
+				) AS members
+				FROM 
+					audit_plan_teams t
+				JOIN 
+					audit_plan_team_members tm ON t.team_id = tm.team_id
+				JOIN 
+					users u ON tm.id = u.id
+				where t.audit_plan = ?
+				GROUP BY 
+					t.team_id
+				ORDER BY 
+					t.team_number
+				", $aps["audit_plan"]);
+
+
+
+			$areas = query("select a.* from area_process ap left join areas a
+								on a.id =ap.area_id where ap.process_id = ?", $aps["process_id"]);
+			$area_ids = implode(',', array_column($aps_area, 'area_id'));
+			// dump($area_ids);
+
+			$positions = query("select p.* from area_position ap left join areas a
+				on a.id =ap.area_id
+				left join position p on p.position_id = ap.position_id
+				where ap.area_id in (".$area_ids.")");
+			// dump($positions);		
+			$html = '';
+			$html.='
+
+			<input type="hidden" name="aps_id" value="'.$aps["aps_id"].'">
+			<div class="form-group">
+				<label>Process</label>
+				<select style="width: 100%;" name="process"  class="form-control processSelect">';
+				foreach ($processes as $p) {
+					$selected = ($p['process_id'] == $aps['process_id']) ? 'selected' : '';
+					$html .= '<option value="'.$p['process_id'].'" '.$selected.'>'.$p['process_name'].'</option>';
+				}
+				$html.='
+				</select>
+			</div>
+			';
+
+
+			$html.='
+			<div class="form-group">
+				<label>Area</label>
+				<select name="area[]" multiple style="width: 100%;" name="area" class="form-control areaSelect">';
+				foreach ($areas as $a) {
+					$selected = '';
+					foreach ($aps_area as $aa) {
+						if ($a['id'] == $aa['area_id']) {
+							$selected = 'selected';
+							break;
+						}
+					}
+				
+					$html .= '<option value="'.$a['id'].'" '.$selected.'>'.$a['area_name'].'</option>';
+				}
+				$html .= '
+						</select>
+					</div>
+				';
+				$html.='
+				</select>
+			</div>
+			';
+
+
+
+			$html.='
+			<div class="form-group">
+				<label>Position</label>
+				<select name="position[]" multiple style="width: 100%;" name="area" class="form-control positionSelect">';
+				foreach ($positions as $p) {
+					$selected = '';
+					foreach ($aps_position as $ap) {
+						if ($p['position_id'] == $ap['position_id']) {
+							$selected = 'selected';
+							break;
+						}
+					}
+				
+					$html .= '<option value="'.$p['position_id'].'" '.$selected.'>'.$p['position_name'].'</option>';
+				}
+				$html .= '
+						</select>
+					</div>
+				';
+				$html.='
+				</select>
+			</div>
+			';
+
+
+			$html.='
+			<div class="form-group">
+				<label>Criteria Clause</label>
+				<textarea name="audit_clause" rows="3" class="form-control">'.$aps["audit_clause"].'</textarea>
+			</div>
+			';
+
+			$html.='
+			<div class="form-group">
+				<label>Team</label>
+				<select style="width: 100%;" name="team"  class="form-control modalSelect">';
+				foreach ($team as $t) {
+					$selected = ($t['team_id'] == $aps['team_id']) ? 'selected' : '';
+					$html .= '<option value="'.$t['team_id'].'" '.$selected.'>Team '. $t["team"] . '-' . $t["members"] .'</option>';
+				}
+				$html.='
+				</select>
+			</div>
+			';
+
+			$html.='
+			<div class="form-group">
+                  <label>Schedule Date</label>
+                  <input type="date" value="'.$aps["schedule_date"].'" class="form-control" name="schedule_date">
+                </div>
+			';
+
+
+			$html.='
+			<div class="row">
+    <div class="col-6">
+        <div class="bootstrap-timepicker">
+            <div class="form-group">
+                <label>From:</label>
+                <div class="input-group date" id="fromtimepickerUpdate" data-target-input="nearest">
+                    <input name="fromTime" value="'.$aps["from_time"].'" type="text" class="form-control datetimepicker-input" data-target="#fromtimepickerUpdate"/>
+                    <div class="input-group-append" data-target="#fromtimepickerUpdate" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="bootstrap-timepicker">
+            <div class="form-group">
+                <label>To:</label>
+                <div class="input-group date" id="totimepickerUpdate" data-target-input="nearest">
+                    <input name="toTime" value="'.$aps["to_time"].'" type="text" class="form-control datetimepicker-input" data-target="#totimepickerUpdate"/>
+                    <div class="input-group-append" data-target="#totimepickerUpdate" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+			';
+
+
+			
+			
+			echo($html);
 		elseif($_POST["action"] == "updateAuditPlanInfo"):
 			// dump($_POST);
 
@@ -581,6 +897,28 @@
 			echo json_encode($res_arr);
 			exit();
 
+		elseif($_POST["action"] == "revertSubmittedPlan"):
+			// dump($_POST);
+
+
+			query("update audit_plans set status = 'FOR REVIEW' where audit_plan = ?", $_POST["id"]);
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+			$audit_plan = $audit_plan[0];
+			$users = query("select * from users where role_id = 5");
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " cancelled the submission and may update it! : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Submitted for Review",
+				"link" => "auditPlan?action=details&id=".$_POST["id"],
+			];
+			echo json_encode($res_arr);
+			exit();
 
 
 		elseif($_POST["action"] == "newPlan"):
@@ -640,20 +978,20 @@
 
 		elseif($_POST["action"] == "addTeam"):
 			// dump($_POST);
-			$auditors = "'" . implode("','", $_POST["team_members"]) . "'";
-			$checkExistingAuditors = query("select * from audit_plan_team_members where audit_plan = ?
-			and id in (".$auditors.")", $_POST["audit_plan_id"]);
+			// $auditors = "'" . implode("','", $_POST["team_members"]) . "'";
+			// $checkExistingAuditors = query("select * from audit_plan_team_members where audit_plan = ?
+			// and id in (".$auditors.")", $_POST["audit_plan_id"]);
 
-			if(!empty($checkExistingAuditors)):
-				$res_arr = [
-					"result" => "failed",
-					"title" => "Failed",
-					"message" => "Team Member already added on this Audit Plan!",
-					"link" => "refresh",
-					// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
-					];
-					echo json_encode($res_arr); exit();
-			endif;
+			// if(!empty($checkExistingAuditors)):
+			// 	$res_arr = [
+			// 		"result" => "failed",
+			// 		"title" => "Failed",
+			// 		"message" => "Team Member already added on this Audit Plan!",
+			// 		"link" => "refresh",
+			// 		// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+			// 		];
+			// 		echo json_encode($res_arr); exit();
+			// endif;
 
 			$at = create_trackid("AT");
 			// dump($at);
@@ -745,6 +1083,81 @@
 				];
 				echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "updateAuditSchedule"):
+			// dump($_POST);
+
+
+
+			$aps = query("select * from audit_plan_schedule where aps_id = ?", $_POST["aps_id"]);
+			$aps = $aps[0];
+			// dump($aps_id);
+
+			query("update audit_plan_schedule set 
+				from_time = ?,
+				to_time = ?,
+				schedule_date = ?,
+				team_id = ?,
+				process_id = ?,
+				audit_clause = ?
+				where aps_id = ?
+			", 
+			$_POST["fromTime"],
+			$_POST["toTime"],
+			$_POST["schedule_date"],
+			$_POST["team"],
+			$_POST["process"],
+			$_POST["audit_clause"],
+			$_POST["aps_id"],
+		);
+
+
+			query("delete from aps_area where aps_id = ?", $_POST["aps_id"]);
+			foreach($_POST["area"] as $row):
+				if (query("insert INTO aps_area 
+				(area_id, audit_plan, aps_id) 
+				VALUES(?,?,?)", 
+				$row, $aps["audit_plan"], $_POST["aps_id"]
+				) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+
+			endforeach;
+
+			query("delete from aps_position where aps_id = ?", $_POST["aps_id"]);
+			foreach($_POST["position"] as $row):
+				if (query("insert INTO aps_position 
+				(position_id, audit_plan, aps_id) 
+				VALUES(?,?,?)", 
+				$row, $aps["audit_plan"], $_POST["aps_id"]
+				) === false)
+				{
+					$res_arr = [
+						"result" => "failed",
+						"title" => "Failed",
+						"message" => "Failed on saving deduction table",
+						"link" => "loans_management?action=list",
+						];
+						echo json_encode($res_arr); exit();
+				}
+			else;
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Schedule successfully updated!",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
+
 		elseif($_POST["action"] == "addSchedule"):
 			
 			// dump($_POST);
@@ -823,23 +1236,23 @@
 			$teams = query("select * from audit_plan_team_members where team_id = ?", $_POST["team_id"]);
 			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan_id"]);
 			$audit_plan = $audit_plan[0];
-			$Message = [];
-			foreach($teams as $row):
-				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " assigned you to Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
-				$Message["link"] = "auditPlan?action=auditorDetails&id=".$audit_plan["audit_plan"];
-				$theMessage = serialize($Message);
-				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
-			endforeach;
+			// $Message = [];
+			// foreach($teams as $row):
+			// 	$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " assigned you to Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+			// 	$Message["link"] = "auditPlan?action=auditorDetails&id=".$audit_plan["audit_plan"];
+			// 	$theMessage = serialize($Message);
+			// 	addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			// endforeach;
 
 			$area = implode(",", $_POST["area_id"]);
 			// dump($area);
-			$users_area = query("select * from users_area where area_id in ($area)");
-			foreach($users_area as $row):
-				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " included your office (".$Area[$row["area_id"]]["area_name"].") for audit under Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
-				$Message["link"] = "auditPlan?action=process_owner_list&id=".$audit_plan["audit_plan"];
-				$theMessage = serialize($Message);
-				addNotification($row["user_id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
-			endforeach;
+			// $users_area = query("select * from users_area where area_id in ($area)");
+			// foreach($users_area as $row):
+			// 	$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " included your office (".$Area[$row["area_id"]]["area_name"].") for audit under Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+			// 	$Message["link"] = "auditPlan?action=process_owner_list&id=".$audit_plan["audit_plan"];
+			// 	$theMessage = serialize($Message);
+			// 	addNotification($row["user_id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			// endforeach;
 
 
 			$res_arr = [

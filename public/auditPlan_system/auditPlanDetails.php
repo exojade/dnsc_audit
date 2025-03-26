@@ -104,6 +104,25 @@
       </div>
     </div>
 
+
+    <div class="modal fade" id="modalUpdateTeam">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Team</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                <input type="hidden" name="action" value="updateTeam">
+                <div class="fetched-data"></div>
+    
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="modalAddSchedule">
       <div class="modal-dialog ">
         <div class="modal-content ">
@@ -191,6 +210,25 @@
                 </div>
 
 
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="modal fade" id="modalUpdateSchedule">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Update Audit Schedule</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="auditPlan">
+                <input type="hidden" name="action" value="updateAuditSchedule">
+                <div class="fetched-data"></div>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
               </form>
           </div>
@@ -294,19 +332,43 @@
                 <h3 class="profile-username text-center"><?php echo($auditPlan["type"]); ?></h3>
                 <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
                 <hr>
-                  
-                <?php if($auditPlan["status"] == "SUBMITTED"): ?>
-                  <form class="generic_form_trigger" data-url="auditPlan" data-title="Revert to Edit Audit Plan" data-message="Audit Plan not yet reviewed. If revert, you can update the details of this plan and can resubmit it again.">
-                  <input type="hidden" name="action" value="revertSubmittedPlan">
-                  <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
-                  <button type="submit" class="btn btn-danger btn-block"><b>Revert to Edit</b></button>
-                </form>
-                <?php else: ?>
-                  <form class="generic_form_trigger" data-url="auditPlan" data-title="Submit Audit Plan" data-message="Are you sure you want this to be reviewed?">
-                  <input type="hidden" name="action" value="submitAuditPlan">
-                  <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
-                  <button type="submit" class="btn btn-warning btn-block"><b>Submit for Review</b></button>
-                </form>
+
+                <?php if($_SESSION["dnsc_audit"]["role"] == 4): ?>
+                  <?php if($auditPlan["status"] == "SUBMITTED"): ?>
+                    <form class="generic_form_trigger" data-url="auditPlan" data-title="Revert to Edit Audit Plan" data-message="Audit Plan not yet reviewed. If revert, you can update the details of this plan and can resubmit it again.">
+                    <input type="hidden" name="action" value="revertSubmittedPlan">
+                    <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                    <button type="submit" class="btn btn-danger btn-block"><b>Revert to Edit</b></button>
+                  </form>
+                  <?php else: ?>
+                    <form class="generic_form_trigger" data-url="auditPlan" data-title="Submit Audit Plan" data-message="Are you sure you want this to be reviewed?">
+                    <input type="hidden" name="action" value="submitAuditPlan">
+                    <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                    <button type="submit" class="btn btn-warning btn-block"><b>Submit for Review</b></button>
+                  </form>
+                  <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if($_SESSION["dnsc_audit"]["role"] == 5): ?>
+                  <?php if($auditPlan["status"] == "SUBMITTED"): ?>
+                    <div class="row">
+                      <div class="col">
+                        <form class="generic_form_trigger" data-url="auditPlan" data-title="Approve Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
+                          <input type="hidden" name="action" value="approveAuditPlanToCMT">
+                          <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                          <button type="submit" class="btn btn-warning btn-block"><b>Approve</b></button>
+                        </form>
+                      </div>
+                      <div class="col">
+                        <form class="generic_form_trigger" data-url="auditPlan" data-title="Return Audit Plan to Internal Auditor for Review" data-message="You are about to return the plan for further review to the Internal Lead Auditor ">
+                          <input type="hidden" name="action" value="returnAuditPlanToILA">
+                          <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                          <button type="submit" class="btn btn-danger btn-block"><b>Return</b></button>
+                        </form>
+                      </div>
+                    </div>
+                    
+                  <?php endif; ?>
                 <?php endif; ?>
 
                 
@@ -395,10 +457,11 @@
 
                   <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success btn-sm">ADD TEAM</a>
                   <hr>
-                  <table class="table table-bordered" id="teamDatatable" width="100%">
+                  <table class="table table-bordered" style="width: 100% !important; table-layout: fixed !important;" id="teamDatatable">
                     <thead>
-                      <th>Team #</th>
-                      <th>Members</th>
+                      <th width="10%"></th>
+                      <th width="10%">Team #</th>
+                      <th width="80%">Members</th>
                     </thead>
                   </table>
 
@@ -494,6 +557,7 @@ var teamDatatable =
                      }
                 },
                 'columns': [
+                    { data: 'action', "orderable": false },
                     { data: 'team_number', "orderable": false },
                     { data: 'team_members', "orderable": false  },
                 ],
@@ -597,10 +661,157 @@ var teamDatatable =
                 // $("#salary_select").select2();
             }
         });
-
-
-        
      });
+
+
+     $('#modalUpdateTeam').on('show.bs.modal', function (e) {
+        var id = $(e.relatedTarget).data('id');
+        $.ajax({
+            type : 'post',
+            url : 'auditPlan', //Here you will fetch records 
+            data: {
+                team_id: id, 
+                action: "modalUpdateTeam",
+
+            },
+            success : function(data){
+                $('#modalUpdateTeam .fetched-data').html(data);
+                $('.modalSelect2').select2();
+                // $("#salary_select").select2();
+            }
+        });
+     });
+
+     $('#modalUpdateSchedule').on('show.bs.modal', function (e) {
+        var id = $(e.relatedTarget).data('id');
+        $.ajax({
+            type : 'post',
+            url : 'auditPlan', //Here you will fetch records 
+            data: {
+                aps_id: id, 
+                action: "modalUpdateSchedule",
+
+            },
+            success : function(data){
+                $('#modalUpdateSchedule .fetched-data').html(data);
+                $('.modalSelect2').select2();
+
+
+                $('.processSelect').select2({
+                  placeholder: "Search for Process Area",
+                });
+
+                $(".areaSelect").select2({
+                      placeholder: "Select Area", // Placeholder text
+                  });
+
+                  $(".positionSelect").select2({
+                      placeholder: "Select Position", // Placeholder text
+                      allowClear: true // Adds a clear button to remove the selection
+                  });
+
+                $(".processSelect").on("change", function () {
+        let process_id = $(this).val(); // Get selected area_id
+        
+        // Ensure an area is selected
+        if (process_id) {
+            // Send AJAX request
+            $.ajax({
+                url: "auditPlan", // Backend PHP script to handle the request
+                type: "POST",
+                data: { process_id: process_id , action: "fetchArea"},
+                dataType: "json",
+                success: function (response) {
+
+                  $(".areaSelect").select2({
+                      placeholder: "Select Area", // Placeholder text
+                      allowClear: true 
+                  });
+
+           
+                  console.log(response);
+
+
+                  // processSelect
+                    // Populate process select
+                    let areaSelect = $(".areaSelect");
+                    areaSelect.empty().append('');
+                    $.each(response.area, function (key, value) {
+                      console.log(value);
+                      areaSelect.append('<option value="' + value.id + '">' + value.area_name + '</option>');
+                    });
+
+                
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                },
+            });
+        }
+    });
+
+
+    $(".areaSelect").on("change", function () {
+        let areaId = $(this).val(); // Get selected area_id
+        
+        // Ensure an area is selected
+        if (areaId) {
+            // Send AJAX request
+            $.ajax({
+                url: "auditPlan", // Backend PHP script to handle the request
+                type: "POST",
+                data: { area_id: areaId , action: "fetchPosition"},
+                dataType: "json",
+                success: function (response) {
+
+                
+
+                  $(".positionSelect").select2({
+                      placeholder: "Select Position", // Placeholder text
+                      allowClear: true // Adds a clear button to remove the selection
+                  });
+                  console.log(response);
+
+
+                 
+
+                    // Populate position select
+                    let positionSelect = $(".positionSelect");
+                    positionSelect.empty().append('');
+                    $.each(response.positions, function (key, value) {
+                        positionSelect.append('<option value="' + value.position_id + '">' + value.position_name + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                },
+            });
+        }
+    });
+
+
+    $('#fromtimepickerUpdate').datetimepicker({
+    format: 'LT',
+    stepping: 30,
+    defaultDate: moment("08:00 AM", "hh:mm A")
+});
+
+$('#totimepickerUpdate').datetimepicker({
+    format: 'LT',
+    stepping: 30,
+    defaultDate: moment("05:00 PM", "hh:mm A")
+});
+
+
+                // $("#salary_select").select2();
+            }
+        });
+     });
+
+     
+
+
+     
 
 
     $(document).ready(function () {
