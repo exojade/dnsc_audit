@@ -353,18 +353,106 @@
                   <?php if($auditPlan["status"] == "SUBMITTED"): ?>
                     <div class="row">
                       <div class="col">
-                        <form class="generic_form_trigger" data-url="auditPlan" data-title="Approve Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
-                          <input type="hidden" name="action" value="approveAuditPlanToCMT">
-                          <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
-                          <button type="submit" class="btn btn-warning btn-block"><b>Approve</b></button>
-                        </form>
+
+                      <div class="modal fade" id="approveAuditPlanToCMT">
+                        <div class="modal-dialog">
+                          <div class="modal-content ">
+                            <div class="modal-header bg-warning">
+                                <h3 class="modal-title text-center">Approve Audit Plan (QAD)</h3>
+                            </div>
+                            <div class="modal-body">
+                            <form class="generic_form_trigger" data-url="auditPlan" data-title="Approve Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
+                                <input type="hidden" name="action" value="approveAuditPlanToCMT">
+                                <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                                    <div class="form-group">
+                                      <label>Remarks</label>
+                                      <textarea name="remarks" class="form-control" rows="3" placeholder="Place Note or Remarks Here!"></textarea>
+                                    </div>
+                                  <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                          <a href="#" data-toggle="modal" data-target="#approveAuditPlanToCMT" class="btn btn-warning btn-block"><b>Approve</b></a>
                       </div>
                       <div class="col">
-                        <form class="generic_form_trigger" data-url="auditPlan" data-title="Return Audit Plan to Internal Auditor for Review" data-message="You are about to return the plan for further review to the Internal Lead Auditor ">
-                          <input type="hidden" name="action" value="returnAuditPlanToILA">
-                          <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
-                          <button type="submit" class="btn btn-danger btn-block"><b>Return</b></button>
-                        </form>
+                      <div class="modal fade" id="modalreturnAuditPlanToILA">
+                        <div class="modal-dialog">
+                          <div class="modal-content ">
+                            <div class="modal-header bg-danger">
+                                <h3 class="modal-title text-center">Return Audit Plan (QAD)</h3>
+                            </div>
+                            <div class="modal-body">
+                            <form class="generic_form_trigger" data-url="auditPlan" data-title="Return Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
+                                <input type="hidden" name="action" value="returnAuditPlanToILA">
+                                <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                                    <div class="form-group">
+                                      <label>Remarks</label>
+                                      <textarea name="remarks" class="form-control" rows="3" placeholder="Place Note or Remarks Here!"></textarea>
+                                    </div>
+                                  <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                        <a href="#" data-toggle="modal" data-target="#modalreturnAuditPlanToILA" class="btn btn-danger btn-block"><b>Return</b></a>
+                      </div>
+                    </div>
+                    
+                  <?php endif; ?>
+                <?php endif; ?>
+
+
+                <?php if($_SESSION["dnsc_audit"]["role"] == 8): ?>
+                  <?php if($auditPlan["status"] == "QAD-APPROVED"): ?>
+                    <div class="row">
+                      <div class="col">
+                      <div class="modal fade" id="modalFinalApproveAP">
+                        <div class="modal-dialog">
+                          <div class="modal-content ">
+                            <div class="modal-header bg-warning">
+                                <h3 class="modal-title text-center">Approve Audit Plan</h3>
+                            </div>
+                            <div class="modal-body">
+                            <form class="generic_form_trigger" data-url="auditPlan" data-title="Approve Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
+                                <input type="hidden" name="action" value="FinalApproveAP">
+                                <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                                    <div class="form-group">
+                                      <label>Remarks</label>
+                                      <textarea name="remarks" class="form-control" rows="3" placeholder="Place Note or Remarks Here!"></textarea>
+                                    </div>
+                                  <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                          <a href="#" data-toggle="modal" data-target="#modalFinalApproveAP" class="btn btn-warning btn-block"><b>Approve</b></a>
+                      </div>
+                      <div class="col">
+                      <div class="modal fade" id="modalreturnAuditPlanToILACMT">
+                        <div class="modal-dialog">
+                          <div class="modal-content ">
+                            <div class="modal-header bg-danger">
+                                <h3 class="modal-title text-center">Return Audit Plan (CMT)</h3>
+                            </div>
+                            <div class="modal-body">
+                            <form class="generic_form_trigger" data-url="auditPlan" data-title="Return Audit Plan" data-message="Submit Audit Plan to CMT for Approval">
+                                <input type="hidden" name="action" value="returnAuditPlanToILACMT">
+                                <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
+                                    <div class="form-group">
+                                      <label>Remarks</label>
+                                      <textarea name="remarks" class="form-control" rows="3" placeholder="Place Note or Remarks Here!"></textarea>
+                                    </div>
+                                  <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                        <a href="#" data-toggle="modal" data-target="#modalreturnAuditPlanToILACMT" class="btn btn-danger btn-block"><b>Return</b></a>
                       </div>
                     </div>
                     
@@ -387,6 +475,7 @@
                   <li class="nav-item"><a class="nav-link active" href="#audit_plan" data-toggle="tab">Audit Plan Info</a></li>
                   <li class="nav-item"><a class="nav-link" href="#teams" data-toggle="tab">Teams</a></li>
                   <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#remarks" data-toggle="tab">Remarks</a></li>
                   <!-- <li class="nav-item"><a class="nav-link" href="#audit_reports" data-toggle="tab">Audit Reports</a></li> -->
                 </ul>
               </div><!-- /.card-header -->
@@ -467,7 +556,31 @@
 
 
                   </div>
-                  <div class="tab-pane" id="audit_reports">
+                  <div class="tab-pane" id="remarks">
+                    <?php
+                    $remarks = query("select apr.*, concat(firstname, ' ', surname) as fullname from audit_plan_remarks apr
+                            left join users u on u.id = remarks_by
+                            where audit_plan = ? order by date_created desc", $_GET["id"]);
+                    ?>
+                    <table class="table table-bordered table-striped">
+                      <thead>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th>By</th>
+                        <th>Date</th>
+                      </thead>
+                      <tbody>
+                        <?php foreach($remarks as $row): ?>
+                          <tr>
+                            <td><?php echo($row["audit_plan_status"]); ?></td>
+                            <td><?php echo($row["remarks"]); ?></td>
+                            <td><?php echo($row["fullname"]); ?></td>
+                            <td><?php echo(date("F d, Y h:i A", $row["date_created"])); ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+
+                    </table>
                   </div>
                 </div>
             </div>

@@ -110,39 +110,39 @@
 
     <div class="card card-success">
       <div class="card-header">
-        <h3 class="card-title"><strong>Compliance</strong></h3>
+        <h3 class="card-title"><strong>Trail</strong></h3>
       </div>
+
+      <div class="card-body text-justify">
+         
+      <table class="table table-bordered">
+        <thead>
+          <th>Clause</th>
+          <th>Comply</th>
+          <th>Trail</th>
+        </thead>
+        <tbody>
+      <?php $clause = unserialize($checklist["audit_trail_array"]); ?>
+
+        <?php foreach($clause as $row): ?>
+          <tr>
+            <td><?php echo($row["clause"]); ?></td>
+            <td><?php echo($row["comply"]); ?></td>
+            <td><?php echo($row["trail"]); ?></td>
+          </tr>
+        <?php endforeach; ?>
+
+        </tbody>
+
+      </table>
+      </div>
+
       <!-- /.card-header -->
       <!-- form start -->
       
-        <div class="card-body text-justify">
-          <?php echo($checklist["comply"]); ?>
-        </div>
+     
     </div>
 
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Audit Trail</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["audit_trail"]); ?>
-        </div>
-    </div>
-
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Remarks</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["remarks"]); ?>
-        </div>
-    </div>
 
     </div>
   </div>

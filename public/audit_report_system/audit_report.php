@@ -236,11 +236,8 @@
 
 		elseif($_POST["action"] == "createAuditReport"):
 			// dump($_POST);
-
-
 			$aps_area = query("select * from aps_area where tblid = ?", $_POST["aps_area_id"]);
 			$aps_area = $aps_area[0];
-
 			$questions =[
 				"Are the procedure steps accurate and complete as compared to true practice?",
 				"Are there sufficient check steps (inspections, tests, reviews, approvals, sign-offs, etc.) that ensure the process outputs meet requirements before passing onto the next process?",
@@ -271,7 +268,10 @@
 
 
 		
-			$ar_id = create_uuid("AR");
+			
+			$audit_report = query("select count(*) as count from audit_report where audit_plan = ?", $aps_area["audit_plan"]);
+			$ar_id = $aps_area["audit_plan"] . "-AR-" . ($audit_report[0]["count"] + 1) ;
+
 			if (query("insert INTO audit_report 
 					(audit_report_id, audit_plan, aps_id, aps_area, timestamp, effectiveness_process, car_status, ofi_improvement,
 					ofi_nonconformance, car_details, audit_report_status, user_id, comments) 
@@ -313,6 +313,15 @@
 
 		elseif($_POST["action"] == "print_audit_report"):
 			// dump($_POST);
+
+
+
+
+
+
+
+
+
 			$audit_report = query("select ar.*,
 			concat(u.firstname, ' ' ,u.middlename, ' ', u.surname) as prepared_by,
 									concat(u2.firstname, ' ' ,u2.middlename, ' ', u2.surname) as reviewed_by,
@@ -333,7 +342,14 @@
 			$aps_schedule = $aps_schedule[0];
 
 
+			$Auditees = query("select concat(firstname, ' ', surname) as fullname from users_area ua 
+								left join users u on u.id = ua.user_id
+								where u.role_id = 2
+								and ua.area_id = ?
+								", $audit_report["aps_area"]);
+			$Auditees = implode(", ", array_column($Auditees, "fullname"));
 
+			// dump($Auditees);
 
 
 // dump($aps_schedule);
@@ -551,7 +567,7 @@ font-size: 12px;
 												<td width="10%" class="p-2 nw"><b>Auditor: </b></td>
                                                 <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_report["firstname"] . " " . $audit_report["middlename"] . " " . $audit_report["surname"].'</td>
                                                 <td width="10%" class="p-2 nw"><b>Auditee</b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;"></td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$Auditees.'</td>
                                             </tr>
                                         </table>
 					<br>
@@ -805,11 +821,11 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td class="p-2 nw" width="50%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
-												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["prepared_by"].'</td>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$Auditees.'</td>
 				
 											</tr>
 											<tr>
-												<td class="p-2 nw text-center" >Internal Auditor / Date</td>
+												<td class="p-2 nw text-center" >Process Owner(s) / Date</td>
 											</tr>
                                         </table>
 												</td>

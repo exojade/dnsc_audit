@@ -62,27 +62,26 @@
 					$data[$i]["office"] = $Office[$row["office_id"]]["office_name"];
 					$data[$i]["date"] = date("M d, Y", $row["timestamp"]);
 					$surveyResult = unserialize($row["survey_result"]);
-
-
-					foreach($criteria as $c):
+				
+					foreach ($criteria as $c):
 						$data[$i][$c["questionnaire_id"]] = 0;
 					endforeach;
-
-
-					$count = 0;
+				
 					$total_count = 0;
-					foreach($surveyResult as $result):
-						if(isset($Criteria[$result["criteria"]])):
+					$valid_count = 0; // Only count non-zero values
+				
+					foreach ($surveyResult as $result):
+						if (isset($Criteria[$result["criteria"]]) && $result["result"] > 0): // Ignore zeros
 							$data[$i][$result["criteria"]] = $result["result"];
-							$total_count+=$result["result"];
-							$count++;
+							$total_count += $result["result"];
+							$valid_count++;
 						endif;
 					endforeach;
-					$data[$i]["average"] = round($total_count / $count);
+				
+					// Avoid division by zero, set average to 0 if no valid entries
+					$data[$i]["average"] = ($valid_count > 0) ? round($total_count / $valid_count, 2) : 0;
 					$data[$i]["comments"] = $row["remarks"];
-					
-
-
+				
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -193,6 +192,76 @@
 						"totalCount" => $totalCount,
 					);
 					echo json_encode($json_data);
+
+
+					elseif ($_POST["action"] == "barChart"):
+
+						$from_timestamp = strtotime($_POST["year"] . "-" . $_POST["from"] . "-01");
+						$to_timestamp = strtotime(date($_POST["year"] . "-" . $_POST["to"] . "-t"));
+					
+						$where = "WHERE timestamp BETWEEN $from_timestamp AND $to_timestamp";
+					
+						// Fetch survey data
+						$surveyData = query("
+							SELECT s.survey_id, s.office_id, s.survey_result, o.office_name
+							FROM survey s
+							JOIN office o ON s.office_id = o.office_id
+							$where
+						");
+					
+						$officeScores = [];
+					
+						foreach ($surveyData as $row):
+							$officeId = $row["office_id"];
+							$officeName = $row["office_name"];
+							
+							// Unserialize survey_result
+							$surveyResults = unserialize($row["survey_result"]);
+							
+							// Calculate average per survey
+							$sum = 0;
+							$count = 0;
+							
+							foreach ($surveyResults as $criteria):
+								$sum += intval($criteria["result"]);
+								$count++;
+							endforeach;
+					
+							if ($count > 0):
+								$surveyAvg = $sum / $count;
+							else:
+								$surveyAvg = 0;
+							endif;
+					
+							// Store results by office
+							if (!isset($officeScores[$officeId])):
+								$officeScores[$officeId] = [
+									"name" => $officeName,
+									"total_score" => 0,
+									"survey_count" => 0
+								];
+							endif;
+					
+							$officeScores[$officeId]["total_score"] += $surveyAvg;
+							$officeScores[$officeId]["survey_count"]++;
+						endforeach;
+					
+						// Compute final office averages
+						$BarCount = [];
+						foreach ($officeScores as $office):
+							$finalAvg = $office["survey_count"] > 0 ? $office["total_score"] / $office["survey_count"] : 0;
+							$BarCount[] = [
+								"name" => $office["name"],
+								"count" => round($finalAvg, 2) // Round to 2 decimal places
+							];
+						endforeach;
+					
+						$json_data = [
+							"dataset" => $BarCount,
+							"totalCount" => count($BarCount),
+						];
+					
+						echo json_encode($json_data);
 
 		elseif($_POST["action"] == "modalUpdateQuestion"):
 			// dump($_POST);

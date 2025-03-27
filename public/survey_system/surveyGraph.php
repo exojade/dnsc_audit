@@ -89,6 +89,65 @@
       </div>
 
 
+      <div class="card">
+        <div class="card-header">
+        <form class="barChartForm" data-url="survey">
+                            <input type="hidden" name="action" value="barChart">
+                            <button  class="btn btn-primary float-right ml-1" type="submit">Filter</button>
+                            <div style="width: 15%;" class="form-group float-right mr-2">
+                                <input  name="year" type="number" value="<?php echo(date("Y")); ?>" class="form-control" id="exampleInputEmail1" placeholder="---">
+                                </div>
+                                <div  style="width: 15%;" class="form-group float-right mr-2">
+                                <select name="to" class="form-control">
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option selected value="12">December</option>
+                                    <!-- <option selected value="<?php echo(date("m")); ?>"><?php echo(date("F")); ?></option> -->
+                                </select>
+                                </div>
+                            <div  style="width: 15%;" class="form-group float-right mr-2">
+                                <select name="from" class="form-control">
+                                    <option selected value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                </div>
+
+                                <div class="form-group float-right mr-2" style="width:20%;">
+                            
+                                </div>
+                            </form>
+
+          
+        </div>
+        <div class="card-body">
+            <!-- <div class="resultLineDiv"></div> -->
+        <div class="chart">
+                  <canvas id="barChart" style="min-height: 350px; height: auto; max-height: 430px; max-width: 100%;"></canvas>
+                </div>
+          
+        </div>
+      </div>
+
+
        
         </div>
 
@@ -132,6 +191,7 @@ $(document).ready(function() {
       // $('.deceased_chart_form').submit();
      
       $('.lineChartForm').submit();
+      $('.barChartForm').submit();
     });
   </script>
 <script>
@@ -252,6 +312,108 @@ success: function (results) {
 }
 });
 });
+
+
+
+let barChartInstance ;
+$('.barChartForm').submit(function (e) {
+    e.preventDefault(); // Prevent the form from submitting
+
+    var form = $(this)[0];
+    var formData = new FormData(form);
+    var url = $(this).data('url');
+
+    Swal.fire({
+        title: 'Please wait...',
+        showClass: {
+            popup: `
+                animate__animated
+                animate__bounceIn
+                animate__faster
+            `
+        },
+        hideClass: {
+            popup: `
+                animate__animated
+                animate__bounceOut
+                animate__faster
+            `
+        },
+        imageUrl: 'AdminLTE_new/dist/img/loader.gif',
+        showConfirmButton: false
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (results) {
+            var response = JSON.parse(results);
+            var barChartDataSet = response.dataset; // Adjust based on the response structure
+            var barChartOffice = response.disease; // Adjust based on the response structure
+            var barChartTotalCount = response.totalCount; // Adjust based on the response structure
+
+            var barChartLabels = barChartDataSet.map(item => item.name);
+            var barChartCounts = barChartDataSet.map(item => item.count);
+
+            var barChartData = {
+                labels: barChartLabels,
+                datasets: [{
+                    label: 'Surveys',
+                    backgroundColor: 'rgba(60,141,188,0.8)',  // Bar color
+                    data: barChartCounts,  // The data values (survey counts)
+                    borderWidth: 2
+                }]
+            };
+
+            var barChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function (val) {
+                                return val + '%'; // Optionally append '%' to Y-axis ticks
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 90, // Rotate the labels 90 degrees
+                            minRotation: 90
+                        }
+                    }
+                }
+            };
+
+            // Destroy previous instance of bar chart if it exists
+            if (barChartInstance) {
+                barChartInstance.destroy();
+            }
+            var barChartCanvas = $('#barChart').get(0).getContext('2d');
+
+            barChartInstance = new Chart(barChartCanvas, {
+                type: 'bar',
+                data: barChartData,
+                options: barChartOptions
+            });
+
+            Swal.close();
+
+            $('.resultBarChartDiv').html(`
+                <div class="alert alert-success" role="alert">
+                    <strong>Office:</strong> ${barChartOffice} <br>
+                    <strong>Total Survey:</strong> ${barChartTotalCount}
+                </div>
+            `);
+        }
+    });
+});
+
     </script>
 
 

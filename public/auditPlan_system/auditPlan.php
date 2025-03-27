@@ -9,6 +9,12 @@
 				$limit = $_POST["length"];
 				$search = $_POST["search"]["value"];
 
+				$users = query("select id, concat(firstname, ' ', surname) as fullname from users");
+				$Users = [];
+				foreach($users as $row):
+					$Users[$row["id"]] = $row;
+				endforeach;
+
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
 
@@ -28,6 +34,15 @@
 				$i = 0;
 				foreach($data as $row):
 					$data[$i]["action"] = '<a href="auditPlan?action=details&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+					if($row["qad_approved"] != ""):
+						$data[$i]["qad_approved"] = $Users[$row["qad_approved"]]["fullname"];
+					endif;
+					if($row["cmt_approved"] != ""):
+						$data[$i]["cmt_approved"] = $Users[$row["cmt_approved"]]["fullname"];
+					endif;
+					
+					
+					
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -184,6 +199,8 @@
 						"aaData" => $data
 					);
 					echo json_encode($json_data);
+
+		
 
 
 		elseif($_POST["action"] == "modalUpdateTeam"):
@@ -875,6 +892,7 @@
 				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
 				];
 				echo json_encode($res_arr); exit();
+				
 
 		elseif($_POST["action"] == "submitAuditPlan"):
 			// dump($_POST);
@@ -919,6 +937,187 @@
 			];
 			echo json_encode($res_arr);
 			exit();
+
+
+		elseif($_POST["action"] == "approveAuditPlanToCMT"):
+			// dump($_POST);
+
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+			$audit_plan = $audit_plan[0];
+			query("update audit_plans set status = 'QAD-APPROVED', qad_approved = ? where audit_plan = ?", $_SESSION["dnsc_audit"]["userid"], $_POST["id"]);
+
+			$result = query("INSERT INTO audit_plan_remarks 
+									(audit_plan, remarks, date_created, remarks_by, audit_plan_status)
+								VALUES(?,?,?,?,?)", 
+								$audit_plan["audit_plan"], $_POST["remarks"], time(), $_SESSION["dnsc_audit"]["userid"], "QAD-APPROVED");
+
+			
+			$users = query("select * from users where role_id = 8");
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " approved : " . $audit_plan["type"] . " - " . $audit_plan["year"].". CMT is the final approver! Kindly Review to make the Audit Plan final!";
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+			$users = query("select * from users where id = ?", $audit_plan["created_by"]);
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " approved : " . $audit_plan["type"] . " - " . $audit_plan["year"].". CMT is the final approver! Kindly wait for the CMT final review! ";
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Submitted for Review",
+				"link" => "auditPlan?action=details&id=".$_POST["id"],
+			];
+			echo json_encode($res_arr);
+			exit();
+
+		elseif($_POST["action"] == "returnAuditPlanToILA"):
+			// dump($_POST);
+
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+			$audit_plan = $audit_plan[0];
+			query("update audit_plans set status = 'FOR REVIEW' where audit_plan = ?", $_POST["id"]);
+
+			$result = query("INSERT INTO audit_plan_remarks 
+									(audit_plan, remarks, date_created, remarks_by, audit_plan_status)
+								VALUES(?,?,?,?,?)", 
+								$audit_plan["audit_plan"], $_POST["remarks"], time(), $_SESSION["dnsc_audit"]["userid"], "RETURN FOR REVIEW");
+
+			
+		
+
+			$users = query("select * from users where id = ?", $audit_plan["created_by"]);
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " returned the : " . $audit_plan["type"] . " - " . $audit_plan["year"].". Kindly view the remarks from the Approver! ";
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Submitted for Review",
+				"link" => "auditPlan?action=details&id=".$_POST["id"],
+			];
+			echo json_encode($res_arr);
+			exit();
+
+			elseif($_POST["action"] == "returnAuditPlanToILACMT"):
+
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+			$audit_plan = $audit_plan[0];
+			query("update audit_plans set status = 'FOR REVIEW', qad_approved = '' where audit_plan = ?", $_POST["id"]);
+
+			$result = query("INSERT INTO audit_plan_remarks 
+									(audit_plan, remarks, date_created, remarks_by, audit_plan_status)
+								VALUES(?,?,?,?,?)", 
+								$audit_plan["audit_plan"], $_POST["remarks"], time(), $_SESSION["dnsc_audit"]["userid"], "RETURN FOR REVIEW from CMT");
+
+			
+		
+
+			$users = query("select * from users where id = ?", $audit_plan["created_by"]);
+			foreach($users as $row):
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " returned the : " . $audit_plan["type"] . " - " . $audit_plan["year"].". Kindly view the remarks from the Approver! This is from CMT ";
+				$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Audit Plan Submitted for Review",
+				"link" => "auditPlan?action=details&id=".$_POST["id"],
+			];
+			echo json_encode($res_arr);
+			exit();
+
+			elseif($_POST["action"] == "FinalApproveAP"):
+				// dump($_POST);
+	
+				$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["id"]);
+				$audit_plan = $audit_plan[0];
+				query("update audit_plans set status = 'ONGOING', cmt_approved = ? where audit_plan = ?", $_SESSION["dnsc_audit"]["userid"], $_POST["id"]);
+	
+				$result = query("INSERT INTO audit_plan_remarks 
+										(audit_plan, remarks, date_created, remarks_by)
+									VALUES(?,?,?,?)", 
+									$audit_plan["audit_plan"], $_POST["remarks"], time(), $_SESSION["dnsc_audit"]["userid"]);
+	
+				
+				// $users = query("select * from users where role_id = 8");
+				// foreach($users as $row):
+				// 	$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " approved : " . $audit_plan["type"] . " - " . $audit_plan["year"].". CMT is the final approver! Kindly Review to make the Audit Plan final!";
+				// 	$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+				// 	$theMessage = serialize($Message);
+				// 	addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+				// endforeach;
+	
+				$users = query("select * from users where id = ?", $audit_plan["created_by"]);
+				foreach($users as $row):
+					$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " approved : " . $audit_plan["type"] . " - " . $audit_plan["year"].". Audit Plan is now fully launched! ";
+					$Message["link"] = "auditPlan?action=details&id=".$audit_plan["audit_plan"];
+					$theMessage = serialize($Message);
+					addNotification($row["id"],$theMessage, $_SESSION["dnsc_audit"]["userid"]);
+				endforeach;
+
+				$teams = query("select * from audit_plan_team_members where audit_plan = ?", $audit_plan["audit_plan"]);
+				$created_by = query("select concat(firstname, ' ', surname) as fullname from users where id = ?", $audit_plan["created_by"]);
+				$created_by = $created_by[0];
+				$Message = [];
+				foreach($teams as $row):
+					$Message["message"] = $created_by["fullname"] . " assigned you to Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+					$Message["link"] = "auditPlan?action=auditorDetails&id=".$audit_plan["audit_plan"];
+					$theMessage = serialize($Message);
+					addNotification($row["id"],$theMessage, $audit_plan["created_by"]);
+				endforeach;
+
+				$area = query("select area_id from aps_area where audit_plan = ?", $audit_plan["audit_plan"]);
+				$Area = [];
+				foreach($area as $row):
+					$Area[] = $row["area_id"];
+
+				endforeach;
+
+	
+				$area = implode(",", $Area);
+				$users_area = query("select * from users_area where area_id in ($area)");
+				$myarea = query("select * from areas");
+				$Area = [];
+				foreach($myarea as $row):
+					$Area[$row["id"]] = $row;
+				endforeach;
+
+
+				foreach($users_area as $row):
+					$Message["message"] = $created_by["fullname"] . " included your office (".$Area[$row["area_id"]]["area_name"].") for audit under Audit Plan : " . $audit_plan["type"] . " - " . $audit_plan["year"];
+					$Message["link"] = "auditPlan?action=process_owner_list&id=".$audit_plan["audit_plan"];
+					$theMessage = serialize($Message);
+					addNotification($row["user_id"],$theMessage, $audit_plan["created_by"]);
+				endforeach;
+
+
+
+
+
+
+
+
+
+
+				$res_arr = [
+					"result" => "success",
+					"title" => "Success",
+					"message" => "Audit Plan Submitted for Review",
+					"link" => "auditPlan?action=details&id=".$_POST["id"],
+				];
+				echo json_encode($res_arr);
+				exit();
 
 
 		elseif($_POST["action"] == "newPlan"):
@@ -1524,6 +1723,8 @@
 						dl{
 						font-size:12px;
 					}
+
+	
 					</style>
 				
 					';
@@ -1548,6 +1749,17 @@
 						font-size: 15px !important;
 						font-weight: 800;
 					}
+
+.table-borderless > tbody > tr > td,
+.table-borderless > tbody > tr > th,
+.table-borderless > tfoot > tr > td,
+.table-borderless > tfoot > tr > th,
+.table-borderless > thead > tr > td,
+.table-borderless > thead > tr > th {
+    border: none !important;
+}
+
+
 
 					h4{
 						margin:0px !important;
@@ -1638,16 +1850,38 @@
 					endforeach;
 
 					$html.='
-
-
-
 					</table>
-				
-			
-			
+					';
 
-		
-					
+					$Users = [];
+					$users = query("select id, concat(firstname, ' ', surname) as fullname from users");
+					foreach($users as $row):
+						$Users[$row["id"]] = $row;
+					endforeach;
+					$created_by = !empty($auditPlan["created_by"]) ? $Users[$auditPlan["created_by"]]["fullname"] : "";
+					$qad_approved = !empty($auditPlan["qad_approved"]) ? $Users[$auditPlan["qad_approved"]]["fullname"] : "";
+					$cmt_approved = !empty($auditPlan["cmt_approved"]) ? $Users[$auditPlan["cmt_approved"]]["fullname"] : "";
+
+				
+
+					$html.='
+					<table class="table table-borderless" style="border: none !important;">
+					<tbody style="border: none !important;">
+						<tr style="border: none !important;">
+							<td style="border: none !important;" width="33%" ><b>Created By</b></td>
+							<td style="border: none !important;" width="33%" ><b>Quality Assurance Director</b></td>
+							<td style="border: none !important;" width="33%" ><b>College Management Team</b></td>
+						</tr>
+						<tr  style="border: none !important;">
+							<td colspan="3">&nbsp;</td>
+						</tr>
+						<tr style="border-bottom: 1px solid black;">
+							<td style="border: none !important;" width="33%" ><b>'.$created_by.'</b></td>
+							<td style="border: none !important;" width="33%" ><b>'.$qad_approved.'</b></td>
+							<td style="border: none !important;" width="33%" ><b>'.$cmt_approved.'</b></td>
+						</tr>
+					</tbody>
+					</table>
 					';
 
 					$mpdf->WriteHTML($html);

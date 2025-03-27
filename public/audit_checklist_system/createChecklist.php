@@ -116,28 +116,46 @@
                     </div>
 
 
-                    <div class="form-group">
-                        <label>Audit Trail</label>
-                        <textarea required name="audit_trail" class="form-control" rows="5" placeholder="Enter ..."></textarea>
+                    <button type="button" class="btn btn-primary" id="addClause">Add Row</button>
+                    <br>
+                    <br>
+                      <div id="clauseContainer">
+
+                      <div class="amik">
+                      <div class="row ">
+                        <div class="col-7">
+                        <div class="form-group ">
+                            <input required type="text" placeholder="Enter Clause Here" class="form-control" name="clause[]">
+                        </div>
+                    
+
+                        </div>
+
+                        <div class="col-3">
+                        <div class="form-group ">
+                          <select class="form-control" name="comply[]" required>
+                            <option selected disabled value=""></option>
+                            <option   value="YES">YES</option>
+                            <option   value="NO">NO</option>
+
+                          </select>
+                        </div>
+                        </div>
+                        <div class="col-2">
+                        <span class="btn btn-block btn-danger remove-btn">X</span>
+
+                        </div>
+
                       </div>
 
                       <div class="form-group">
-                        <label>Comply</label>
-                        <select required name="comply" class="form-control">
-                        <option value="" selected disabled >Select option here!</option>
-
-                          <option value="YES"  >YES</option>
-                          <option value="NO"  >NO</option>
-
-                        </select>
+                        <textarea required placeholder="Enter observance/trail/remarks here!" class="form-control" rows="3" name="remarks[]"></textarea>
                       </div>
+                  </div>
+                      
+                    </div>
 
-
-                      <div class="form-group">
-                        <label>AUDIT FINDINGS/NOTES/REMARKS (evidence)</label>
-                        <textarea name="remarks" class="form-control" rows="5" placeholder="Enter ..."></textarea>
-                      </div>
-                   
+              
                 <!-- <button class="btn btn-info btn-previous" >Previous</button> -->
                 <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
@@ -212,6 +230,23 @@
 <script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script>
 <script src="AdminLTE_new/plugins/jquery-validation/additional-methods.min.js"></script>
 <?php require("layouts/footer.php") ?>
+<script>
+        $(document).ready(function () {
+            $("#addClause").click(function () {
+                let newClause = $(".amik:first").clone(); // Clone the first .form-group
+                newClause.find("input").val(""); // Clear input field
+                $("#clauseContainer").append(newClause); // Append clone
+            });
+
+            $(document).on("click", ".remove-btn", function () {
+                if ($(".amik").length > 1) {
+                    $(this).closest(".amik").remove(); // Remove only if more than 1 exists
+                } else {
+                    alert("At least one clause is required!");
+                }
+            });
+        });
+    </script>
 
 <script>
 

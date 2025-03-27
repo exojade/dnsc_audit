@@ -104,8 +104,17 @@
 		elseif($_POST["action"] == "updateChecklist"):
 			// dump($_POST);
 
-			query("update audit_checklist set audit_trail = ?, comply = ?, remarks = ? where audit_checklist_id = ?" ,$_POST["audit_trail"], $_POST["comply"],
-					$_POST["remarks"], $_POST["audit_checklist_id"]);
+			$Clause = [];
+			$i = 0;
+			foreach($_POST["clause"] as $row):
+				$Clause[$i]["clause"] = $_POST["clause"][$i];
+				$Clause[$i]["trail"] = $_POST["remarks"][$i];
+				$Clause[$i]["comply"] = $_POST["comply"][$i];
+				$i++;
+			endforeach;
+
+			$finalClause = serialize($Clause);
+			query("update audit_checklist set audit_trail_array = ? where audit_checklist_id = ?" ,$finalClause, $_POST["audit_checklist_id"]);
 
 		$res_arr = [
 			"result" => "success",
@@ -233,24 +242,30 @@
 			$aps_area = query("select * from aps_area where tblid = ?", $_POST["aps_area_id"]);
 			$aps_area = $aps_area[0];
 
+			$Clause = [];
+			$i = 0;
+			foreach($_POST["clause"] as $row):
+				$Clause[$i]["clause"] = $_POST["clause"][$i];
+				$Clause[$i]["trail"] = $_POST["remarks"][$i];
+				$Clause[$i]["comply"] = $_POST["comply"][$i];
+				$i++;
+			endforeach;
 
 
-
+			$finalClause = serialize($Clause);
+			// dump($finalClause);
 
 			// dump($_POST);
 
+			$audit_report = query("select count(*) as count from audit_checklist where audit_plan = ?", $aps_area["audit_plan"]);
+			$ac_id = $aps_area["audit_plan"] . "-AC-" . ($audit_report[0]["count"] + 1) ;
 
-		
-			$ac_id = create_trackid("AC");
-			
 
-				query("insert INTO audit_checklist 
-					(audit_checklist_id, audit_plan, aps_id, aps_area, timestamp, audit_trail, comply, remarks,user_id) 
+			query("insert INTO audit_checklist 
+				(audit_checklist_id, audit_plan, aps_id, aps_area, timestamp,user_id, checklist_type, audit_trail_array, audit_checklist_status) 
 			  VALUES(?,?,?,?,?,?,?,?,?)", 
 				$ac_id, $aps_area["audit_plan"], $aps_area["aps_id"], $aps_area["area_id"], time(),
-				$_POST["audit_trail"],$_POST["comply"], $_POST["remarks"], $_SESSION["dnsc_audit"]["userid"]);
-
-
+				$_SESSION["dnsc_audit"]["userid"],"UNFILLED",$finalClause, "PENDING" );
 				$users = query("select * from users where role_id = 4");
 				foreach($users as $row):
 					$Message = [];
@@ -514,20 +529,31 @@ font-size: 12px;
                                             </tr>
                                         </table>
 					<br>
-					<br>
-					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-											<tr>
-												<td width="40%" style="text-align: center;"><b>AUDIT TRAIL</b></td>
-												<td width="10%" style="text-align: center;"><b>Comply (Y/N)</b></td>
-												<td width="50%" style="text-align: center;"><b>AUDIT FINDINGS/NOTES/REMARKS (evidence)</b></td>
-                                            </tr>
+					<br>';
 
-											<tr style="height: 580px;">
-        <td style="height: 580px; text-align: justify; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["audit_trail"].'</p></td>
-        <td style="height: 580px; text-align: center; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["comply"].'</p></td>
-        <td style="height: 580px; text-align: justify; vertical-align: top;"><p style="font-size:11px;">'.$audit_checklist["remarks"].'</p></td>
-    </tr>
-                                        </table>
+
+					$html .= '
+<table class="tbl2" style="font-size: 12px; padding-top: 10px; height: 800px; table-layout: fixed; width: 100%; border-collapse: collapse; display: block;">
+    <tbody style="display: block; height: 800px; overflow: hidden;">
+    <tr style="height: 50px; display: table; width: 100%;">
+        <td width="40%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT TRAIL</td>
+        <td width="10%" style="text-align: center; font-weight: bold; border: 1px solid black;">Comply (Y/N)</td>
+        <td width="50%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT FINDINGS/NOTES/REMARKS (evidence)</td>
+    </tr>';
+
+$clause = unserialize($audit_checklist["audit_trail_array"]);
+
+foreach ($clause as $row):
+    $html .= '<tr style="height: 580px; display: table; width: 100%;">'; // Fixed row height
+    $html .= '<td style="text-align: justify; vertical-align: top; border: 1px solid black; padding: 5px;">' . $row["clause"] . '</td>';
+    $html .= '<td style="text-align: center; vertical-align: top; border: 1px solid black; padding: 5px;">' . $row["comply"] . '</td>';
+    $html .= '<td style="text-align: justify; vertical-align: top; border: 1px solid black; padding: 5px;">' . $row["trail"] . '</td>';
+    $html .= '</tr>';
+endforeach;
+$html .= '</tbody></table>';
+
+
+										$html.='
 					
 
 					
