@@ -163,7 +163,7 @@
 
 
                 <div class="form-group">
-                    <label>Process</label>
+                    <label>Team</label>
                     <select class="form-control"  name="team_id" required style="width: 100%;">
                       <option value="" selected disabled>Please select team here!</option>
                       <?php foreach($team as $row): ?>
@@ -340,7 +340,7 @@
                     <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
                     <button type="submit" class="btn btn-danger btn-block"><b>Revert to Edit</b></button>
                   </form>
-                  <?php else: ?>
+                  <?php elseif($auditPlan["status"] == "FOR REVIEW"): ?>
                     <form class="generic_form_trigger" data-url="auditPlan" data-title="Submit Audit Plan" data-message="Are you sure you want this to be reviewed?">
                     <input type="hidden" name="action" value="submitAuditPlan">
                     <input type="hidden" name="id" value="<?php echo($_GET['id']); ?>">
@@ -484,7 +484,10 @@
                 <div class="tab-content">
                   <div class="active tab-pane" id="audit_plan">
 
-                  <a href="#" data-toggle="modal" data-audit_plan="<?php echo($_GET["id"]); ?>" data-target="#modalUpdateInfo" class="btn btn-warning btn-sm">UPDATE</a>
+                  <?php if($_SESSION["dnsc_audit"]["role"] == 4 && $auditPlan["status"] == "FOR REVIEW"): ?>
+                    <a href="#" data-toggle="modal" data-audit_plan="<?php echo($_GET["id"]); ?>" data-target="#modalUpdateInfo" class="btn btn-warning btn-sm">UPDATE</a>
+                  <?php endif; ?>
+                  
                   <hr>
                   <div class="card">
                     <div class="card-header">
@@ -527,8 +530,12 @@
 
                   </div>
                   <div class="tab-pane" id="timeline">
+                  <?php if($_SESSION["dnsc_audit"]["role"] == 4 && $auditPlan["status"] == "FOR REVIEW"): ?>
                     <a href="#" data-toggle="modal" data-target="#modalAddSchedule" class="btn btn-success btn-sm">Add Audit Schedule</a>
                     <a href="#" data-toggle="modal" data-target="#modalAddFixedSchedule" class="btn btn-warning btn-sm">Add Fixed Schedule</a>
+                  <?php endif; ?> 
+                    
+
                     <hr>
 
                     <table id="timelineDatatable" style="width: 100% !important;">
@@ -543,8 +550,9 @@
                
                   </div>
                   <div class="tab-pane" id="teams">
-
+                  <?php if($_SESSION["dnsc_audit"]["role"] == 4 && $auditPlan["status"] == "FOR REVIEW"): ?>
                   <a href="#" data-toggle="modal" data-target="#modalAddTeam" class="btn btn-success btn-sm">ADD TEAM</a>
+                  <?php endif; ?>
                   <hr>
                   <table class="table table-bordered" style="width: 100% !important; table-layout: fixed !important;" id="teamDatatable">
                     <thead>

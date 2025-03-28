@@ -96,9 +96,8 @@
 					require 'public/audit_evaluation_system/audit_evaluation.php';
 				else if ($request == 'settings')
 					require 'public/settings_system/settings.php';
-				else if ($request == 'logout'){
+				else if ($request == 'logout')
 					require 'logout.php';
-				}
 			else
 				require 'public/404_system/404.php';
 			

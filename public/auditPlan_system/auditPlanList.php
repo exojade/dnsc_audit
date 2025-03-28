@@ -13,7 +13,9 @@
             <h1>Audit Plan List</h1>
           </div>
           <div class="col-sm-6">
-            <a href="auditPlan?action=create" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>Create Audit Plan</a>
+            <?php if($_SESSION["dnsc_audit"]["role"] == "4"): ?>
+              <a href="auditPlan?action=create" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>Create Audit Plan</a>
+            <?php endif; ?>
           </div>
       
         </div>

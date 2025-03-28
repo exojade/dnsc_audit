@@ -313,15 +313,6 @@
 
 		elseif($_POST["action"] == "print_audit_report"):
 			// dump($_POST);
-
-
-
-
-
-
-
-
-
 			$audit_report = query("select ar.*,
 			concat(u.firstname, ' ' ,u.middlename, ' ', u.surname) as prepared_by,
 									concat(u2.firstname, ' ' ,u2.middlename, ' ', u2.surname) as reviewed_by,

@@ -1,7 +1,5 @@
 <?php
     if($_SERVER["REQUEST_METHOD"] === "POST") {
-
-		
 		if($_POST["action"] == "auditPlanList"):
 				// dump($_REQUEST);
 				$draw = isset($_POST["draw"]) ? $_POST["draw"] : 1;
@@ -330,6 +328,20 @@
 				];
 				echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "deleteTeam"):
+			// dump($_POST);
+
+			query("delete from audit_plan_team_members where team_id = ?", $_POST["team_id"]);
+			query("delete from audit_plan_teams where team_id = ?", $_POST["team_id"]);
+
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Team delete successfully!",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
 
 
 		elseif($_POST["action"] == "teamDatatable"):
@@ -360,6 +372,7 @@
 					$data[$i]["action"] = '
 					<form class="generic_form_trigger" data-url="auditPlan">
 						<input type="hidden" name="action" value="deleteTeam">
+						<input type="hidden" name="team_id" value="'.$row["team_id"].'">
 						<div class="btn-group btn-block">
 							<a href="#" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpdateTeam" data-id="'.$row["team_id"].'">Update</a>
 							<button class="btn btn-danger btn-sm">Remove</button>
@@ -607,9 +620,10 @@
 					$Area[$row["aps_id"]][$row["id"]] = $row;
 				endforeach;
 
+				$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan"]);
+				$audit_plan = $audit_plan[0];
+
 				// dump($Position);
-
-
 
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
@@ -634,11 +648,24 @@
                   		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
 							
                 
-                </div>
-				<form class="generic_form_trigger">
+                </div>';
+
+				if($_SESSION["dnsc_audit"]["role"] == "4" && $audit_plan["status"] == "FOR REVIEW"):
+					$data[$i]["card"].='
+					<form class="generic_form_trigger" data-url="auditPlan">
+					<input type="hidden" name="action" value="deleteAuditSchedule">
+					<input type="hidden" name="aps_id" value="'.$row["aps_id"].'">
 								<button class="btn btn-danger btn-sm float-right">Delete</button>
 							</form>
 								<a href="#" data-toggle="modal" data-target="#modalUpdateSchedule" data-id="'.$row["aps_id"].'" class="btn btn-sm btn-warning float-right mr-1">Update</a>
+					';
+				endif;
+
+
+				$data[$i]["card"].='
+
+
+				
               </div>
               <div class="card-body">
 
@@ -668,10 +695,11 @@
 							
                 
                 </div>
-				<form class="generic_form_trigger">
+				<form class="generic_form_trigger" data-url="auditPlan">
+					<input type="hidden" name="action" value="deleteAuditSchedule">
+					<input type="hidden" name="aps_id" value="'.$row["aps_id"].'">
 								<button class="btn btn-danger btn-sm float-right">Delete</button>
 							</form>
-								<a href="#" class="btn btn-sm btn-warning float-right mr-1">Update</a>
               </div>
               <div class="card-body text-center">
 			<b>'.$row["fixed_title"].'</b>
@@ -693,6 +721,22 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+
+		elseif($_POST["action"] == "deleteAuditSchedule"):
+			// dump($_POST);
+
+			query("delete from audit_plan_schedule where aps_id = ?", $_POST["aps_id"]);
+			query("delete from aps_position where aps_id = ?", $_POST["aps_id"]);
+			query("delete from aps_area where aps_id = ?", $_POST["aps_id"]);
+
+			$res_arr = [
+				"result" => "success",
+				"title" => "Success",
+				"message" => "Delete Successfully!",
+				"link" => "refresh",
+				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
+				];
+				echo json_encode($res_arr); exit();
 
 		elseif($_POST["action"] == "modalUpdateSchedule"):
 			// dump($_POST);

@@ -624,6 +624,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-header">Audit Plans</li>
+  <li class="nav-item">
+      <a href="auditPlan" class="nav-link">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>
+          Audit Plan List
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
   <li class="nav-header">Human Resource</li>
   <li class="nav-item">
             <a href="#" class="nav-link">
@@ -844,7 +854,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 
   <li class="nav-header">Audit Plans</li>
   <li class="nav-item">
-      <a href="index" class="nav-link">
+      <a href="auditPlan" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>
           Audit Plan List
@@ -852,15 +862,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
-  <li class="nav-item">
-      <a href="index" class="nav-link">
-        <i class="nav-icon fas fa-check"></i>
-        <p>
-          Approve Audit Plan
-          <span class="right badge badge-danger"></span>
-        </p>
-      </a>
-  </li>
+
     <?php break;
   default:
     echo "Invalid day entered.";
