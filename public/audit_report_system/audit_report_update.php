@@ -151,7 +151,7 @@
                   <tbody>
                     <th width="50%">Questions</th>
                     <th width="15%">Rate</th>
-                    <th width="35%">Comments</th>
+                    <th width="35%">Evidence or Notes Sheet Ref #, ISO Clauses</th>
 
                     <?php $i=1; foreach($questions as $row): ?>
 
@@ -161,10 +161,9 @@
                           
                         <select name="<?php echo($i); ?>_question" required class="form-control">
                           <option selected value="<?php echo($effectiveness_process[$i]["rate"]); ?>"><?php echo($effectiveness_process[$i]["rate"]); ?></option>
-                          <option value="4">4</option>
-                          <option value="3">3</option>
-                          <option value="2">2</option>
-                          <option value="1">1</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                          <option value="N/A">N/A</option>
                         </select>
                       </th>
                       <th>

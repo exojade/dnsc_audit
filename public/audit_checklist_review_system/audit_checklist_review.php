@@ -140,7 +140,6 @@
 					LEFT JOIN 
 						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
 						$where
-						
 					";
 				// dump($string_query);
 
@@ -209,6 +208,7 @@
 
 					$data[$i]["action"] = $action;
 					$data[$i]["team"] = $teamMembersString;
+					$data[$i]["timestamp"] = date("M d, Y-h:i a", $row["timestamp"]);
 					$data[$i]["process_name"] = $row["process_name"];
 					$data[$i]["area_name"] = $row["area_name"];
 					$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["type"];

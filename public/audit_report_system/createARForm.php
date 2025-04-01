@@ -151,8 +151,8 @@
                           
                         <select name="<?php echo($i); ?>_question" required class="form-control">
                           <option selected disabled value=""></option>
-                          <option value="Y">Yes</option>
-                          <option value="N">No</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
                           <option value="N/A">N/A</option>
                         </select>
                       </th>

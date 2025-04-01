@@ -555,12 +555,19 @@
                   <?php endif; ?>
                   <hr>
                   <table class="table table-bordered" style="width: 100% !important; table-layout: fixed !important;" id="teamDatatable">
-                    <thead>
-                      <th width="10%"></th>
-                      <th width="10%">Team #</th>
-                      <th width="80%">Members</th>
-                    </thead>
-                  </table>
+                  <colgroup>
+                      <col style="width: 20%;">
+                      <col style="width: 10%;">
+                      <col style="width: 80%;">
+                  </colgroup>
+                  <thead>
+                      <tr>
+                          <th></th>
+                          <th>Team #</th>
+                          <th>Members</th>
+                      </tr>
+                  </thead>
+              </table>
 
 
                   </div>

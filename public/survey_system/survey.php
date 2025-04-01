@@ -217,7 +217,6 @@
 							
 							// Unserialize survey_result
 							$surveyResults = unserialize($row["survey_result"]);
-							
 							// Calculate average per survey
 							$sum = 0;
 							$count = 0;

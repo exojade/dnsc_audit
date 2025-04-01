@@ -132,19 +132,33 @@
       </div>
 
       <div class="row">
-        <div class="col">
-          <div class="form-group">
+    <div class="col">
+        <div class="form-group">
             <label>Password <span class="text-danger">*</span></label>
-            <input id="password" type="password" class="form-control" name="password" placeholder="Enter Password">
-          </div>
+            <div class="input-group">
+                <input id="password" type="password" class="form-control" name="password" placeholder="Enter Password">
+                <div class="input-group-append">
+                    <span class="input-group-text toggle-password" toggle="#password">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+            </div>
         </div>
-        <div class="col">
+    </div>
+    <div class="col">
         <div class="form-group">
             <label>Confirm Password <span class="text-danger">*</span></label>
-            <input id="confirm_password" type="password" class="form-control" name="confirm_password" placeholder="Confirm Password">
-          </div>
+            <div class="input-group">
+                <input id="confirm_password" type="password" class="form-control" name="confirm_password" placeholder="Confirm Password">
+                <div class="input-group-append">
+                    <span class="input-group-text toggle-password" toggle="#confirm_password">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
+</div>
 
       <div class="form-group">
                     <label for="exampleInputFile">Profile Image</label>
@@ -391,6 +405,21 @@ $(document).on('submit', '.generic_form_trigger', function(e) {
     });
 });
 
+</script>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(item => {
+        item.addEventListener('click', function() {
+            let input = document.querySelector(this.getAttribute('toggle'));
+            if (input.type === "password") {
+                input.type = "text";
+                this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+            } else {
+                input.type = "password";
+                this.innerHTML = '<i class="fa fa-eye"></i>';
+            }
+        });
+    });
 </script>
 </body>
 </html>

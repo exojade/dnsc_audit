@@ -33,22 +33,20 @@
             <!-- Default box -->
             <div class="card">
               <div class="card-header">
-                <!-- <div class="row">
+                <div class="row">
                   <div class="col-4">
                   <div class="form-group">
-                  <label>Role List</label>
-                  <select class="form-control selectFilter" id="roleSelect">
-                    <option value="" selected disabled>Please select role to show</option>
-                    <?php $roles = query("select * from roles"); ?>
+                  <select class="form-control selectFilter select2" id="roleSelect">
+                    <option value="" selected disabled>FILTER Year Here!!!</option>
+                    <?php $roles = query("select year from audit_plans group by year order by year desc"); ?>
                     <?php foreach($roles as $row): ?>
-                      <option value="<?php echo($row["id"]); ?>"><?php echo($row["role_name"]); ?></option>
+                      <option value="<?php echo($row["year"]); ?>"><?php echo($row["year"]); ?></option>
                     <?php endforeach; ?>
                   </select>
 
                 </div>
                   </div>
-                </div> -->
-                
+                </div>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -123,10 +121,10 @@
         });
      });
 
-
+     $('.select2').select2();
 var datatable = 
             $('#ajax_datatable').DataTable({
-                "searching": true,
+                "searching": false,
                 "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"
@@ -182,8 +180,8 @@ var datatable =
 
   $('.selectFilter').on('change', function() {
     // alert("change");
-            var roleSelect = $('#roleSelect').val();
-            datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
+            var yearSelect = $('#roleSelect').val();
+            datatable.ajax.url('auditPlan?action=auditPlanList&year=' + yearSelect).load();
   });
 
 </script>

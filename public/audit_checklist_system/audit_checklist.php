@@ -257,9 +257,24 @@
 
 			// dump($_POST);
 
-			$audit_report = query("select count(*) as count from audit_checklist where audit_plan = ?", $aps_area["audit_plan"]);
-			$ac_id = $aps_area["audit_plan"] . "-AC-" . ($audit_report[0]["count"] + 1) ;
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $aps_area["audit_plan"]);
+			$audit_plan = $audit_plan[0];
 
+			$typeMapping = [
+				"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+				"2nd Internal Quality Audit" => "02"  // 2nd Internal Quality Audit
+			];
+
+			$monthMapping = [
+				"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+				"2nd Internal Quality Audit" => "08"  // 2nd Internal Quality Audit
+			];
+
+
+			$audit_report = query("select count(*) as count from audit_checklist where audit_plan = ?", $aps_area["audit_plan"]);
+			$ac_id = "AC-" . $audit_plan["year"] ."-" . $typeMapping[$audit_plan["type"]] . "-". $monthMapping[$audit_plan["type"]] ."-" .($audit_report[0]["count"] + 1) ;
+
+			
 
 			query("insert INTO audit_checklist 
 				(audit_checklist_id, audit_plan, aps_id, aps_area, timestamp,user_id, checklist_type, audit_trail_array, audit_checklist_status) 
@@ -287,9 +302,6 @@
 
 		
 		elseif($_POST["action"] == "print_audit_checklist"):
-			// dump($_POST);
-
-
 			$audit_checklist = query("select ac.*, concat(u.firstname, ' ' ,u.middlename, ' ', u.surname) as prepared_by,
 									concat(u2.firstname, ' ' ,u2.middlename, ' ', u2.surname) as reviewed_by
 									from audit_checklist ac 
@@ -305,45 +317,62 @@
 			$aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
 									left join process p on p.process_id = aps.process_id
 									where aps_id = ?", $aps_area["aps_id"]);
+
+				$Auditees = query("select concat(firstname, ' ', surname) as fullname from users_area ua 
+				left join users u on u.id = ua.user_id
+				where u.role_id = 2
+				and ua.area_id = ?
+				", $audit_checklist["aps_area"]);
+				$Auditees = implode(", ", array_column($Auditees, "fullname"));
+
 			$aps_schedule = $aps_schedule[0];
-
-
-
-
-
-// dump($aps_schedule);
-
-			
-			
-
-		
-
-
-
 					$mpdf = new \Mpdf\Mpdf([
 						'mode' => 'utf-8',
 						'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
 						'debug' => true,
-						'margin_top' => 4,
-						'margin_left' => 15,
-						'margin_right' => 15,
+						'margin_top' => 10,
+						'margin_left' => 0,
+						'margin_right' => 0,
 						'margin_bottom' => 2,
-						'margin_footer' => 1,
+						'margin_footer' => 0,
 						'default_font' => 'helvetica'
 					]);
-
 					$mpdf->SetHTMLHeader('
-
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
+					<div class="container">
 					<div class="row">
-						<div class="col-xs-7">
-							<img src="resources/dnscHeader.png" 
+						<div class="col-xs-8">
+							<img src="resources/portraitHeader.png" 
 							style="width:100%; height: auto; max-height: 90px;">
 						</div>
-						
+						<div class="col-xs-3">
+							<table id="headerTable " class="table">
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Form No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">FM-DNSC-IQA-03</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Issue Status</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">05</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Revision No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">05</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Effective Date: </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">02 January 2025</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Approved By </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">President</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 					</div>
 					');
 
@@ -352,32 +381,14 @@
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
-				
-					<hr>
-					
 					<div id="myFooter">
 							<div class="row">
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2"><b>Address</b></dt>
-									<dd class="col-xs-7 text-left">Davao del Norte State College<br>Tadeco Road, New Visayas <br>Panabo City, Davao del Norte, 8105</dd>
-								</dl>
-							</div>
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2 text-left"><b>Website</b></dt>
-									<dd class="col-xs-7 text-left">www.dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>Email</b></dt>
-									<dd class="col-xs-7 text-left">president@dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>FB Page</b></dt>
-									<dd class="col-xs-7 text-left">www.facebook.com/davnorstatecollege</dd>
-								</dl>
-							</div>
+							
 
-							<div class="col-xs-2 text-right">
-								<img src="resources/footerimage.jpg" 
+							<div class="col-xs-12 text-right">
+								<img src="resources/portaitFooter.png" 
 								style="width:100%;
-								height: auto; max-height: 60px;">
+								height: auto; max-height: 200px;">
 							</div>
 						</div>
 					</div>
@@ -425,7 +436,7 @@
 					<br>
 					<br>
 					
-
+<div class="container">
 		
 					<h4 class="text-center"><b>AUDIT CHECKLIST</b></h4>
 
@@ -525,7 +536,7 @@ font-size: 12px;
 												<td width="10%" class="p-2 nw"><b>Auditor: </b></td>
                                                 <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["prepared_by"].'</td>
                                                 <td width="10%" class="p-2 nw"><b>Auditee</b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;"></td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$Auditees.'</td>
                                             </tr>
                                         </table>
 					<br>
@@ -608,6 +619,7 @@ $html .= '</tbody></table>';
                                        
                                             </tr>
                                         </table>
+										</div>
 
 
 

@@ -102,7 +102,7 @@
             <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
               <input type="hidden" name="action" value="print_audit_checklist">
               <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
-              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Report</button>
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist</button>
             </form>
     </div>
     <div class="col">

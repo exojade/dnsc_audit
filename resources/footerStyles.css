@@ -8,3 +8,7 @@
         #headerTable thead td{
             padding:0px !important;
         }
+
+        #headerTable {
+            font-size: 2px !important;
+                }

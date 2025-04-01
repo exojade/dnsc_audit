@@ -266,11 +266,24 @@
 
 			// dump($car_details);
 
+			$audit_plan = query("select * from audit_plans where audit_plan = ?", $aps_area["audit_plan"]);
+			$audit_plan = $audit_plan[0];
+
+			$typeMapping = [
+				"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+				"2nd Internal Quality Audit" => "02"  // 2nd Internal Quality Audit
+			];
+
+			$monthMapping = [
+				"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+				"2nd Internal Quality Audit" => "08"  // 2nd Internal Quality Audit
+			];
+
 
 		
 			
 			$audit_report = query("select count(*) as count from audit_report where audit_plan = ?", $aps_area["audit_plan"]);
-			$ar_id = $aps_area["audit_plan"] . "-AR-" . ($audit_report[0]["count"] + 1) ;
+			$ar_id = "AR-" . $audit_plan["year"] ."-" . $typeMapping[$audit_plan["type"]] . "-". $monthMapping[$audit_plan["type"]] ."-" .($audit_report[0]["count"] + 1) ;
 
 			if (query("insert INTO audit_report 
 					(audit_report_id, audit_plan, aps_id, aps_area, timestamp, effectiveness_process, car_status, ofi_improvement,
@@ -356,11 +369,11 @@
 						'mode' => 'utf-8',
 						'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
 						'debug' => true,
-						'margin_top' => 4,
-						'margin_left' => 15,
-						'margin_right' => 15,
+						'margin_top' => 40,
+						'margin_left' => 0,
+						'margin_right' => 0,
 						'margin_bottom' => 2,
-						'margin_footer' => 1,
+						'margin_footer' => 0,
 						'default_font' => 'helvetica'
 					]);
 
@@ -370,12 +383,42 @@
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
+					<div class="container">
 					<div class="row">
-						<div class="col-xs-7">
-							<img src="resources/dnscHeader.png" 
+						<div class="col-xs-8">
+							<img src="resources/portraitHeader.png" 
 							style="width:100%; height: auto; max-height: 90px;">
 						</div>
+					
+
+						<div class="col-xs-3">
+							<table id="headerTable " class="table">
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Form No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">FM-DNSC-IQA-04</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Issue Status</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">06</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Revision No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">08</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Effective Date: </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">02 January 2025</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Approved By </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">President</td>
+								</tr>
+
+							</table>
 						
+						</div>
+						
+					</div>
 					</div>
 					');
 
@@ -384,32 +427,12 @@
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
-				
-					<hr>
-					
 					<div id="myFooter">
 							<div class="row">
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2"><b>Address</b></dt>
-									<dd class="col-xs-7 text-left">Davao del Norte State College<br>Tadeco Road, New Visayas <br>Panabo City, Davao del Norte, 8105</dd>
-								</dl>
-							</div>
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2 text-left"><b>Website</b></dt>
-									<dd class="col-xs-7 text-left">www.dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>Email</b></dt>
-									<dd class="col-xs-7 text-left">president@dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>FB Page</b></dt>
-									<dd class="col-xs-7 text-left">www.facebook.com/davnorstatecollege</dd>
-								</dl>
-							</div>
-
-							<div class="col-xs-2 text-right">
-								<img src="resources/footerimage.jpg" 
+							<div class="col-xs-12 text-right">
+								<img src="resources/portaitFooter.png" 
 								style="width:100%;
-								height: auto; max-height: 60px;">
+								height: auto; max-height: 300px;">
 							</div>
 						</div>
 					</div>
@@ -511,14 +534,7 @@ font-size: 12px;
 						font-size:9px;
 					}
 					</style>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					
-
-		
+					<div class="container">
 					<h4 class="text-center"><b>Internal Audit Report</b></h4>
 
 				<br>
@@ -627,7 +643,7 @@ font-size: 12px;
 <br>
 										
 
-
+</div>
 
 					';
 					$mpdf->WriteHTML($html);
@@ -726,16 +742,9 @@ font-size: 12px;
 					}
 					</style>
 					';
-
 					$html2.='
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
+					<div class="container">
 					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
-                        
 											<tr>
 												<td width="20%" style="text-align: center;"><b>CAR FORM #</b></td>
 												<td width="60%" style="text-align: center;"><b>Describe finding as you want it to appear in the CAR Form System</b></td>
@@ -750,14 +759,10 @@ font-size: 12px;
 												'.$car_details[0]["ofi_findings"].'<br>
 												<b>Evidence/s</b><br>
 												'.$car_details[0]["ofi_evidences"].'<br>
-												
-												
-
 												</td>
 												<td></td>
                                             </tr>
 											</table>
-											
 											<br>
 											<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
 												<tr>
@@ -765,7 +770,7 @@ font-size: 12px;
 												</tr>
 												<tr>
 													<td class="p-2 nw" style="border-top: 0px;"><div style="min-height: 200px;">
-       '.$audit_report["review_comments"].'</div>
+												'.$audit_report["comments"].'</div>
 												</tr>
 											</table>
 <br>
@@ -848,6 +853,7 @@ All auditors on the audit team must submit their audit reports for summary and r
                                        
                                             </tr>
                                         </table>
+										</div>
 				';
 
 

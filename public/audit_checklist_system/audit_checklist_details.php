@@ -47,6 +47,8 @@
                               where aps_id = ?", $aps_area["aps_id"]);
       $aps_schedule = $aps_schedule[0];
 
+      
+
 
 
 
@@ -58,14 +60,14 @@
     <div class="col-3">
     <div class="card card-success">
               <div class="card-header">
-                <h3 class="card-title"><strong>About IAR</strong></h3>
+                <h3 class="card-title"><strong>About this Checklist</strong></h3>
               </div>
               <div class="card-body">
-                <strong>IAR No</strong>
-                <p class="text-muted mb-0"><?php echo($aps_area["area_name"]); ?></p>
+                <strong>Audit Checklist ID</strong>
+                <p class="text-muted mb-0"><?php echo($checklist["audit_checklist_id"]); ?></p>
                 <hr>
-                <strong>Date of Audit</strong>
-                <p class="text-muted mb-0"><?php echo(date("F d, Y")); ?></p>
+                <strong>Date Created</strong>
+                <p class="text-muted mb-0"><?php echo(date("F d, Y h:i a", $checklist["timestamp"])); ?></p>
                 <hr>
                 <strong>Process Area</strong>
                 <p class="text-muted mb-0"><?php echo($aps_area["area_name"]); ?></p>
@@ -78,50 +80,8 @@
                 
               </div>
             </div>
-    </div>
-    <div class="col-6">
 
-
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Compliance</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["comply"]); ?>
-        </div>
-    </div>
-
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Audit Trail</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["audit_trail"]); ?>
-        </div>
-    </div>
-
-    <div class="card card-success">
-      <div class="card-header">
-        <h3 class="card-title"><strong>Remarks</strong></h3>
-      </div>
-      <!-- /.card-header -->
-      <!-- form start -->
-      
-        <div class="card-body text-justify">
-          <?php echo($checklist["remarks"]); ?>
-        </div>
-    </div>
-
-    </div>
-
-    <div class="col-3">
-    <div class="card card-success">
+            <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>Review Details</strong></h3>
               </div>
@@ -133,11 +93,48 @@
                 <p class="text-muted mb-0"><?php echo($checklist["review_comments"]); ?></p>
                 <hr>
                 <strong>Date Reviewed</strong>
-                <p class="text-muted mb-0"><?php echo(date("F d, Y", $checklist["review_timestamp"])); ?></p>
+                <p class="text-muted mb-0"><?php echo(date("F d, Y h:i a", $checklist["review_timestamp"])); ?></p>
                
                 
               </div>
             </div>
+    </div>
+    <div class="col-9">
+
+
+    <div class="card card-success">
+      <div class="card-header">
+        <h3 class="card-title"><strong>Audit Trail</strong></h3>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+       
+      
+        <div class="card-body text-justify">
+          <?php $trail = unserialize($checklist["audit_trail_array"]); 
+          ?>
+
+          <table class="table table-bordered">
+            <thead>
+              <th>Clause</th>
+              <th>Comply?</th>
+              <th>Trail</th>
+            </thead>
+            <tbody>
+              <?php foreach($trail as $row): ?>
+                <tr>
+                  <td><?php echo($row["clause"]); ?></td>
+                  <td><?php echo($row["comply"]); ?></td>
+                  <td><?php echo($row["trail"]); ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+
+          </table>
+
+
+        </div>
+    </div>
     </div>
   </div>
 <!-- 

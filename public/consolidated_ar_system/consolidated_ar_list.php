@@ -112,7 +112,9 @@
                   </div>
 
                   <div class="col-sm-8">
-            <a href="#" data-toggle="modal" data-target="#modalNewConsoAR" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>New Consolidated Audit Report</a>
+                    <?php if($_SESSION["dnsc_audit"]["role"] == 4): ?>
+                      <a href="#" data-toggle="modal" data-target="#modalNewConsoAR" class="btn btn-success float-right"><i class="fa fa-plus mr-3"></i>New Consolidated Audit Report</a>
+                    <?php endif; ?>
           </div>
                 </div>
                 

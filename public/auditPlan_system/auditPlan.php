@@ -6,7 +6,12 @@
 				$offset = $_POST["start"];
 				$limit = $_POST["length"];
 				$search = $_POST["search"]["value"];
-
+				$where = " where 1=1";
+				if(isset($_REQUEST["year"])):
+					if($_REQUEST["year"] != ""):
+						$where .=" and year = '".$_REQUEST["year"]."'";
+					endif;
+				endif;
 				$users = query("select id, concat(firstname, ' ', surname) as fullname from users");
 				$Users = [];
 				foreach($users as $row):
@@ -16,14 +21,13 @@
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
 
-				$where = " where 1=1";
+			
 				if($search != ""):
 				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
 				$baseQuery = "select * from audit_plans" . $where;
 				else:
 					$baseQuery = "select * from audit_plans" . $where;
 				endif;
-
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 
@@ -357,6 +361,8 @@
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 
+				$audit_plan = query("select * from audit_plans where audit_plan = ?" , $_POST["audit_plan"]);
+				$audit_plan = $audit_plan[0];
 
 				$team_members = query("select atm.*, concat(u.firstname, ' ', u.surname) as fullname from audit_plan_team_members atm
 										left join users u on u.id = atm.id where audit_plan = ?", $_POST["audit_plan"]);
@@ -369,16 +375,24 @@
 
 				$i = 0;
 				foreach($data as $row):
-					$data[$i]["action"] = '
-					<form class="generic_form_trigger" data-url="auditPlan">
-						<input type="hidden" name="action" value="deleteTeam">
-						<input type="hidden" name="team_id" value="'.$row["team_id"].'">
-						<div class="btn-group btn-block">
-							<a href="#" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpdateTeam" data-id="'.$row["team_id"].'">Update</a>
-							<button class="btn btn-danger btn-sm">Remove</button>
-						</div>
-					</form>
-				';
+
+					if($audit_plan["status"] == "FOR REVIEW"):
+						$data[$i]["action"] = '
+							<form class="generic_form_trigger" data-url="auditPlan">
+								<input type="hidden" name="action" value="deleteTeam">
+								<input type="hidden" name="team_id" value="'.$row["team_id"].'">
+								<div class="btn-group btn-block">
+									<a href="#" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpdateTeam" data-id="'.$row["team_id"].'">Update</a>
+									<button class="btn btn-danger btn-sm">Remove</button>
+								</div>
+							</form>
+						';
+
+					else:
+						$data[$i]["action"] = '<button class="btn btn-block btn-info" disabled>No Action</button>';
+					endif;
+					
+					
 					$fullnamesWithRoles = array_map(function($item) {
 						return $item['fullname'] . " (" . $item['role'] . ")";
 					}, $Team_Members[$row["team_id"]]);
@@ -573,14 +587,17 @@
 				$baseQuery = "select * from audit_plan_schedule" . $where . " ORDER BY schedule_date asc, from_time asc";
 
 				$aps_position = query("select * from aps_position ap
-										left join position p on p.position_id = ap.position_id");
+										left join position p on p.position_id = ap.position_id
+										where audit_plan = ?", $_POST["audit_plan"]);
 				$aps_area = query("select * from aps_area aa
 										left join areas a on a.id = aa.area_id");
 				$Position = [];
 				$Area = [];
 				foreach($aps_position as $row):
-					$Position[$row["aps_id"]][$row["position_id"]] = $row;
+					$Position[$row["position_id"]] = $row;
 				endforeach;
+
+				// dump($Position);
 
 				$Process = [];
 				$process = query("select * from process");
@@ -679,6 +696,13 @@
                   <dd class="col-sm-9">'.$row["audit_clause"].'</dd>
                   <dt class="col-sm-3">Audit Team</dt>
                   <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+				  <dt class="col-sm-3">Auditee</dt>';
+
+				  $positionNames = implode(', ', array_column($Position, 'position_name'));
+				//   dump($positionNames);
+				// echo $positionNames;
+				  $data[$i]["card"].='
+                  <dd class="col-sm-9">'.$positionNames.'</dd>
                 </dl>
               
               </div>
@@ -1170,12 +1194,15 @@
 
 
 				$typeMapping = [
-					"1st Internal Quality Audit" => "1IQA", // 1st Internal Quality Audit
-					"2nd Internal Quality Audit" => "2IQA"  // 2nd Internal Quality Audit
+					"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+					"2nd Internal Quality Audit" => "02"  // 2nd Internal Quality Audit
 				];
-				$audit_plan_id = "AP-" . $_POST["year"] . "-" . $typeMapping[$_POST["type"]];
-				// dump($audit_plan_id);
-				// Execute the query
+
+				$monthMapping = [
+					"1st Internal Quality Audit" => "01", // 1st Internal Quality Audit
+					"2nd Internal Quality Audit" => "08"  // 2nd Internal Quality Audit
+				];
+				$audit_plan_id = "AP" . $_POST["year"] . "-" . $typeMapping[$_POST["type"]] . "-" . $monthMapping[$_POST["type"]];
 				$result = query("INSERT INTO audit_plans 
 									(audit_plan, type, introduction, audit_objectives, reference_standard,
 									 audit_methodologies, year, status, created_by, timestamp) 
@@ -1205,7 +1232,7 @@
 				if ($errorCode == 1062) {
 					$message = "Duplicate Type and Year";
 				} else {
-					$message = "An unexpected error occurred: " . $e->getMessage();
+					$message = "Duplicate Type and Year";
 				}
 			
 				// Error response
@@ -1575,6 +1602,7 @@
 									left join position p on p.position_id = aps.position_id
 									where aps.audit_plan = ?", $_POST["audit_plan_id"]);
 			$ApsPosition = [];
+			$ApsPosition = [];
 			foreach($aps_position as $row):
 				$ApsPosition[$row["aps_id"]][$row["position_id"]] = $row;
 			endforeach;
@@ -1622,11 +1650,11 @@
 						'mode' => 'utf-8',
 						'format' => 'A4-L', // 'A4-L' sets the orientation to landscape
 						'debug' => true,
-						'margin_top' => 50,
-						'margin_left' => 3,
-						'margin_right' => 3,
-						'margin_bottom' => 30,
-						'margin_footer' => 1,
+						'margin_top' => 40,
+						'margin_left' => 0,
+						'margin_right' => 0,
+						'margin_bottom' => 10,
+						'margin_footer' => 0,
 						'default_font' => 'helvetica'
 					]);
 
@@ -1636,9 +1664,35 @@
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<div class="row" >
-						<div class="col-xs-9">
-							<img src="resources/dnscHeader.png" 
+						<div class="col-xs-8">
+							<img src="resources/auditPlanHeader.png" 
 							style="width:100%; height: auto; max-height: 130px;">
+						</div>
+						<div class="col-xs-3">
+							<table id="headerTable " class="table">
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Form No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">FM-DNSC-IQA-02</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Issue Status</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">05</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Revision No.</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">06</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Effective Date: </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">02 January 2025</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">Approved By </td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">President</td>
+								</tr>
+
+							</table>
+						
 						</div>
 					</div>
 			
@@ -1648,29 +1702,11 @@
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
-					<hr>
 							<div class="row">
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2"><b>Address</b></dt>
-									<dd class="col-xs-8 text-left">Davao del Norte State College<br>Tadeco Road, New Visayas <br>Panabo City, Davao del Norte, 8105</dd>
-								</dl>
-							</div>
-							<div class="col-xs-4">
-								<dl class="row">
-									<dt class="col-xs-2 text-left"><b>Website</b></dt>
-									<dd class="col-xs-8 text-left">www.dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>Email</b></dt>
-									<dd class="col-xs-8 text-left">president@dnsc.edu.ph</dd>
-									<dt class="col-xs-2 text-left"><b>FB Page</b></dt>
-									<dd class="col-xs-8 text-left">www.facebook.com/davnorstatecollege</dd>
-								</dl>
-							</div>
-
-							<div class="col-xs-2 text-right">
-								<img src="resources/footerimage.jpg" 
+							<div class="col-xs-12 text-right">
+								<img src="resources/auditPlanFooter.png" 
 								style="width:100%;
-								height: auto; max-height: 60px;">
+								height: auto; max-height: 100px;">
 							</div>
 						</div>
 						');
@@ -1711,6 +1747,8 @@
 					}
 
 					</style>
+					<div class="container">
+					<h4 class="text-center"><b><i>QUALITY MANAGEMENT SYSTEM OFFICE</b></i></h4>
 					<h4 class="text-center"><b>Audit Plan</b></h4>
 
 					<table class="table" style="margin-top: 10px;">
@@ -1770,6 +1808,7 @@
 
 	
 					</style>
+					</div>
 				
 					';
 					$mpdf->WriteHTML($html);
@@ -1821,7 +1860,7 @@
 					}
 
 					</style>
-
+					<div class="container">
 					<table class="table" style="margin-top: 10px;">
 					<tbody>
 						<tr>
@@ -1926,7 +1965,9 @@
 						</tr>
 					</tbody>
 					</table>
+					</div>
 					';
+
 
 					$mpdf->WriteHTML($html);
 

@@ -83,11 +83,11 @@
             <?php $ap = query("select * from audit_plans order by year, timestamp"); ?>
                   <div class="col-4">
                   <div class="form-group">
-                  <select class="form-control selectFilter" id="apSelect">
+                  <select class="form-control selectFilter select2" id="apSelect">
                     <option value="" selected disabled>Filter Audit Plan</option>
                     
                     <?php foreach($ap as $row): ?>
-                      <option value="<?php echo($row["audit_plan"]); ?>"><?php echo($row["type"]); ?></option>
+                      <option value="<?php echo($row["audit_plan"]); ?>"><?php echo($row["year"] . " - ". $row["type"]); ?></option>
                     <?php endforeach; ?>
                   </select>
 
@@ -169,7 +169,7 @@
 <script>
 
 
-
+$('.select2').select2();
 
     $('#medicalRecordModal').on('show.bs.modal', function (e) {
         var rowid = $(e.relatedTarget).data('id');

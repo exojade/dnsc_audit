@@ -199,8 +199,14 @@ var datatable =
                     { data: 'office', "orderable": false  },
                     <?php $criteria = query("select * from survey_questionnaire where active_status = 'ACTIVE'"); ?>
                     <?php foreach($criteria as $row): ?>
-                      { data: '<?php echo($row["questionnaire_id"]); ?>', "orderable": false  },
-                    <?php endforeach; ?>
+                { 
+                    data: '<?php echo($row["questionnaire_id"]); ?>', 
+                    "orderable": false,
+                    "render": function(data, type, row) {
+                        return data == 0 ? "N/A" : data;
+                    }
+                },
+            <?php endforeach; ?>
                     { data: 'average', "orderable": false  },
                     { data: 'comments', "orderable": false  },
                 ],
