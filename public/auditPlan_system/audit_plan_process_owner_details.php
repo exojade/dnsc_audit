@@ -89,7 +89,7 @@ $auditPlan = $auditPlan[0];
             </div>
 
 
-            <div class="card card-success card-outline">
+            <!-- <div class="card card-success card-outline">
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center"><?php echo($auditPlan["type"]); ?></h3>
                 <p class="text-muted text-center"><?php echo($auditPlan["year"]); ?></p>
@@ -100,7 +100,7 @@ $auditPlan = $auditPlan[0];
                   <button class="btn btn-success btn-block">Print Audit Plan</button>
                 </form>
               </div>
-            </div>
+            </div> -->
         </div>
         <div class="col-9">
         <div class="card">

@@ -220,7 +220,7 @@
 
 							$action.='
 									<li><a class="dropdown-item" target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'">Evidences</a></li>
-									<li><a class="dropdown-item" target="_blank" href="#" data-toggle="modal" data-target="#scheduleModal" data-id="'.$row["tblid"].'">Audit Plan Schedule Details</a></li>
+									<li><a class="dropdown-item" href="#" data-toggle="modal" data-target="#aps_details" data-id="'.$row["aps_id"].'">Audit Plan Schedule Details</a></li>
 								</ul>
 							</div>
 							';

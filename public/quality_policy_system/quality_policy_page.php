@@ -244,7 +244,17 @@
     // Function to download a file when double-clicked
     function downloadFile(filePath) {
         const encodedFilePath = encodeURIComponent(filePath);
-        window.location.href = "quality_policy?action=download&file=" + encodedFilePath;
+        const fileExtension = filePath.split('.').pop().toLowerCase();
+
+        const inlineTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+
+        if (inlineTypes.includes(fileExtension)) {
+            // Open in new tab for viewable files
+            window.open("system_control?action=download&file=" + encodedFilePath, '_blank');
+        } else {
+            // Trigger download for other file types
+            window.location.href = "system_control?action=download&file=" + encodedFilePath;
+        }
     }
 
     $(document).ready(function () {

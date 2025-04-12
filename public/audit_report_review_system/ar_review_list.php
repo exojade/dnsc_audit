@@ -15,6 +15,25 @@
 </style>
 
 <div class="content-wrapper">
+
+<div class="modal fade" id="aps_details">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-success">
+              <h4 class="modal-title ">Audit Plan Schedule Details</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="fetched-data"></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
@@ -171,17 +190,18 @@
 
 $('.select2').select2();
 
-    $('#medicalRecordModal').on('show.bs.modal', function (e) {
+
+$('#aps_details').on('show.bs.modal', function (e) {
         var rowid = $(e.relatedTarget).data('id');
         Swal.fire({title: 'Please wait...', imageUrl: 'AdminLTE_new/dist/img/loader.gif', showConfirmButton: false});
         $.ajax({
             type : 'post',
-            url : 'medical', //Here you will fetch records 
+            url : 'audit_report', //Here you will fetch records 
             data: {
-                checkupId: rowid, action: "medicalRecordModal"
+                aps_id: rowid, action: "aps_details"
             },
             success : function(data){
-                $('#medicalRecordModal .fetched-data').html(data);
+                $('#aps_details .fetched-data').html(data);
                 Swal.close();
                 // $(".select2").select2();//Show fetched data from database
             }

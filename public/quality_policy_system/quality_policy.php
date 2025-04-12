@@ -433,13 +433,33 @@ elseif($_POST["action"] == "move_file"):
 					render("public/quality_policy_system/quality_policy_page.php",[
 					]);
 
-                    elseif($_GET["action"] == "download"):
+                    elseif ($_GET["action"] == "download"):
                         $filePath = urldecode($_GET['file']);
                         $fullPath = $filePath;
-                        
+                    
                         if (file_exists($fullPath)) {
-                            header('Content-Type: application/octet-stream');
-                            header('Content-Disposition: attachment; filename="' . basename($fullPath) . '"');
+                            $fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+                    
+                            // MIME types for inline display
+                            $mimeTypes = [
+                                'pdf' => 'application/pdf',
+                                'jpg' => 'image/jpeg',
+                                'jpeg' => 'image/jpeg',
+                                'png' => 'image/png',
+                                'gif' => 'image/gif',
+                                'webp' => 'image/webp',
+                                'bmp' => 'image/bmp',
+                                'svg' => 'image/svg+xml'
+                            ];
+                    
+                            if (array_key_exists($fileExtension, $mimeTypes)) {
+                                header('Content-Type: ' . $mimeTypes[$fileExtension]);
+                                header('Content-Disposition: inline; filename="' . basename($fullPath) . '"');
+                            } else {
+                                header('Content-Type: application/octet-stream');
+                                header('Content-Disposition: attachment; filename="' . basename($fullPath) . '"');
+                            }
+                    
                             readfile($fullPath);
                             exit;
                         } else {

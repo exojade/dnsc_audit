@@ -50,6 +50,124 @@
 				);
 				echo json_encode($json_data);
 
+		elseif($_POST["action"] == "aps_details"):
+			// dump($_POST);
+
+			$audit_plan_schedule = query("select * from audit_plan_schedule where aps_id = ?", $_POST["aps_id"]);
+			$row = $audit_plan_schedule[0];
+
+			$_POST["audit_plan"] = $row["audit_plan"];
+
+			$aps_position = query("select * from aps_position ap
+										left join position p on p.position_id = ap.position_id
+										where audit_plan = ?", $row["audit_plan"]);
+				$aps_area = query("select * from aps_area aa
+										left join areas a on a.id = aa.area_id");
+				$Position = [];
+				$Area = [];
+				foreach($aps_position as $row):
+					$Position[$row["position_id"]] = $row;
+				endforeach;
+
+				// dump($Position);
+
+				$Process = [];
+				$process = query("select * from process");
+				foreach($process as $row):
+					$Process[$row["process_id"]] = $row;
+				endforeach;
+
+
+				$team = query("SELECT 
+						t.team_id,
+						t.team_number AS team,
+						GROUP_CONCAT(
+							CONCAT(u.firstname, ' ', u.surname, ' (', tm.role, ')') 
+							ORDER BY tm.role = 'LEADER' DESC, u.surname
+							SEPARATOR ', '
+						) AS members
+						FROM 
+							audit_plan_teams t
+						JOIN 
+							audit_plan_team_members tm ON t.team_id = tm.team_id
+						JOIN 
+							users u ON tm.id = u.id
+						where t.audit_plan = ?
+						GROUP BY 
+							t.team_id
+						ORDER BY 
+							t.team_number 
+						", $_POST["audit_plan"]);
+				$Team = [];
+				foreach($team as $row):
+					$Team[$row["team_id"]] = $row;
+				endforeach;
+
+
+
+				foreach($aps_area as $row):
+					$Area[$row["aps_id"]][$row["id"]] = $row;
+				endforeach;
+
+				$row = $audit_plan_schedule[0];
+
+				$audit_plan = query("select * from audit_plans where audit_plan = ?", $_POST["audit_plan"]);
+				$audit_plan = $audit_plan[0];
+
+			$html='';
+			$area = [];
+			if(isset($Area[$row["aps_id"]])):
+				foreach($Area[$row["aps_id"]] as $a):
+					$area[] = $a["area_name"];
+				endforeach;
+			endif;
+	
+			$html.='
+			<div class="card card-widget" >
+              <div class="card-header">
+                <div class="user-block">
+                  		<span  class="username ml-2">'.date('F d, Y', strtotime($row["schedule_date"])).' | '.date("g:i A", strtotime($row["from_time"])) . "-" . date("g:i A", strtotime($row["to_time"])).'</span>
+							
+                
+                </div>';
+
+
+
+
+				$html.='
+
+
+				
+              </div>
+              <div class="card-body">
+
+
+			  <dl class="row">
+                  <dt class="col-sm-3">Process</dt>
+                  <dd class="col-sm-9">'.$Process[$row["process_id"]]["process_name"].'</dd>
+                  <dt class="col-sm-3">Area</dt>
+                  <dd class="col-sm-9">'.implode(",", $area).'</dd>
+                  <dt class="col-sm-3">Audit Clause</dt>
+                  <dd class="col-sm-9">'.$row["audit_clause"].'</dd>
+                  <dt class="col-sm-3">Audit Team</dt>
+                  <dd class="col-sm-9">'.$Team[$row["team_id"]]["members"].'</dd>
+				  <dt class="col-sm-3">Auditee</dt>';
+
+				  $positionNames = implode(', ', array_column($Position, 'position_name'));
+				//   dump($positionNames);
+				// echo $positionNames;
+				  $html.='
+                  <dd class="col-sm-9">'.$positionNames.'</dd>
+                </dl>
+              
+              </div>
+          
+            </div>
+			
+			';
+
+			echo($html);
+
 		elseif($_POST["action"] == "audit_plan_report_datatable"):
 
 
@@ -118,8 +236,7 @@
                     $areaNamesString = implode(', ', $areaNames);
                     $teamMembers = array_column($TeamMembers[$row["team_id"]], "fullname");
                     $teamMembersString = implode(', ', $teamMembers);
-					// dump($row);
-
+					// dump($data);
 
 					$action = '
 							<div class="btn-group btn-block">
@@ -133,7 +250,7 @@
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">View Audit Report</a></li>';
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Print Audit Report</a></li>';
 										else:
-											$action .= '<li><a class="dropdown-item" href="audit_report?action=update&id='.$row["audit_report_id"].'">Edit Audit Report</a></li>';
+											$action .= '<li><a data-id="'.$row["audit_report_id"].'" class="dropdown-item" href="audit_report?action=update&id='.$row["audit_report_id"].'">Edit Audit Report</a></li>';
 										endif;
 
 									else:
@@ -142,7 +259,7 @@
 
 							$action.='
 									<li><a class="dropdown-item" target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'">Evidences</a></li>
-									<li><a class="dropdown-item" target="_blank" href="#" data-toggle="modal" data-target="#scheduleModal" data-id="'.$row["tblid"].'">Audit Plan Schedule Details</a></li>
+									<li><a class="dropdown-item" href="#" data-toggle="modal" data-target="#aps_details" data-id="'.$row["aps_id"].'">Audit Plan Schedule Details</a></li>
 								</ul>
 							</div>
 							';

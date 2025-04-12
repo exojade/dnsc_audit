@@ -295,9 +295,19 @@
 
     // Function to download a file when double-clicked
     function downloadFile(filePath) {
-        const encodedFilePath = encodeURIComponent(filePath);
+    const encodedFilePath = encodeURIComponent(filePath);
+    const fileExtension = filePath.split('.').pop().toLowerCase();
+
+    const inlineTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+
+    if (inlineTypes.includes(fileExtension)) {
+        // Open in new tab for viewable files
+        window.open("evidence?action=download&file=" + encodedFilePath, '_blank');
+    } else {
+        // Trigger download for other file types
         window.location.href = "evidence?action=download&file=" + encodedFilePath;
     }
+}
 
     $(document).ready(function () {
         loadFiles(); // Load root directory initially
