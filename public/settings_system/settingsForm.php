@@ -14,6 +14,11 @@
 </style>
 
 
+<?php
+  $all_settings = query("select * from utility_settings");
+?>
+
+
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -28,30 +33,252 @@
       <div class="container-fluid">
 
       <div class="row">
-        <div class="col">
+        <div class="col-6">
+            <div class="card">
+            <div class="card-header bg-success">
+              <h3 class="card-title"><b>Audit Checklist Settings</b></h3>
+            </div>
+            <div class="card-body">
+            <?php $audit_checklist = unserialize($all_settings[0]["audit_checklist"]); ?>
+            <form class="generic_form_trigger" data-url="settings">
+              <input type="hidden" name="action" value="update_audit_checklist_settings">
+              <div class="form-group">
+                <label>Header Image</label>
+                  <img id="audit_checklist_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["header"]); ?>">
+                  <div class="custom-file">
+                    <input name="header" type="file" class="custom-file-input customFile" id="audit_checklist_header_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label>Footer Image</label>
+                  <img id="audit_checklist_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["footer"]); ?>">
+                  <div class="custom-file">
+                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_checklist_footer_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+
+              <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_checklist["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_checklist["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_checklist["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_checklist["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_checklist["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+              <hr>
+              <button class="btn btn-primary" type="submit">Save</button>
+
+            </form>
+          
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card">
+            <div class="card-header bg-success">
+              <h3 class="card-title"><b>Audit Report Settings</b></h3>
+            </div>
+            <div class="card-body">
+            <?php $audit_report = unserialize($all_settings[0]["audit_report"]); ?>
+            <form class="generic_form_trigger" data-url="settings">
+              <input type="hidden" name="action" value="update_audit_report_settings">
+              <div class="form-group">
+                <label>Header Image</label>
+                  <img id="audit_report_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_report["header"]); ?>">
+                  <div class="custom-file">
+                    <input name="header" type="file" class="custom-file-input customFile" id="audit_report_header_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label>Footer Image</label>
+                  <img id="audit_report_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_report["footer"]); ?>">
+                  <div class="custom-file">
+                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_report_footer_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+
+              <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_report["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_report["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_report["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_report["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_report["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+              <hr>
+              <button class="btn btn-primary" type="submit">Save</button>
+
+            </form>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-6">
+            <div class="card">
+            <div class="card-header bg-success">
+              <h3 class="card-title"><b>Audit Evaluation Settings</b></h3>
+            </div>
+            <div class="card-body">
+            <?php $audit_evaluation = unserialize($all_settings[0]["audit_evaluation"]); ?>
+            <form class="generic_form_trigger" data-url="settings">
+              <input type="hidden" name="action" value="update_audit_evaluation_settings">
+              <div class="form-group">
+                <label>Header Image</label>
+                  <img id="audit_evaluation_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_evaluation["header"]); ?>">
+                  <div class="custom-file">
+                    <input name="header" type="file" class="custom-file-input customFile" id="audit_evaluation_header_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label>Footer Image</label>
+                  <img id="audit_evaluation_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_evaluation["footer"]); ?>">
+                  <div class="custom-file">
+                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_evaluation_footer_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+
+              <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_evaluation["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_evaluation["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_evaluation["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_evaluation["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_evaluation["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+              <hr>
+              <button class="btn btn-primary" type="submit">Save</button>
+
+            </form>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-6">
             <div class="card">
             <div class="card-header bg-success">
               <h3 class="card-title"><b>Audit Plan Settings</b></h3>
             </div>
             <div class="card-body">
-              
+            <?php $audit_plan = unserialize($all_settings[0]["audit_plan"]); ?>
+            <form class="generic_form_trigger" data-url="settings">
+              <input type="hidden" name="action" value="update_audit_plan_settings">
+              <div class="form-group">
+                <label>Header Image</label>
+                  <img id="audit_plan_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_plan["header"]); ?>">
+                  <div class="custom-file">
+                    <input name="header" type="file" class="custom-file-input customFile" id="audit_plan_header_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label>Footer Image</label>
+                  <img id="audit_plan_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_plan["footer"]); ?>">
+                  <div class="custom-file">
+                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_plan_footer_input" accept=".png">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+              </div>
+
+              <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_plan["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_plan["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_plan["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_plan["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_plan["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+              <hr>
+              <button class="btn btn-primary" type="submit">Save</button>
+
+            </form>
+          
 
 
-              
             </div>
           </div>
         </div>
 
-        <div class="col">
-            <div class="card">
-            <div class="card-header bg-success">
-              <h3 class="card-title"><b>Audit Plan Settings</b></h3>
-            </div>
-            <div class="card-body">
-              Start creating your amazing application!
-            </div>
-          </div>
-        </div>
+
+       
+
+
+
+        
 
  
 
@@ -85,3 +312,119 @@ $('.my-colorpicker2').on('colorpickerChange', function(event) {
   $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
 })
 </script> 
+
+<script>
+  $(document).ready(function () {
+    function readImageURL(input, targetImgId) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#' + targetImgId).attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Header image preview
+    $('#audit_plan_header_input').on('change', function () {
+      readImageURL(this, 'audit_plan_header');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    // Footer image preview
+    $('#audit_plan_footer_input').on('change', function () {
+      readImageURL(this, 'audit_plan_footer');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+  });
+</script>
+
+
+
+<script>
+  $(document).ready(function () {
+    function readImageURL(input, targetImgId) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#' + targetImgId).attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Header image preview
+    $('#audit_report_header_input').on('change', function () {
+      readImageURL(this, 'audit_report_header');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    // Footer image preview
+    $('#audit_report_footer_input').on('change', function () {
+      readImageURL(this, 'audit_report_footer');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+  });
+</script>
+
+
+<script>
+  $(document).ready(function () {
+    function readImageURL(input, targetImgId) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#' + targetImgId).attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Header image preview
+    $('#audit_checklist_header_input').on('change', function () {
+      readImageURL(this, 'audit_checklist_header');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    // Footer image preview
+    $('#audit_checklist_footer_input').on('change', function () {
+      readImageURL(this, 'audit_checklist_footer');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+  });
+</script>
+
+
+<script>
+  $(document).ready(function () {
+    function readImageURL(input, targetImgId) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#' + targetImgId).attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Header image preview
+    $('#audit_evaluation_header_input').on('change', function () {
+      readImageURL(this, 'audit_evaluation_header');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    // Footer image preview
+    $('#audit_evaluation_footer_input').on('change', function () {
+      readImageURL(this, 'audit_evaluation_footer');
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+  });
+</script>

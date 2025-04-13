@@ -494,6 +494,9 @@
 						'default_font' => 'helvetica'
 					]);
 
+					$settings = query("select * from utility_settings");
+					$settings = unserialize($settings[0]["audit_report"]);
+					// dump($settings);
 					$mpdf->SetHTMLHeader('
 
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
@@ -503,7 +506,7 @@
 					<div class="container">
 					<div class="row">
 						<div class="col-xs-8">
-							<img src="resources/portraitHeader.png" 
+							<img src="'.$settings["header"].'" 
 							style="width:100%; height: auto; max-height: 90px;">
 						</div>
 					
@@ -512,23 +515,23 @@
 							<table id="headerTable " class="table">
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Form No.</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">FM-DNSC-IQA-04</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["form_number"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Issue Status</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">06</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["issue_status"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Revision No.</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">08</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["revision_number"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Effective Date: </td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">02 January 2025</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["effective_date"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Approved By </td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">President</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["approved_by"].'</td>
 								</tr>
 
 							</table>
@@ -547,7 +550,7 @@
 					<div id="myFooter">
 							<div class="row">
 							<div class="col-xs-12 text-right">
-								<img src="resources/portaitFooter.png" 
+								<img src="'.$settings["footer"].'" 
 								style="width:100%;
 								height: auto; max-height: 300px;">
 							</div>

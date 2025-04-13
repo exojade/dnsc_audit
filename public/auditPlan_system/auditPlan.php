@@ -1671,6 +1671,13 @@
 						'default_font' => 'helvetica'
 					]);
 
+					$settings = query("select * from utility_settings");
+					$settings = unserialize($settings[0]["audit_plan"]);
+					// dump($settings);
+
+
+
+
 					$mpdf->SetHTMLHeader('
 
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
@@ -1678,30 +1685,30 @@
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<div class="row" >
 						<div class="col-xs-8">
-							<img src="resources/auditPlanHeader.png" 
+							<img src="'.$settings["header"].'" 
 							style="width:100%; height: auto; max-height: 130px;">
 						</div>
 						<div class="col-xs-3">
 							<table id="headerTable " class="table">
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Form No.</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">FM-DNSC-IQA-02</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["form_number"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Issue Status</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">05</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["issue_status"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Revision No.</td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">06</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["revision_number"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Effective Date: </td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">02 January 2025</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["effective_date"].'</td>
 								</tr>
 								<tr>
 									<td class="text-center" style="font-size: 10px; padding:2px !important;">Approved By </td>
-									<td class="text-center" style="font-size: 10px; padding:2px !important;">President</td>
+									<td class="text-center" style="font-size: 10px; padding:2px !important;">'.$settings["approved_by"].'</td>
 								</tr>
 
 							</table>
@@ -1717,7 +1724,7 @@
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 							<div class="row">
 							<div class="col-xs-12 text-right">
-								<img src="resources/auditPlanFooter.png" 
+								<img src="'.$settings["footer"].'" 
 								style="width:100%;
 								height: auto; max-height: 100px;">
 							</div>
