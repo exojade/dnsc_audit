@@ -114,6 +114,17 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+  <li class="nav-item">
+      <a href="position" class="nav-link">
+        <i class="nav-icon fas fa-cog"></i>
+        <p>
+          Settings
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+
   <li class="nav-header">Human Resource</li>
   <li class="nav-item">
             <a href="#" class="nav-link">
@@ -715,6 +726,16 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         <i class="nav-icon fas fa-briefcase"></i>
         <p>
           Position
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="settings" class="nav-link">
+        <i class="nav-icon fas fa-cog"></i>
+        <p>
+          Settings
           <span class="right badge badge-danger"></span>
         </p>
       </a>

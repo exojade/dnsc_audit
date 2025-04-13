@@ -154,6 +154,14 @@
 					endforeach;
 					// dump($thePlans);
 
+					$ap = query("select * from audit_plans");
+					$AP = [];
+					foreach($ap as $row):
+						$AP[$row["audit_plan"]] = $row;
+					endforeach;
+					
+
+
 
 
 
@@ -179,21 +187,25 @@
 	
 					$i = 0;
 					foreach($data as $row):
-						$data[$i]["action"] = '<a href="auditPlan?action=auditorDetails&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
+						if($AP[$row["audit_plan"]]["status"] == "ONGOING"):
+							$data[$i]["action"] = '<a href="auditPlan?action=auditorDetails&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
 						
-						$data[$i]["create_count"] = 0;
-						$data[$i]["pending_count"] = 0;
-						$data[$i]["done_count"] = 0;
-
-						if(isset($thePlans[$row["audit_plan"]])):
-							$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
-							$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
-							$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
+							$data[$i]["create_count"] = 0;
+							$data[$i]["pending_count"] = 0;
+							$data[$i]["done_count"] = 0;
+	
+							if(isset($thePlans[$row["audit_plan"]])):
+								$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
+								$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
+								$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
+							endif;
+						else:
+							unset($data[$i]);
 						endif;
-						
-						
-						
 						$i++;
+
+
+						
 					endforeach;
 					$json_data = array(
 						"draw" => $draw + 1,

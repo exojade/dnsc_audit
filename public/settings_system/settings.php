@@ -53,9 +53,6 @@
 				// "html" => '<a href="#">View or Print '.$transaction_id.'</a>'
 				];
 				echo json_encode($res_arr); exit();
-
-
-
 		endif;
     }
 	else {

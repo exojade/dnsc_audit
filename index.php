@@ -91,6 +91,9 @@
 				else if ($request == 'myProfile')
 					require 'public/myProfile_system/myProfile.php';
 
+				else if ($request == 'settings')
+					require 'public/settings_system/settings.php';
+
 
 				else if ($request == 'audit_evaluation')
 					require 'public/audit_evaluation_system/audit_evaluation.php';
