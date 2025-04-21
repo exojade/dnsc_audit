@@ -45,14 +45,14 @@
 				);
 				echo json_encode($json_data);
 
-		elseif($_POST["action"] == "review_audit_checklist"):
+		elseif($_POST["action"] == "review_audit_checklist_unfilled"):
 			// dump($_POST);
 
 			query("update audit_checklist set 
 						reviewed_by = ?,
 						review_comments = ?,
 						review_timestamp = ?,
-						audit_checklist_status = 'DONE'
+						audit_checklist_status = 'PENDING FILLED'
 						where audit_checklist_id = ?
 						", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
 
@@ -64,8 +64,8 @@
 			$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
 			foreach($team_members as $row):
 				$Message = [];
-				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and approved the audit report : " . $_POST["audit_checklist_id"];
-				$Message["link"]= "audit_checklist?action=details&id=".$_POST["audit_checklist_id"];
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and approved the audit report (UNFILLED), now you may add remarks to make it (FILLED) - " . $_POST["audit_checklist_id"] . " - Remarks - " . $_POST["review_comments"];
+				$Message["link"]= "audit_checklist?action=update_filled&id=".$_POST["audit_checklist_id"];
 				$theMessage = serialize($Message);
 				addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
 			endforeach;
@@ -75,9 +75,115 @@
 							"result" => "success",
 							"title" => "Success",
 							"message" => "Success",
-							"link" => "audit_checklist?action=details&id=".$_POST["audit_checklist_id"],
+							"link" => "audit_checklist_review",
 							];
 							echo json_encode($res_arr); exit();
+
+
+
+							elseif($_POST["action"] == "review_audit_checklist_filled"):
+								// dump($_POST);
+					
+								query("update audit_checklist set 
+											reviewed_by = ?,
+											review_comments = ?,
+											review_timestamp = ?,
+											audit_checklist_status = 'DONE'
+											where audit_checklist_id = ?
+											", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
+					
+					
+											$audit_checklist = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_checklist ar
+														left join users u on u.id = ar.user_id
+														 where audit_checklist_id = ?", $_POST["audit_checklist_id"]);
+								$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_checklist[0]["aps_id"]);
+								$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+								foreach($team_members as $row):
+									$Message = [];
+									$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and approved the audit report (FILLED) - " . $_POST["audit_checklist_id"] . " - Remarks - " . $_POST["review_comments"];
+									$Message["link"]= "audit_checklist?action=details&id=".$_POST["audit_checklist_id"];
+									$theMessage = serialize($Message);
+									addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+								endforeach;
+					
+					
+											$res_arr = [
+												"result" => "success",
+												"title" => "Success",
+												"message" => "Success",
+												"link" => "audit_checklist?action=details&id=".$_POST["audit_checklist_id"],
+												];
+												echo json_encode($res_arr); exit();
+
+
+				elseif($_POST["action"] == "deny_audit_checklist_unfilled"):
+					// dump($_POST);
+		
+					query("update audit_checklist set 
+								reviewed_by = ?,
+								review_comments = ?,
+								review_timestamp = ?,
+								audit_checklist_status = 'PENDING UNFILLED'
+								where audit_checklist_id = ?
+								", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
+		
+		
+								$audit_checklist = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_checklist ar
+											left join users u on u.id = ar.user_id
+												where audit_checklist_id = ?", $_POST["audit_checklist_id"]);
+					$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_checklist[0]["aps_id"]);
+					$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+					foreach($team_members as $row):
+						$Message = [];
+						$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and denied the audit report (UNFILLED) - " . $_POST["audit_checklist_id"] . " - Remarks : " . $_POST["review_comments"];;
+						$Message["link"]= "audit_checklist?action=update_unfilled&id=".$_POST["audit_checklist_id"];
+						$theMessage = serialize($Message);
+						addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+					endforeach;
+		
+		
+								$res_arr = [
+									"result" => "success",
+									"title" => "Success",
+									"message" => "Success",
+									"link" => "audit_checklist_review",
+									];
+									echo json_encode($res_arr); exit();
+
+
+									elseif($_POST["action"] == "deny_audit_checklist_filled"):
+										// dump($_POST);
+							
+										query("update audit_checklist set 
+													reviewed_by = ?,
+													review_comments = ?,
+													review_timestamp = ?,
+													audit_checklist_status = 'PENDING FILLED'
+													where audit_checklist_id = ?
+													", $_SESSION["dnsc_audit"]["userid"], $_POST["review_comments"], time(), $_POST["audit_checklist_id"]);
+							
+							
+													$audit_checklist = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_checklist ar
+																left join users u on u.id = ar.user_id
+																	where audit_checklist_id = ?", $_POST["audit_checklist_id"]);
+										$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_checklist[0]["aps_id"]);
+										$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+										foreach($team_members as $row):
+											$Message = [];
+											$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and denied the audit report (FILLED) - " . $_POST["audit_checklist_id"] . " - Remarks : " . $_POST["review_comments"];;
+											$Message["link"]= "audit_checklist?action=update_filled&id=".$_POST["audit_checklist_id"];
+											$theMessage = serialize($Message);
+											addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+										endforeach;
+							
+							
+													$res_arr = [
+														"result" => "success",
+														"title" => "Success",
+														"message" => "Success",
+														"link" => "audit_checklist_review",
+														];
+														echo json_encode($res_arr); exit();
 
 		elseif($_POST["action"] == "ac_review_list"):
 
@@ -98,7 +204,7 @@
 
 			$myTeam = "'" . implode("','", $teamIds) . "'";
 			$where =" WHERE 
-						aps.team_id IN ($myTeam)";
+						aps.team_id IN ($myTeam) and ap.status = 'ONGOING'";
 			if(isset($_REQUEST["ap"])):
 				if($_REQUEST["ap"] != ""):
 					$where .= " and aps.audit_plan ='".$_REQUEST["ap"]."'";
@@ -126,9 +232,28 @@
 						ar.timestamp,
 						a.area_name,
 						COALESCE(ar.audit_checklist_status, 'CREATE') AS audit_checklist_status,
-						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
-						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
-						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
+						SUM(CASE 
+        WHEN ar.audit_checklist_status IN ('PENDING UNFILLED', 'PENDING FILLED') 
+        THEN 1 ELSE 0 
+    END) AS pending_count,
+
+    -- Grouped FOR REVIEW (both UNFILLED & FILLED)
+    SUM(CASE 
+        WHEN ar.audit_checklist_status IN ('FOR REVIEW UNFILLED', 'FOR REVIEW FILLED') 
+        THEN 1 ELSE 0 
+    END) AS for_review_count,
+
+    -- CREATE (still NULL)
+    SUM(CASE 
+        WHEN ar.audit_checklist_status IS NULL 
+        THEN 1 ELSE 0 
+    END) AS create_count,
+
+    -- DONE
+    SUM(CASE 
+        WHEN ar.audit_checklist_status = 'DONE' 
+        THEN 1 ELSE 0 
+    END) AS done_count
 					FROM 
 						audit_plan_schedule aps
 					LEFT JOIN 
@@ -139,6 +264,7 @@
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
 						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+					LEFT JOIN audit_plans ap on ap.audit_plan = aps.audit_plan
 						$where
 					";
 				// dump($string_query);
@@ -192,8 +318,10 @@
 									if($row["audit_checklist_id"] != ""):
 										if($row["audit_checklist_status"] == "DONE"):
 											$action .= '<li><a class="dropdown-item" href="audit_checklist?action=details&id='.$row["audit_checklist_id"].'">View Audit Checklist</a></li>';
-										else:
-											$action .= '<li><a class="dropdown-item" href="audit_checklist_review?action=review&id='.$row["audit_checklist_id"].'">Review</a></li>';
+										elseif($row["audit_checklist_status"] == "PENDING UNFILLED"):
+											$action .= '<li><a class="dropdown-item" href="audit_checklist_review?action=review_unfilled&id='.$row["audit_checklist_id"].'">Review</a></li>';
+											elseif($row["audit_checklist_status"] == "FOR REVIEW FILLED"):
+												$action .= '<li><a class="dropdown-item" href="audit_checklist_review?action=review_filled&id='.$row["audit_checklist_id"].'">Review</a></li>';
 										endif;
 
 									else:
@@ -725,9 +853,13 @@ font-size: 12px;
 				render("public/audit_report_system/audit_report_details.php",[
 				]);
 
-			elseif($_GET["action"] == "review"):
-				render("public/audit_checklist_review_system/ac_review_page.php",[
+			elseif($_GET["action"] == "review_unfilled"):
+				render("public/audit_checklist_review_system/ac_review_page_unfilled.php",[
 				]);
+
+				elseif($_GET["action"] == "review_filled"):
+					render("public/audit_checklist_review_system/ac_review_page_filled.php",[
+					]);
 			endif;
 
 		endif;

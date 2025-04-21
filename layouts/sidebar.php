@@ -430,8 +430,10 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
 						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+          LEFT JOIN
+            audit_plans ap on ap.audit_plan = aps.audit_plan
 						WHERE 
-						aps.team_id IN ($myTeam)
+						aps.team_id IN ($myTeam) and ap.status = 'ONGOING'
 					";
 					$audit_plans = query($audit_plans);
           ?>

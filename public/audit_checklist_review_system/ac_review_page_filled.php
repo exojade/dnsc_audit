@@ -4,7 +4,6 @@
   <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="AdminLTE_new/plugins/bs-stepper/css/bs-stepper.min.css">
-  <link rel="stylesheet" href="AdminLTE_new/plugins/summernote/summernote-bs4.min.css">
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -12,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Create Audit Checklist (FILLED)</h1>
+            <h1>Audit Checklist Review (FILLED)</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -29,9 +28,12 @@
       <div class="container-fluid">
 
       <?php
+      $checklist = query("select * from audit_checklist where audit_checklist_id = ?", $_GET["id"]);
+      $checklist = $checklist[0];    
+      // dump($checklist);  
       $aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where tblid = ?", $_GET["aps_area_id"]);
+                          where area_id = ? and aps_id = ?", $checklist["aps_area"], $checklist["aps_id"]);
       $aps_area = $aps_area[0];
 
       $aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -48,6 +50,59 @@
 
   <div class="row">
     <div class="col-3">
+
+
+    <div class="modal fade" id="modalReview">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-warning">
+              <h3 class="modal-title text-center">Accept Audit Checklist</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_checklist_review">
+                <input type="hidden" name="action" value="review_audit_checklist_filled">
+                <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
+                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalReviewDeny">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-danger">
+              <h3 class="modal-title text-center">Deny Audit Checklist</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_checklist_review">
+                <input type="hidden" name="action" value="deny_audit_checklist_filled">
+                <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
+                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <?php if($checklist["audit_checklist_status"] == "FOR REVIEW FILLED" ): ?>
+      <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">ACCEPT THIS CHECKLIST</a>
+      <a href="#" class="btn btn-danger btn-block mb-2" data-toggle="modal" data-target="#modalReviewDeny">DENY THIS CHECKLIST</a>
+    <?php endif; ?>
+    
+
+
     <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><strong>About IAR</strong></h3>
@@ -71,92 +126,57 @@
                 
               </div>
             </div>
-            <a target="_blank" href="evidence?action=myEvidence&root=<?php echo($aps_area["area_id"]); ?>" class="btn btn-warning btn-block"><i class="fa fa-folder"></i> Check Evidence</a>
+            <form class="generic_form_trigger_no_prompt mb-2" data-url="audit_checklist" >
+              <input type="hidden" name="action" value="print_audit_checklist_unfilled">
+              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist (UNFILLED)</button>
+            </form>
+
+
+            <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
+              <input type="hidden" name="action" value="print_audit_checklist_filled">
+              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist (FILLED)</button>
+            </form>
     </div>
     <div class="col">
 
+
     <div class="card card-success">
-              <div class="card-header">
-                <h3 class="card-title"><strong><?php echo($aps_schedule["process_name"]); ?></strong></h3>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              
-                <div class="card-body">
-                <form class="generic_form_trigger" data-url="audit_checklist" id="internalReportForm">
-                <input type="hidden" name="action" value="createChecklist">
-                <input type="hidden" name="aps_area_id" value="<?php echo($_GET["aps_area_id"]); ?>">
+      <div class="card-header">
+        <h3 class="card-title"><strong>Trail</strong></h3>
+      </div>
 
-<!-- <style>
-.myTable th{
- padding: 5px;
-}
-</style> -->
+      <div class="card-body text-justify">
+         
+      <table class="table table-bordered">
+        <thead>
+          <th width="45%">Clause</th>
+          <th width="5%">Comply</th>
+          <th width="45%">Trail</th>
+        </thead>
+        <tbody>
+      <?php $clause = unserialize($checklist["audit_trail_array"]); ?>
 
-<?php
-                    
-                    $questions =[
-                      "Are the procedure steps accurate and complete as compared to true practice?",
-                      "Are there sufficient check steps (inspections, tests, reviews, approvals, sign-offs, etc.) that ensure the process outputs meet requirements before passing onto the next process?",
-                      "Does the process appear to adequately meet the requirements of ISO 9001 and its documentation?",
-                      "Does the process appear to adequately meet all customer or regulatory requirements?",
-                      "Are the quality objectives or targets identified in the process met?"
-                    ];
-                    // dump($questions);
-                    
-                    ?>
+        <?php foreach($clause as $row): ?>
+          <tr>
+            <td><?php echo($row["clause"]); ?></td>
+            <td><?php echo($row["comply"]); ?></td>
+            <td><?php echo($row["remarks"]); ?></td>
+          </tr>
+        <?php endforeach; ?>
 
-              
-                  <div class="bs-stepper-content">
-                    <!-- your steps content here -->
-                    <div id="logins-part" class="content" role="tabpanel" aria-labelledby="logins-part-trigger">
-                    <div class="alert alert-success alert-dismissible">
-                      <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
-                      <p class="text-justify">Reminder: This checklist is just a guide, you are free (and encouraged) to add more questions as you conduct the actual audit.</p>
-                    </div>
+        </tbody>
 
+      </table>
+      </div>
 
-                    <button type="button" class="btn btn-primary" id="addClause">Add Row</button>
-                    <br>
-                    <br>
-                      <div id="clauseContainer">
+      <!-- /.card-header -->
+      <!-- form start -->
+      
+     
+    </div>
 
-                      <div class="amik">
-                      <div class="row ">
-                        <div class="col-11">
-                        <div class="form-group">
-                          <textarea required placeholder="Enter Clause/Question Here!" class="form-control summernote" rows="3" name="clause[]"></textarea>
-                        </div>
-                        </div>
-                        <div class="col-1">
-                        <span class="btn btn-block btn-danger remove-btn">X</span>
-
-                        </div>
-
-                      </div>
-
-                     
-                  </div>
-                      
-                    </div>
-
-              
-                <!-- <button class="btn btn-info btn-previous" >Previous</button> -->
-                <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                  </div>
-
-
-
-
-                
-              
-                <hr>
-                <!-- <button class="btn btn-primary">Save Audit Report</button> -->
-                </form>
-                </div>
-
-            </div>
 
     </div>
   </div>
@@ -214,26 +234,7 @@
 <script src="AdminLTE_new/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 <script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script>
 <script src="AdminLTE_new/plugins/jquery-validation/additional-methods.min.js"></script>
-<script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
 <?php require("layouts/footer.php") ?>
-<script>
-  $('.summernote').summernote()
-        $(document).ready(function () {
-            $("#addClause").click(function () {
-                let newClause = $(".amik:first").clone(); // Clone the first .form-group
-                newClause.find("input").val(""); // Clear input field
-                $("#clauseContainer").append(newClause); // Append clone
-            });
-
-            $(document).on("click", ".remove-btn", function () {
-                if ($(".amik").length > 1) {
-                    $(this).closest(".amik").remove(); // Remove only if more than 1 exists
-                } else {
-                    alert("At least one clause is required!");
-                }
-            });
-        });
-    </script>
 
 <script>
 

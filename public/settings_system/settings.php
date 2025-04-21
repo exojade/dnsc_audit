@@ -172,11 +172,25 @@
 				$audit_checklist = unserialize($settings[0]["audit_checklist"]);
 	
 			
-				$audit_checklist["form_number"] = $_POST["form_number"];
-				$audit_checklist["issue_status"] = $_POST["issue_status"];
-				$audit_checklist["revision_number"] = $_POST["revision_number"];
-				$audit_checklist["effective_date"] = $_POST["effective_date"];
-				$audit_checklist["approved_by"] = $_POST["approved_by"];
+				$audit_checklist["form_number"] = $_POST["ac_form_number"];
+				$audit_checklist["issue_status"] = $_POST["ac_issue_status"];
+				$audit_checklist["revision_number"] = $_POST["ac_revision_number"];
+				$audit_checklist["effective_date"] = $_POST["ac_effective_date"];
+				$audit_checklist["approved_by"] = $_POST["ac_approved_by"];
+
+
+				$audit_report["form_number"] = $_POST["ar_form_number"];
+				$audit_report["issue_status"] = $_POST["ar_issue_status"];
+				$audit_report["revision_number"] = $_POST["ar_revision_number"];
+				$audit_report["effective_date"] = $_POST["ar_effective_date"];
+				$audit_report["approved_by"] = $_POST["ar_approved_by"];
+
+
+				$audit_evaluation["form_number"] = $_POST["ae_form_number"];
+				$audit_evaluation["issue_status"] = $_POST["ae_issue_status"];
+				$audit_evaluation["revision_number"] = $_POST["ae_revision_number"];
+				$audit_evaluation["effective_date"] = $_POST["ae_effective_date"];
+				$audit_evaluation["approved_by"] = $_POST["ae_approved_by"];
 	
 	
 	
@@ -190,6 +204,8 @@
 							exit();
 						}
 						$audit_checklist["header"] = $target;
+						$audit_report["header"] = $target;
+						$audit_evaluation["header"] = $target;
 					}
 	
 					if($_FILES["footer"]["size"] != 0){
@@ -200,11 +216,18 @@
 							exit();
 						}
 						$audit_checklist["footer"] = $target;
+						$audit_report["footer"] = $target;
+						$audit_evaluation["footer"] = $target;
 					}
 	
 					$audit_checklist = serialize($audit_checklist);
+					// dump($audit_report);
+					$audit_report = serialize($audit_report);
+					
+					$audit_evaluation = serialize($audit_evaluation);
 	
-					query("update utility_settings set audit_checklist = ?", $audit_checklist);
+					query("update utility_settings set audit_checklist = ?, audit_report = ?, audit_evaluation = ?", 
+								$audit_checklist, $audit_report, $audit_evaluation);
 	
 				$res_arr = [
 					"result" => "success",

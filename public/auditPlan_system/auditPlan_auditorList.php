@@ -42,9 +42,6 @@
                     <th class="bg-info">Done</th>
                   </tr>
                   </thead>
-                  <tbody>
-                 
-                  </tbody>
                 </table>
               </div>
               <!-- /.card-body -->

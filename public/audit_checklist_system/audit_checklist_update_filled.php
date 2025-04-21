@@ -12,7 +12,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Create Audit Checklist (FILLED)</h1>
+            <h1>Audit Checklist FILLED</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -29,9 +29,17 @@
       <div class="container-fluid">
 
       <?php
+
+      $audit_checklist = query("select * from audit_checklist where audit_checklist_id = ?", $_GET["id"]);
+      $audit_checklist = $audit_checklist[0];
+      // $_GET["aps_area_id"] = $audit_checklist["aps_area"];
+
+      // $tblid = query("select * from ");
+
+
       $aps_area = query("select * from aps_area aa
                           left join areas a on a.id = aa.area_id 
-                          where tblid = ?", $_GET["aps_area_id"]);
+                          where aps_id = ? and area_id = ?", $audit_checklist["aps_id"], $audit_checklist["aps_area"]);
       $aps_area = $aps_area[0];
 
       $aps_schedule = query("select aps.*, p.process_name from audit_plan_schedule aps
@@ -72,7 +80,13 @@
               </div>
             </div>
             <a target="_blank" href="evidence?action=myEvidence&root=<?php echo($aps_area["area_id"]); ?>" class="btn btn-warning btn-block"><i class="fa fa-folder"></i> Check Evidence</a>
-    </div>
+            <br><form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
+              <input type="hidden" name="action" value="print_audit_checklist_unfilled">
+              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist (UNFILLED)</button>
+            </form>
+    
+          </div>
     <div class="col">
 
     <div class="card card-success">
@@ -84,8 +98,8 @@
               
                 <div class="card-body">
                 <form class="generic_form_trigger" data-url="audit_checklist" id="internalReportForm">
-                <input type="hidden" name="action" value="createChecklist">
-                <input type="hidden" name="aps_area_id" value="<?php echo($_GET["aps_area_id"]); ?>">
+                <input type="hidden" name="action" value="updateChecklistFilled">
+                <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
 
 <!-- <style>
 .myTable th{
@@ -113,36 +127,56 @@
                     <div class="alert alert-success alert-dismissible">
                       <h5><i class="icon fas fa-exclamation-triangle"></i> Notes!</h5>
                       <p class="text-justify">Reminder: This checklist is just a guide, you are free (and encouraged) to add more questions as you conduct the actual audit.</p>
-                    </div>
-
-
-                    <button type="button" class="btn btn-primary" id="addClause">Add Row</button>
-                    <br>
-                    <br>
-                      <div id="clauseContainer">
-
-                      <div class="amik">
-                      <div class="row ">
-                        <div class="col-11">
-                        <div class="form-group">
-                          <textarea required placeholder="Enter Clause/Question Here!" class="form-control summernote" rows="3" name="clause[]"></textarea>
-                        </div>
-                        </div>
-                        <div class="col-1">
-                        <span class="btn btn-block btn-danger remove-btn">X</span>
-
-                        </div>
-
-                      </div>
-
-                     
-                  </div>
-                      
-                    </div>
-
               
+                    </div>
+
+
+                    <table class="table table-bordered">
+                        <thead>
+                          <th width="40%">Checklist Clause</th>
+                          <th width="10%">Comply</th>
+                          <th width="50%">Remarks</th>
+                        </thead>
+
+                      <tbody>
+
+                 
+
+                      <?php $clause = unserialize($audit_checklist["audit_trail_array"]); ?>
+                      <?php foreach($clause as $row): ?>
+
+                        <tr>
+                          <td><?php echo($row["clause"]); ?></td>
+                          <td>
+                              <select required name="comply[]" class="form-control">
+                                <option value="" disabled <?= !isset($row['comply']) ? 'selected' : '' ?>>Y/N</option>
+                                <option value="YES" <?= (isset($row['comply']) && $row['comply'] === 'YES') ? 'selected' : '' ?>>YES</option>
+                                <option value="NO" <?= (isset($row['comply']) && $row['comply'] === 'NO') ? 'selected' : '' ?>>NO</option>
+                              </select>
+                            </td>
+                          <td>
+                          <textarea required placeholder="Enter observance/trail/remarks here!" class="form-control summernote" rows="3" name="remarks[]">
+                            <?php echo isset($row["remarks"]) ? htmlspecialchars($row["remarks"]) : ""; ?>
+                          </textarea>
+                          </td>
+                        </tr>
+                   
+
+                      <?php endforeach; ?>
+
+
+                      
+                      </tbody>
+                    </table>
+                      
+                   
                 <!-- <button class="btn btn-info btn-previous" >Previous</button> -->
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <?php if($audit_checklist["audit_checklist_status"] == "PENDING FILLED"): ?>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                <?php else: ?>
+                  <button type="button" disabled class="btn btn-warning">REVIEW IS ONGOING</button>
+                <?php endif; ?>
+
                     </div>
                   </div>
 
@@ -212,92 +246,106 @@
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
 <script src="AdminLTE_new/plugins/bs-stepper/js/bs-stepper.min.js"></script>
-<script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script>
+<!-- <script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script> -->
 <script src="AdminLTE_new/plugins/jquery-validation/additional-methods.min.js"></script>
 <script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
 <?php require("layouts/footer.php") ?>
 <script>
-  $('.summernote').summernote()
-        $(document).ready(function () {
-            $("#addClause").click(function () {
-                let newClause = $(".amik:first").clone(); // Clone the first .form-group
-                newClause.find("input").val(""); // Clear input field
-                $("#clauseContainer").append(newClause); // Append clone
-            });
+    $(document).ready(function () {
+        // Initialize existing summernotes
+        $('.summernote').summernote();
 
-            $(document).on("click", ".remove-btn", function () {
-                if ($(".amik").length > 1) {
-                    $(this).closest(".amik").remove(); // Remove only if more than 1 exists
-                } else {
-                    alert("At least one clause is required!");
-                }
+        // Add new clause
+        $("#addClause").click(function () {
+            let newClause = $(".amik:first").clone(); // Clone the first .amik
+            newClause.find("textarea").val(""); // Clear textarea
+            newClause.find(".note-editor").remove(); // Remove old Summernote UI if present (just in case)
+            newClause.find("textarea").removeClass('summernote'); // Remove class first (avoid double-init)
+            newClause.find("textarea").addClass('summernote'); // Re-add to make sure
+
+            $("#clauseContainer").append(newClause); // Append the clone
+
+            // Re-initialize Summernote for new textareas only
+            newClause.find(".summernote").summernote({
+                height: 100,
+                placeholder: 'Enter observance/trail/remarks here!'
             });
         });
-    </script>
+
+        // Remove clause
+        $(document).on("click", ".remove-btn", function () {
+            if ($(".amik").length > 1) {
+                $(this).closest(".amik").remove();
+            } else {
+                alert("At least one clause is required!");
+            }
+        });
+    });
+</script>
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function () {
-    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-  })
+// document.addEventListener('DOMContentLoaded', function () {
+//     window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+//   })
 
 
-  $(function () {
-  $('#internalReportForm').validate({
-    errorElement: 'span',
-    errorPlacement: function (error, element) {
-      error.addClass('invalid-feedback');
+//   $(function () {
+//   $('#internalReportForm').validate({
+//     errorElement: 'span',
+//     errorPlacement: function (error, element) {
+//       error.addClass('invalid-feedback');
 
-      // For radio buttons, append the error to the parent container
-      if (element.is(':radio')) {
-    // Append the error to the closest parent of the group (e.g., the <td>)
-    element.closest('tr').append(error);
-  } else {
-    // Default behavior for other input types
-    element.closest('.form-group').append(error);
-  }
-    },
-    highlight: function (element, errorClass, validClass) {
-      $(element).addClass('is-invalid').removeClass('is-valid');
-    },
-    unhighlight: function (element, errorClass, validClass) {
-      $(element).removeClass('is-invalid').addClass('is-valid');
-    },
-    success: function (label, element) {
-      $(element).addClass('is-valid'); // Adds green border when valid
-      $(element).closest('.form-group').find('span.valid-feedback').remove();
-    },
-    rules: {
-      // Add rules for radio buttons (if dynamically created, use attribute selectors)
-      'your_radio_group_name': {
-        required: true
-      }
-    },
-    messages: {
-      'your_radio_group_name': {
-        required: 'Please select an option.'
-      }
-    }
-  });
+//       // For radio buttons, append the error to the parent container
+//       if (element.is(':radio')) {
+//     // Append the error to the closest parent of the group (e.g., the <td>)
+//     element.closest('tr').append(error);
+//   } else {
+//     // Default behavior for other input types
+//     element.closest('.form-group').append(error);
+//   }
+//     },
+//     highlight: function (element, errorClass, validClass) {
+//       $(element).addClass('is-invalid').removeClass('is-valid');
+//     },
+//     unhighlight: function (element, errorClass, validClass) {
+//       $(element).removeClass('is-invalid').addClass('is-valid');
+//     },
+//     success: function (label, element) {
+//       $(element).addClass('is-valid'); // Adds green border when valid
+//       $(element).closest('.form-group').find('span.valid-feedback').remove();
+//     },
+//     rules: {
+//       // Add rules for radio buttons (if dynamically created, use attribute selectors)
+//       'your_radio_group_name': {
+//         required: true
+//       }
+//     },
+//     messages: {
+//       'your_radio_group_name': {
+//         required: 'Please select an option.'
+//       }
+//     }
+//   });
 
-  // Handle the Next button click
-  $('.btn-next').on('click', function (e) {
-    e.preventDefault(); // Prevent default action
+//   // Handle the Next button click
+//   $('.btn-next').on('click', function (e) {
+//     e.preventDefault(); // Prevent default action
 
-    // Check if the form is valid
-    if ($('#internalReportForm').valid()) {
-      stepper.next(); // Go to the next step if valid
-    } else {
-      // Focus on the first invalid element
-      $('#internalReportForm').find('.is-invalid').first().focus();
-    }
-  });
+//     // Check if the form is valid
+//     if ($('#internalReportForm').valid()) {
+//       stepper.next(); // Go to the next step if valid
+//     } else {
+//       // Focus on the first invalid element
+//       $('#internalReportForm').find('.is-invalid').first().focus();
+//     }
+//   });
 
-  // Handle the Previous button click
-  $('.btn-previous').on('click', function (e) {
-    e.preventDefault(); // Prevent default action
-    stepper.previous(); // Go to the previous step
-  });
-});
+//   // Handle the Previous button click
+//   $('.btn-previous').on('click', function (e) {
+//     e.preventDefault(); // Prevent default action
+//     stepper.previous(); // Go to the previous step
+//   });
+// });
 
 </script>

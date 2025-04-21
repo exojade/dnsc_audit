@@ -114,7 +114,7 @@
 
 			$myTeam = "'" . implode("','", $teamIds) . "'";
 			$where =" WHERE 
-						aps.team_id IN ($myTeam)";
+						aps.team_id IN ($myTeam) and ap.status = 'ONGOING'";
 			if(isset($_REQUEST["ap"])):
 				if($_REQUEST["ap"] != ""):
 					$where .= " and aps.audit_plan ='".$_REQUEST["ap"]."'";
@@ -156,6 +156,8 @@
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
 						audit_report ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
+					LEFT JOIN audit_plans ap
+						on ap.audit_plan = aps.audit_plan
 						$where
 					
 					";
@@ -229,7 +231,12 @@
 					$data[$i]["team"] = $teamMembersString;
 					$data[$i]["process_name"] = $row["process_name"];
 					$data[$i]["area_name"] = $row["area_name"];
-					$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["type"];
+
+					if(floatval($row["timestamp"])!=0):
+						$data[$i]["timestamp"] = date("F d, Y h:i a", $row["timestamp"]);
+					endif;
+					
+					$data[$i]["audit_plan"] = $AuditPlan[$row["audit_plan"]]["year"] . " - " .$AuditPlan[$row["audit_plan"]]["type"];
 					$data[$i]["pending_count"] = $count_data[0]["pending_count"];
 					$data[$i]["done_count"] = $count_data[0]["done_count"];
 					$data[$i]["create_count"] = $count_data[0]["create_count"];

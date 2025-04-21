@@ -37,24 +37,41 @@
             <form class="generic_form_trigger" data-url="auditPlan">
               <input type="hidden" name="action" value="newPlan">
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-6">
                 <div class="form-group">
-                  <label>Type</label>
+                  <label>Audit Plan</label>
                   <select required class="form-control" name="type" style="width: 100%;">
-                    <option selected value="" disabled>Please select type of Audit Plan</option>
+                    <option selected value="" disabled>Audit Plan</option>
                     <option class="1st Internal Quality Audit">1st Internal Quality Audit</option>
                     <option class="2nd Internal Quality Audit">2nd Internal Quality Audit</option>
                   </select>
                 </div>
               </div>
+
+              <div class="col-md-3">
+              <label>Type</label>
+                  <select required class="form-control" name="audit_type" style="width: 100%;">
+                    <option selected value="" disabled>Type</option>
+                    <option class="REGULAR">REGULAR</option>
+                    <option class="SPECIAL">SPECIAL</option>
+                  </select>
+              </div>
               <!-- /.col -->
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label>Year</label>
                   <input required type="text" name="year" class="form-control" placeholder="Enter Year">
                 </div>
               </div>
+
+              
+
+
             </div>
+
+            <label>Scope</label>
+              <textarea name="scope" required class="summernote">
+            </textarea>
 
             <label>Introduction</label>
               <textarea name="introduction" required class="summernote">

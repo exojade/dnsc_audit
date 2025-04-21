@@ -11,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Checklist</h1>
+            <h1>Audit Checklist Review (UNFILLED)</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -56,11 +56,11 @@
       <div class="modal-dialog ">
         <div class="modal-content ">
           <div class="modal-header bg-warning">
-              <h3 class="modal-title text-center">Review Audit Report</h3>
+              <h3 class="modal-title text-center">Accept Audit Checklist</h3>
           </div>
           <div class="modal-body">
               <form class="generic_form_trigger" data-url="audit_checklist_review">
-                <input type="hidden" name="action" value="review_audit_checklist">
+                <input type="hidden" name="action" value="review_audit_checklist_unfilled">
                 <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
                   <label>Reviewer's Comments</label>
@@ -73,7 +73,34 @@
         </div>
       </div>
     </div>
-    <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">REVIEW THIS REPORT</a>
+
+    <div class="modal fade" id="modalReviewDeny">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-danger">
+              <h3 class="modal-title text-center">Deny Audit Checklist</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_checklist_review">
+                <input type="hidden" name="action" value="deny_audit_checklist_unfilled">
+                <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
+                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <?php if($checklist["audit_checklist_status"] == "PENDING UNFILLED" ): ?>
+      <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">ACCEPT THIS CHECKLIST</a>
+      <a href="#" class="btn btn-danger btn-block mb-2" data-toggle="modal" data-target="#modalReviewDeny">DENY THIS CHECKLIST</a>
+    <?php endif; ?>
+
 
 
     <div class="card card-success">
@@ -100,9 +127,9 @@
               </div>
             </div>
             <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
-              <input type="hidden" name="action" value="print_audit_checklist">
+              <input type="hidden" name="action" value="print_audit_checklist_unfilled">
               <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
-              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist</button>
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist (UNFILLED)</button>
             </form>
     </div>
     <div class="col">
@@ -127,8 +154,8 @@
         <?php foreach($clause as $row): ?>
           <tr>
             <td><?php echo($row["clause"]); ?></td>
-            <td><?php echo($row["comply"]); ?></td>
-            <td><?php echo($row["trail"]); ?></td>
+            <td></td>
+            <td></td>
           </tr>
         <?php endforeach; ?>
 

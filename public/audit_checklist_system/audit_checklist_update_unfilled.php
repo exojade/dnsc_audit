@@ -4,6 +4,7 @@
   <link rel="stylesheet" href="AdminLTE/bower_components/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="AdminLTE_new/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="AdminLTE_new/plugins/bs-stepper/css/bs-stepper.min.css">
+  <link rel="stylesheet" href="AdminLTE_new/plugins/summernote/summernote-bs4.min.css">
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -11,7 +12,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Audit Report</h1>
+            <h1>Audit Checklist UNFILLED</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -91,7 +92,7 @@
               
                 <div class="card-body">
                 <form class="generic_form_trigger" data-url="audit_checklist" id="internalReportForm">
-                <input type="hidden" name="action" value="updateChecklist">
+                <input type="hidden" name="action" value="updateChecklistUnfilled">
                 <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
 
 <!-- <style>
@@ -135,34 +136,22 @@
                       <?php foreach($clause as $row): ?>
                         <div class="amik">
                         <div class="row ">
-                        <div class="col-7">
-                        <div class="form-group ">
-                            <input required value="<?php echo($row["clause"]); ?>" type="text" placeholder="Enter Clause Here" class="form-control" name="clause[]">
-                        </div>
-                    
+                        <div class="col-11">
+                        <div class="form-group">
+                        <textarea required placeholder="Enter observance/trail/remarks here!" class="form-control summernote" rows="3" name="clause[]"><?php echo($row["clause"]); ?></textarea>
+                      </div>
 
                         </div>
 
-                        <div class="col-3">
-                        <div class="form-group ">
-                          <select class="form-control" name="comply[]" required>
-                            <option   value="<?php echo($row["comply"]); ?>"><?php echo($row["comply"]); ?></option>
-                            <option   value="YES">YES</option>
-                            <option   value="NO">NO</option>
-
-                          </select>
-                        </div>
-                        </div>
-                        <div class="col-2">
+                
+                        <div class="col-1">
                         <span class="btn btn-block btn-danger remove-btn">X</span>
 
                         </div>
 
                       </div>
 
-                      <div class="form-group">
-                        <textarea required placeholder="Enter observance/trail/remarks here!" class="form-control" rows="3" name="remarks[]"><?php echo($row["trail"]); ?></textarea>
-                      </div>
+                    
                     </div>
 
                       <?php endforeach; ?>
@@ -243,91 +232,106 @@
 <script src="AdminLTE_new/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
 <script src="AdminLTE_new/plugins/bs-stepper/js/bs-stepper.min.js"></script>
-<script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script>
+<!-- <script src="AdminLTE_new/plugins/jquery-validation/jquery.validate.min.js"></script> -->
 <script src="AdminLTE_new/plugins/jquery-validation/additional-methods.min.js"></script>
+<script src="AdminLTE_new/plugins/summernote/summernote-bs4.min.js"></script>
 <?php require("layouts/footer.php") ?>
-
 <script>
-        $(document).ready(function () {
-            $("#addClause").click(function () {
-                let newClause = $(".amik:first").clone(); // Clone the first .form-group
-                newClause.find("input, textarea").val("") // Clear input field
-                $("#clauseContainer").append(newClause); // Append clone
-            });
+    $(document).ready(function () {
+        // Initialize existing summernotes
+        $('.summernote').summernote();
 
-            $(document).on("click", ".remove-btn", function () {
-                if ($(".amik").length > 1) {
-                    $(this).closest(".amik").remove(); // Remove only if more than 1 exists
-                } else {
-                    alert("At least one clause is required!");
-                }
+        // Add new clause
+        $("#addClause").click(function () {
+            let newClause = $(".amik:first").clone(); // Clone the first .amik
+            newClause.find("textarea").val(""); // Clear textarea
+            newClause.find(".note-editor").remove(); // Remove old Summernote UI if present (just in case)
+            newClause.find("textarea").removeClass('summernote'); // Remove class first (avoid double-init)
+            newClause.find("textarea").addClass('summernote'); // Re-add to make sure
+
+            $("#clauseContainer").append(newClause); // Append the clone
+
+            // Re-initialize Summernote for new textareas only
+            newClause.find(".summernote").summernote({
+                height: 100,
+                placeholder: 'Enter observance/trail/remarks here!'
             });
         });
-    </script>
+
+        // Remove clause
+        $(document).on("click", ".remove-btn", function () {
+            if ($(".amik").length > 1) {
+                $(this).closest(".amik").remove();
+            } else {
+                alert("At least one clause is required!");
+            }
+        });
+    });
+</script>
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function () {
-    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-  })
+// document.addEventListener('DOMContentLoaded', function () {
+//     window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+//   })
 
 
-  $(function () {
-  $('#internalReportForm').validate({
-    errorElement: 'span',
-    errorPlacement: function (error, element) {
-      error.addClass('invalid-feedback');
+//   $(function () {
+//   $('#internalReportForm').validate({
+//     errorElement: 'span',
+//     errorPlacement: function (error, element) {
+//       error.addClass('invalid-feedback');
 
-      // For radio buttons, append the error to the parent container
-      if (element.is(':radio')) {
-    // Append the error to the closest parent of the group (e.g., the <td>)
-    element.closest('tr').append(error);
-  } else {
-    // Default behavior for other input types
-    element.closest('.form-group').append(error);
-  }
-    },
-    highlight: function (element, errorClass, validClass) {
-      $(element).addClass('is-invalid').removeClass('is-valid');
-    },
-    unhighlight: function (element, errorClass, validClass) {
-      $(element).removeClass('is-invalid').addClass('is-valid');
-    },
-    success: function (label, element) {
-      $(element).addClass('is-valid'); // Adds green border when valid
-      $(element).closest('.form-group').find('span.valid-feedback').remove();
-    },
-    rules: {
-      // Add rules for radio buttons (if dynamically created, use attribute selectors)
-      'your_radio_group_name': {
-        required: true
-      }
-    },
-    messages: {
-      'your_radio_group_name': {
-        required: 'Please select an option.'
-      }
-    }
-  });
+//       // For radio buttons, append the error to the parent container
+//       if (element.is(':radio')) {
+//     // Append the error to the closest parent of the group (e.g., the <td>)
+//     element.closest('tr').append(error);
+//   } else {
+//     // Default behavior for other input types
+//     element.closest('.form-group').append(error);
+//   }
+//     },
+//     highlight: function (element, errorClass, validClass) {
+//       $(element).addClass('is-invalid').removeClass('is-valid');
+//     },
+//     unhighlight: function (element, errorClass, validClass) {
+//       $(element).removeClass('is-invalid').addClass('is-valid');
+//     },
+//     success: function (label, element) {
+//       $(element).addClass('is-valid'); // Adds green border when valid
+//       $(element).closest('.form-group').find('span.valid-feedback').remove();
+//     },
+//     rules: {
+//       // Add rules for radio buttons (if dynamically created, use attribute selectors)
+//       'your_radio_group_name': {
+//         required: true
+//       }
+//     },
+//     messages: {
+//       'your_radio_group_name': {
+//         required: 'Please select an option.'
+//       }
+//     }
+//   });
 
-  // Handle the Next button click
-  $('.btn-next').on('click', function (e) {
-    e.preventDefault(); // Prevent default action
+//   // Handle the Next button click
+//   $('.btn-next').on('click', function (e) {
+//     e.preventDefault(); // Prevent default action
 
-    // Check if the form is valid
-    if ($('#internalReportForm').valid()) {
-      stepper.next(); // Go to the next step if valid
-    } else {
-      // Focus on the first invalid element
-      $('#internalReportForm').find('.is-invalid').first().focus();
-    }
-  });
+//     // Check if the form is valid
+//     if ($('#internalReportForm').valid()) {
+//       stepper.next(); // Go to the next step if valid
+//     } else {
+//       // Focus on the first invalid element
+//       $('#internalReportForm').find('.is-invalid').first().focus();
+//     }
+//   });
 
-  // Handle the Previous button click
-  $('.btn-previous').on('click', function (e) {
-    e.preventDefault(); // Prevent default action
-    stepper.previous(); // Go to the previous step
-  });
-});
+//   // Handle the Previous button click
+//   $('.btn-previous').on('click', function (e) {
+//     e.preventDefault(); // Prevent default action
+//     stepper.previous(); // Go to the previous step
+//   });
+// });
 
 </script>

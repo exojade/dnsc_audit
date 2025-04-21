@@ -33,56 +33,140 @@
       <div class="container-fluid">
 
       <div class="row">
-        <div class="col-6">
+        <div class="col-12">
             <div class="card">
             <div class="card-header bg-success">
-              <h3 class="card-title"><b>Audit Checklist Settings</b></h3>
+              <h3 class="card-title"><b>Audit Checklist / Audit Report / Audit Evaluation Settings</b></h3>
             </div>
             <div class="card-body">
             <?php $audit_checklist = unserialize($all_settings[0]["audit_checklist"]); ?>
             <form class="generic_form_trigger" data-url="settings">
               <input type="hidden" name="action" value="update_audit_checklist_settings">
-              <div class="form-group">
-                <label>Header Image</label>
-                  <img id="audit_checklist_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["header"]); ?>">
-                  <div class="custom-file">
-                    <input name="header" type="file" class="custom-file-input customFile" id="audit_checklist_header_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-group">
+                      <label>Header Image</label>
+                      <hr>
+                        <img id="audit_checklist_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["header"]); ?>">
+                        <hr>
+                        <div class="custom-file">
+                          <input name="header" type="file" class="custom-file-input customFile" id="audit_checklist_header_input" accept=".png">
+                          <label class="custom-file-label" for="customFile">Choose file</label>
+                        </div>
                   </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
+                    <label>Footer Image</label>
+                      <hr>
+                      <img id="audit_checklist_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["footer"]); ?>">
+                      <hr>
+                      <div class="custom-file">
+                        <input name="footer" type="file" class="custom-file-input customFile" id="audit_checklist_footer_input" accept=".png">
+                        <label class="custom-file-label" for="customFile">Choose file</label>
+                      </div>
+                  </div>
+                </div>
               </div>
               <hr>
-              <div class="form-group">
-                <label>Footer Image</label>
-                  <img id="audit_checklist_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_checklist["footer"]); ?>">
-                  <div class="custom-file">
-                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_checklist_footer_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-              </div>
-
-              <table class="table table-bordered">
+              <div class="row">
+                <div class="col-4">
+                <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle" colspan="2">Audit Checklist</th>
+                </tr>
                 <tr>
                   <th class="align-middle">Form No.</th>
-                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_checklist["form_number"]); ?>"></td>
+                  <td><input required type="text" class="form-control" name="ac_form_number" value="<?php echo($audit_checklist["form_number"]); ?>"></td>
                 </tr>
                 <tr>
                   <th class="align-middle">Issue Status</th>
-                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_checklist["issue_status"]); ?>"></td>
+                  <td><input required type="text" class="form-control" name="ac_issue_status" value="<?php echo($audit_checklist["issue_status"]); ?>"></td>
                 </tr>
                 <tr>
                   <th class="align-middle">Revision No.</th>
-                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_checklist["revision_number"]); ?>"></td>
+                  <td><input required type="text" class="form-control" name="ac_revision_number" value="<?php echo($audit_checklist["revision_number"]); ?>"></td>
                 </tr>
                 <tr>
                   <th class="align-middle">Effective Date</th>
-                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_checklist["effective_date"]); ?>"></td>
+                  <td><input required type="text" class="form-control" name="ac_effective_date" value="<?php echo($audit_checklist["effective_date"]); ?>"></td>
                 </tr>
                 <tr>
                   <th class="align-middle">Approved By</th>
-                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_checklist["approved_by"]); ?>"></td>
+                  <td><input required type="text" class="form-control" name="ac_approved_by" value="<?php echo($audit_checklist["approved_by"]); ?>"></td>
                 </tr>
 
               </table>
+
+                </div>
+                <?php $audit_report = unserialize($all_settings[0]["audit_report"]); ?>
+
+
+                <div class="col-4">
+                <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle" colspan="2">Audit Report</th>
+                </tr>
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="ar_form_number" value="<?php echo($audit_report["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="ar_issue_status" value="<?php echo($audit_report["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="ar_revision_number" value="<?php echo($audit_report["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="ar_effective_date" value="<?php echo($audit_report["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="ar_approved_by" value="<?php echo($audit_report["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+                </div>
+                <?php $audit_evaluation = unserialize($all_settings[0]["audit_evaluation"]); ?>
+
+                <div class="col-4">
+
+                <table class="table table-bordered">
+                <tr>
+                  <th class="align-middle" colspan="2">Audit Evaluation</th>
+                </tr>
+                <tr>
+                  <th class="align-middle">Form No.</th>
+                  <td><input required type="text" class="form-control" name="ae_form_number" value="<?php echo($audit_evaluation["form_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Issue Status</th>
+                  <td><input required type="text" class="form-control" name="ae_issue_status" value="<?php echo($audit_evaluation["issue_status"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Revision No.</th>
+                  <td><input required type="text" class="form-control" name="ae_revision_number" value="<?php echo($audit_evaluation["revision_number"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Effective Date</th>
+                  <td><input required type="text" class="form-control" name="ae_effective_date" value="<?php echo($audit_evaluation["effective_date"]); ?>"></td>
+                </tr>
+                <tr>
+                  <th class="align-middle">Approved By</th>
+                  <td><input required type="text" class="form-control" name="ae_approved_by" value="<?php echo($audit_evaluation["approved_by"]); ?>"></td>
+                </tr>
+
+              </table>
+                  
+                </div>
+
+              </div>
+              
+
+              
               <hr>
               <button class="btn btn-primary" type="submit">Save</button>
 
@@ -94,125 +178,7 @@
           </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-            <div class="card-header bg-success">
-              <h3 class="card-title"><b>Audit Report Settings</b></h3>
-            </div>
-            <div class="card-body">
-            <?php $audit_report = unserialize($all_settings[0]["audit_report"]); ?>
-            <form class="generic_form_trigger" data-url="settings">
-              <input type="hidden" name="action" value="update_audit_report_settings">
-              <div class="form-group">
-                <label>Header Image</label>
-                  <img id="audit_report_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_report["header"]); ?>">
-                  <div class="custom-file">
-                    <input name="header" type="file" class="custom-file-input customFile" id="audit_report_header_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-              </div>
-              <hr>
-              <div class="form-group">
-                <label>Footer Image</label>
-                  <img id="audit_report_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_report["footer"]); ?>">
-                  <div class="custom-file">
-                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_report_footer_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-              </div>
-
-              <table class="table table-bordered">
-                <tr>
-                  <th class="align-middle">Form No.</th>
-                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_report["form_number"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Issue Status</th>
-                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_report["issue_status"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Revision No.</th>
-                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_report["revision_number"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Effective Date</th>
-                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_report["effective_date"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Approved By</th>
-                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_report["approved_by"]); ?>"></td>
-                </tr>
-
-              </table>
-              <hr>
-              <button class="btn btn-primary" type="submit">Save</button>
-
-            </form>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="col-6">
-            <div class="card">
-            <div class="card-header bg-success">
-              <h3 class="card-title"><b>Audit Evaluation Settings</b></h3>
-            </div>
-            <div class="card-body">
-            <?php $audit_evaluation = unserialize($all_settings[0]["audit_evaluation"]); ?>
-            <form class="generic_form_trigger" data-url="settings">
-              <input type="hidden" name="action" value="update_audit_evaluation_settings">
-              <div class="form-group">
-                <label>Header Image</label>
-                  <img id="audit_evaluation_header" style="max-width: 100%; height: auto;" src="<?php echo($audit_evaluation["header"]); ?>">
-                  <div class="custom-file">
-                    <input name="header" type="file" class="custom-file-input customFile" id="audit_evaluation_header_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-              </div>
-              <hr>
-              <div class="form-group">
-                <label>Footer Image</label>
-                  <img id="audit_evaluation_footer" style="max-width: 100%; height: auto;" src="<?php echo($audit_evaluation["footer"]); ?>">
-                  <div class="custom-file">
-                    <input name="footer" type="file" class="custom-file-input customFile" id="audit_evaluation_footer_input" accept=".png">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-              </div>
-
-              <table class="table table-bordered">
-                <tr>
-                  <th class="align-middle">Form No.</th>
-                  <td><input required type="text" class="form-control" name="form_number" value="<?php echo($audit_evaluation["form_number"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Issue Status</th>
-                  <td><input required type="text" class="form-control" name="issue_status" value="<?php echo($audit_evaluation["issue_status"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Revision No.</th>
-                  <td><input required type="text" class="form-control" name="revision_number" value="<?php echo($audit_evaluation["revision_number"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Effective Date</th>
-                  <td><input required type="text" class="form-control" name="effective_date" value="<?php echo($audit_evaluation["effective_date"]); ?>"></td>
-                </tr>
-                <tr>
-                  <th class="align-middle">Approved By</th>
-                  <td><input required type="text" class="form-control" name="approved_by" value="<?php echo($audit_evaluation["approved_by"]); ?>"></td>
-                </tr>
-
-              </table>
-              <hr>
-              <button class="btn btn-primary" type="submit">Save</button>
-
-            </form>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="col-6">
+        <div class="col-12">
             <div class="card">
             <div class="card-header bg-success">
               <h3 class="card-title"><b>Audit Plan Settings</b></h3>

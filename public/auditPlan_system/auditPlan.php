@@ -185,36 +185,33 @@
 	
 	
 	
-					$i = 0;
-					foreach($data as $row):
-						if($AP[$row["audit_plan"]]["status"] == "ONGOING"):
-							$data[$i]["action"] = '<a href="auditPlan?action=auditorDetails&id='.$row["audit_plan"].'" class="btn btn-block btn-sm btn-success">Details</a>';
-						
-							$data[$i]["create_count"] = 0;
-							$data[$i]["pending_count"] = 0;
-							$data[$i]["done_count"] = 0;
-	
-							if(isset($thePlans[$row["audit_plan"]])):
-								$data[$i]["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
-								$data[$i]["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
-								$data[$i]["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
-							endif;
-						else:
-							unset($data[$i]);
-						endif;
-						$i++;
+					// $i = 0;
+					$newData = [];
+					foreach ($data as $row) {
+						if ($AP[$row["audit_plan"]]["status"] == "ONGOING") {
+							$row["action"] = '<a href="auditPlan?action=auditorDetails&id=' . $row["audit_plan"] . '" class="btn btn-block btn-sm btn-success">Details</a>';
 
+							$row["create_count"] = 0;
+							$row["pending_count"] = 0;
+							$row["done_count"] = 0;
 
-						
-					endforeach;
+							if (isset($thePlans[$row["audit_plan"]])) {
+								$row["create_count"] = $thePlans[$row["audit_plan"]]["create_count"];
+								$row["pending_count"] = $thePlans[$row["audit_plan"]]["pending_count"];
+								$row["done_count"] = $thePlans[$row["audit_plan"]]["done_count"];
+							}
+
+							$newData[] = $row;
+						}
+					}
+					// dump($data);
 					$json_data = array(
 						"draw" => $draw + 1,
 						"iTotalRecords" => count($all_data),
 						"iTotalDisplayRecords" => count($all_data),
-						"aaData" => $data
+						"aaData" => $newData
 					);
 					echo json_encode($json_data);
-
 		
 
 
@@ -350,6 +347,7 @@
 
 			query("delete from audit_plan_team_members where team_id = ?", $_POST["team_id"]);
 			query("delete from audit_plan_teams where team_id = ?", $_POST["team_id"]);
+			query("delete from audit_plan_schedule where team_id = ?", $_POST["team_id"]);
 
 			$res_arr = [
 				"result" => "success",
@@ -370,7 +368,8 @@
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
 				$where = " where audit_plan = '".$_POST["audit_plan"]."'";
-				$baseQuery = "select * from audit_plan_teams" . $where;
+				$order_by = " order by team_number asc";
+				$baseQuery = "select * from audit_plan_teams" . $where . $order_by;
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 
@@ -435,28 +434,32 @@
 			$html = "";
 
 			$html.='
-
 			<input type="hidden" name="audit_plan" value="'.$_POST["audit_plan"].'">
+
+			<label>Audit Type</label>
+			<select name="audit_type" class="form-control" required>
+				<option value="REGULAR" ' . ($audit_plan["audit_type"] == "REGULAR" ? "selected" : "") . '>REGULAR</option>
+				<option value="SPECIAL" ' . ($audit_plan["audit_type"] == "SPECIAL" ? "selected" : "") . '>SPECIAL</option>
+			</select>
+
+			<div class="form-group">
+			<label>Scope</label>
+              <textarea name="scope" required class="summernote form-control">'.$audit_plan["scope"].'</textarea>
+			</div>
+			
+
 			<label>Introduction</label>
-              <textarea name="introduction"  required class="summernote">
-			  '.$audit_plan["introduction"].'
-            </textarea>
+              <textarea name="introduction"  required class="summernote">'.$audit_plan["introduction"].'</textarea>
 
 
 			<label>Audit Objectives</label>
-              <textarea name="audit_objectives" required class="summernote">
-			  '.$audit_plan["audit_objectives"].'
-            </textarea>
+              <textarea name="audit_objectives" required class="summernote">'.$audit_plan["audit_objectives"].'</textarea>
 
             <label>Reference Standard</label>
-              <textarea name="reference_standard" required class="summernote">
-			  '.$audit_plan["reference_standard"].'
-            </textarea>
+              <textarea name="reference_standard" required class="summernote">'.$audit_plan["reference_standard"].'</textarea>
 
             <label>Audit Methodologies</label>
-              <textarea name="audit_methodologies" required class="summernote">
-			  '.$audit_plan["audit_methodologies"].'
-            </textarea>
+              <textarea name="audit_methodologies" required class="summernote">'.$audit_plan["audit_methodologies"].'</textarea>
 			';
 
 			echo($html);
@@ -961,7 +964,9 @@
 					introduction = '".$_POST["introduction"]."',
 					audit_objectives = '".$_POST["audit_objectives"]."',
 					reference_standard = '".$_POST["reference_standard"]."',
-					audit_methodologies = '".$_POST["audit_methodologies"]."'
+					audit_methodologies = '".$_POST["audit_methodologies"]."',
+					scope = '".$_POST["scope"]."',
+					audit_type = '".$_POST["audit_type"]."'
 					where audit_plan = ?", $_POST["audit_plan_id"]);
 
 
@@ -1218,10 +1223,12 @@
 				$audit_plan_id = "AP" . $_POST["year"] . "-" . $typeMapping[$_POST["type"]] . "-" . $monthMapping[$_POST["type"]];
 				$result = query("INSERT INTO audit_plans 
 									(audit_plan, type, introduction, audit_objectives, reference_standard,
-									 audit_methodologies, year, status, created_by, timestamp) 
-								VALUES(?,?,?,?,?,?,?,?,?,?)", 
+									 audit_methodologies, year, status, created_by, timestamp, audit_type, scope) 
+								VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", 
 								$audit_plan_id, $_POST["type"], $_POST["introduction"], $_POST["audit_objectives"] , $_POST["reference_standard"],
-								$_POST["audit_methodologies"], $_POST["year"], "FOR REVIEW", $_SESSION["dnsc_audit"]["userid"], time());
+								$_POST["audit_methodologies"], $_POST["year"], "FOR REVIEW", $_SESSION["dnsc_audit"]["userid"], time(),
+								$_POST["audit_type"], $_POST["scope"]
+							);
 			
 				// Check if query() function encountered an error
 				// if (!$result) {
@@ -1666,7 +1673,7 @@
 						'margin_top' => 40,
 						'margin_left' => 0,
 						'margin_right' => 0,
-						'margin_bottom' => 10,
+						'margin_bottom' => 40,
 						'margin_footer' => 0,
 						'default_font' => 'helvetica'
 					]);
@@ -1790,6 +1797,20 @@
 							<td>'.$auditPlan["audit_methodologies"].'</td>
 						</tr>
 						<tr>
+							<td width="20%" class="text-center">Type</td>
+							<td>
+							<span>Regular / Full (' . ($auditPlan["audit_type"] == "REGULAR" ? "✔" : "") . ')</span> &nbsp;&nbsp;
+							<span>Special (' . ($auditPlan["audit_type"] == "SPECIAL" ? "✔" : "") . ')</span>
+						</td>
+						</tr>
+
+						<tr>
+							<td width="20%" class="text-center">Scope</td>
+							<td>'.$auditPlan["scope"].'</td>
+						</tr>
+
+						
+						<tr>
 							<td width="20%" class="text-center">Audit Team</td>
 							<td>Members</td>
 						</tr>
@@ -1901,6 +1922,19 @@
 						</tr>
 						';
 
+						if($day == 1):
+							$html.='
+							<tr>
+								<th class="text-center"><b>Time</b></th>
+								<th class="text-center"><b>Process/Audit Area</b></th>
+								<th class="text-center"><b>Audit Criteria/Clauses</b></th>
+								<th class="text-center"><b>Auditor/s</b></th>
+								<th class="text-center"><b>Area/Functions/Process Owners/Auditee</b></th>
+							</tr>
+							';
+						endif;
+
+
 						if(isset($TheSchedule[$row["schedule_date"]])):
 							// dump($TheSchedule[$row["schedule_date"]]);
 							foreach($TheSchedule[$row["schedule_date"]] as $sched):
@@ -1968,30 +2002,43 @@
 				
 
 					$html.='
-					<table class="table table-borderless" style="border: none !important;">
-					<tbody style="border: none !important;">
-						<tr style="border: none !important;">
-							<td style="border: none !important;" width="33%" ><b>Created By</b></td>
-							<td style="border: none !important;" width="33%" ><b>Quality Assurance Director</b></td>
-							<td style="border: none !important;" width="33%" ><b>College Management Team</b></td>
-						</tr>
-						<tr  style="border: none !important;">
-							<td colspan="3">&nbsp;</td>
-						</tr>
-						<tr style="border-bottom: 1px solid black;">
-							<td style="border: none !important;" width="33%" ><b>'.$created_by.'</b></td>
-							<td style="border: none !important;" width="33%" ><b>'.$qad_approved.'</b></td>
-							<td style="border: none !important;" width="33%" ><b>'.$cmt_approved.'</b></td>
-						</tr>
-					</tbody>
-					</table>
+				
 					</div>
 					';
 
+					$html .= '
 
+					<div class="container" style="page-break-inside: avoid;">
+					<table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; font-size: 12px;">
+						<tr>
+							<td width="80%" colspan="2" style="vertical-align: top;">
+							<b>Prepared by:</b><br><br><br>
+							<strong><b>'.$created_by.'</b></strong><br>
+							<span style="font-size: 11px;">Internal Lead Auditor</span>
+							</td>
+							<td width="20%" style="vertical-align: top;">
+							<strong>Date:</strong><br><br><br>
+							</td>
+						</tr>
+						<tr>
+							<td width="40%" style="vertical-align: top;">
+							<b>Reviewed by:</b><br><br><br>
+							<b>'.$qad_approved.'</b><br>
+							<span style="font-size: 11px;">Director for Quality Assurance / QMC</span>
+							</td>
+							<td width="40%" style="vertical-align: top;">
+							<b>Approved by:</b><br><br><br>
+							<b>'.$cmt_approved.'</b><br>
+							<span style="font-size: 11px;">College Management Team</span>
+							</td>
+							<td width="20%" style="vertical-align: top;">
+							<strong>Date</strong>
+							</td>
+						</tr>
+						</table>
+						</div>
+						';
 					$mpdf->WriteHTML($html);
-
-					
 
 					$filename = "audit_plan";
 					$path = "reports/".$filename.".pdf";

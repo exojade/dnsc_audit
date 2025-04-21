@@ -489,6 +489,27 @@
                   <?php endif; ?>
                   
                   <hr>
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Audit Type</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["audit_type"]); ?>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"><b>Scope</b></h3>
+                    </div>
+                    <div class="card-body">
+                    <?php echo($auditPlan["scope"]); ?>
+                    </div>
+                  </div>
+
+
+
                   <div class="card">
                     <div class="card-header">
                       <h3 class="card-title"><b>Introduction</b></h3>
