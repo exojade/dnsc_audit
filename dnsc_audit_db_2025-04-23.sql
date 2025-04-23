@@ -871,7 +871,7 @@ CREATE TABLE `utility_settings` (
   `audit_report` text,
   `audit_checklist` text,
   `audit_evaluation` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `utility_settings` */
 
