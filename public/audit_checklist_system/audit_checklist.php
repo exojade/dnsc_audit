@@ -23,25 +23,35 @@
 
 
 				$audit_plans = "
-					SELECT 
-						aps.audit_plan,
-						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
-						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
-						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
-					FROM 
-						audit_plan_schedule aps
-					LEFT JOIN 
-						process p ON p.process_id = aps.process_id
-					LEFT JOIN 
-						aps_area aa ON aa.aps_id = aps.aps_id
-					LEFT JOIN 
-						areas a ON a.id = aa.area_id
-					LEFT JOIN 
-						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
-						WHERE 
-						aps.team_id IN ($myTeam)
-						group by aps.audit_plan
-					";
+	SELECT 
+		aps.audit_plan,
+		SUM(CASE 
+			WHEN ar.audit_checklist_status IN ('PENDING FILLED', 'PENDING UNFILLED') THEN 1 
+			ELSE 0 
+		END) AS pending_count,
+		SUM(CASE 
+			WHEN ar.audit_checklist_status IS NULL THEN 1 
+			ELSE 0 
+		END) AS create_count, -- NULL means 'CREATE'
+		SUM(CASE 
+			WHEN ar.audit_checklist_status = 'DONE' THEN 1 
+			ELSE 0 
+		END) AS done_count
+	FROM 
+		audit_plan_schedule aps
+	LEFT JOIN 
+		process p ON p.process_id = aps.process_id
+	LEFT JOIN 
+		aps_area aa ON aa.aps_id = aps.aps_id
+	LEFT JOIN 
+		areas a ON a.id = aa.area_id
+	LEFT JOIN 
+		audit_checklist ar ON ar.aps_area = aa.area_id AND ar.aps_id = aps.aps_id
+	WHERE 
+		aps.team_id IN ($myTeam)
+	GROUP BY 
+		aps.audit_plan
+";
 					$audit_plans = query($audit_plans);
 
 					$thePlans = [];
@@ -297,13 +307,24 @@ echo json_encode($json_data);
 							
 							';
 						else:
-							$data[$i]["action"] = '
-									<div class="btn-block btn-group">
-										<a href="audit_checklist?action=update_unfilled&id='.$row["audit_checklist_id"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
-										<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
-									</div>
+
+							if($row["audit_checklist_status"] == "PENDING FILLED"):
+								$data[$i]["action"] = '
+								<div class="btn-block btn-group">
+									<a href="audit_checklist?action=update_filled&id='.$row["audit_checklist_id"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
+									<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
+								</div>
+						';
+							else:
+								$data[$i]["action"] = '
+								<div class="btn-block btn-group">
+									<a href="audit_checklist?action=update_unfilled&id='.$row["audit_checklist_id"].'" class="btn btn-warning btn-sm" ><i class="fa fa-edit"></i></a>
+									<a target="_blank" href="evidence?action=myEvidence&root='.$row["area_id"].'" class="btn btn-danger btn-sm" ><i class="fa fa-folder"></i></a>
+								</div>
+						';
+							endif;
+
 							
-							';
 						endif;
 					else:
 						$data[$i]["action"] = '
@@ -425,10 +446,10 @@ echo json_encode($json_data);
 						'mode' => 'utf-8',
 						'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
 						'debug' => true,
-						'margin_top' => 10,
+						'margin_top' => 40,
 						'margin_left' => 0,
 						'margin_right' => 0,
-						'margin_bottom' => 2,
+						'margin_bottom' => 35,
 						'margin_footer' => 0,
 						'default_font' => 'helvetica'
 					]);
@@ -528,11 +549,6 @@ echo json_encode($json_data);
 					}
 
 					</style>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
 					
 <div class="container">
 		
@@ -773,10 +789,10 @@ $html .= '</tbody></table>';
 										'mode' => 'utf-8',
 										'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
 										'debug' => true,
-										'margin_top' => 10,
+										'margin_top' => 40,
 										'margin_left' => 0,
 										'margin_right' => 0,
-										'margin_bottom' => 2,
+										'margin_bottom' => 35,
 										'margin_footer' => 0,
 										'default_font' => 'helvetica'
 									]);
@@ -876,11 +892,6 @@ $html .= '</tbody></table>';
 									}
 				
 									</style>
-									<br>
-									<br>
-									<br>
-									<br>
-									<br>
 									
 				<div class="container">
 						

@@ -415,26 +415,35 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
 					$myTeam = "'" . implode("','", $teamIds) . "'";
 
 					$audit_plans = "
-					SELECT 
-						aps.audit_plan,
-						SUM(CASE WHEN ar.audit_checklist_status = 'PENDING' THEN 1 ELSE 0 END) AS pending_count,
-						SUM(CASE WHEN ar.audit_checklist_status IS NULL THEN 1 ELSE 0 END) AS create_count, -- NULL means 'CREATE'
-						SUM(CASE WHEN ar.audit_checklist_status = 'DONE' THEN 1 ELSE 0 END) as done_count
-					FROM 
-						audit_plan_schedule aps
-					LEFT JOIN 
-						process p ON p.process_id = aps.process_id
-					LEFT JOIN 
-						aps_area aa ON aa.aps_id = aps.aps_id
-					LEFT JOIN 
-						areas a ON a.id = aa.area_id
-					LEFT JOIN 
-						audit_checklist ar ON ar.aps_area = aa.area_id and ar.aps_id = aps.aps_id
-          LEFT JOIN
-            audit_plans ap on ap.audit_plan = aps.audit_plan
-						WHERE 
-						aps.team_id IN ($myTeam) and ap.status = 'ONGOING'
-					";
+	SELECT 
+		aps.audit_plan,
+		SUM(CASE 
+			WHEN ar.audit_checklist_status IN ('PENDING FILLED', 'PENDING UNFILLED') THEN 1 
+			ELSE 0 
+		END) AS pending_count,
+		SUM(CASE 
+			WHEN ar.audit_checklist_status IS NULL THEN 1 
+			ELSE 0 
+		END) AS create_count, -- NULL means 'CREATE'
+		SUM(CASE 
+			WHEN ar.audit_checklist_status = 'DONE' THEN 1 
+			ELSE 0 
+		END) AS done_count
+	FROM 
+		audit_plan_schedule aps
+	LEFT JOIN 
+		process p ON p.process_id = aps.process_id
+	LEFT JOIN 
+		aps_area aa ON aa.aps_id = aps.aps_id
+	LEFT JOIN 
+		areas a ON a.id = aa.area_id
+	LEFT JOIN 
+		audit_checklist ar ON ar.aps_area = aa.area_id AND ar.aps_id = aps.aps_id
+	LEFT JOIN 
+		audit_plans ap ON ap.audit_plan = aps.audit_plan
+	WHERE 
+		aps.team_id IN ($myTeam) AND ap.status = 'ONGOING'
+";
 					$audit_plans = query($audit_plans);
           ?>
           <?php if(!empty($audit_plans)): ?>
