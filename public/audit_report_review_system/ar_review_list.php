@@ -211,7 +211,7 @@ $('#aps_details').on('show.bs.modal', function (e) {
 
 var datatable = 
             $('#ajax_datatable').DataTable({
-                "searching": true,
+                "searching": false,
                 "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"

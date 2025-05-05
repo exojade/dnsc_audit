@@ -661,9 +661,9 @@ font-size: 12px;
 <table class="tbl2" style="font-size: 12px; padding-top: 10px; height: 800px; table-layout: fixed; width: 100%; border-collapse: collapse; display: block;">
     <tbody style="display: block; height: 800px; overflow: hidden;">
     <tr style="height: 50px; display: table; width: 100%;">
-        <td width="73%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT TRAIL</td>
-        <td width="7%" style="text-align: center; font-weight: bold; border: 1px solid black;">Comply (Y/N)</td>
-        <td width="20%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT FINDINGS/NOTES/REMARKS (evidence)</td>
+        <td width="45%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT TRAIL</td>
+        <td width="10%" style="text-align: center; font-weight: bold; border: 1px solid black;">Comply (Y/N)</td>
+        <td width="45%" style="text-align: center; font-weight: bold; border: 1px solid black;">AUDIT FINDINGS/NOTES/REMARKS (evidence)</td>
     </tr>';
 
 $clause = unserialize($audit_checklist["audit_trail_array"]);

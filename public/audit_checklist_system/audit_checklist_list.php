@@ -105,7 +105,7 @@
 
 var datatable = 
             $('#ajax_datatable').DataTable({
-                "searching": true,
+                "searching": false,
                 "pageLength": 10,
                 language: {
                     searchPlaceholder: "Search Name"

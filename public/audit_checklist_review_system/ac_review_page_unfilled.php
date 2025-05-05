@@ -64,7 +64,7 @@
                 <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
                   <label>Reviewer's Comments</label>
-                <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <textarea rows="5" class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
                 <hr>
                 </div>
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
