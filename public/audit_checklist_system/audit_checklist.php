@@ -463,7 +463,7 @@ echo json_encode($json_data);
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
-					<div class="container">
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<div class="row">
 						<div class="col-xs-8">
 							<img src="'.$settings["header"].'" 
@@ -550,7 +550,7 @@ echo json_encode($json_data);
 
 					</style>
 					
-<div class="container">
+<div class="container" style="margin-left:35px; margin-right:35px;">
 		
 					<h4 class="text-center"><b>AUDIT CHECKLIST</b></h4>
 
@@ -806,7 +806,7 @@ $html .= '</tbody></table>';
 									<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 									<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 									<link rel="stylesheet" href="resources/footerStyles.css">
-									<div class="container">
+									<div class="container" style="margin-left:35px; margin-right:35px;">
 									<div class="row">
 										<div class="col-xs-8">
 											<img src="'.$settings["header"].'" 
@@ -893,7 +893,7 @@ $html .= '</tbody></table>';
 				
 									</style>
 									
-				<div class="container">
+				<div class="container" style="margin-left:35px; margin-right:35px;">
 						
 									<h4 class="text-center"><b>AUDIT CHECKLIST</b></h4>
 				

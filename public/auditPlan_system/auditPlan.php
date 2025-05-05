@@ -1690,7 +1690,7 @@
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
-					
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<div class="row" >
 						<div class="col-xs-9">
 							<img src="'.$settings["header"].'" 
@@ -1722,6 +1722,7 @@
 							</table>
 						
 						</div>
+					</div>
 					</div>
 			
 					');
@@ -1775,7 +1776,7 @@
 					}
 
 					</style>
-					<div class="container">
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<h4 class="text-center"><b><i>QUALITY MANAGEMENT SYSTEM OFFICE</b></i></h4>
 					<h4 class="text-center"><b>Audit Plan</b></h4>
 
@@ -1902,7 +1903,7 @@
 					}
 
 					</style>
-					<div class="container">
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<table class="table" style="margin-top: 10px;">
 					<tbody>
 						<tr>
@@ -2009,7 +2010,7 @@
 
 					$html .= '
 
-					<div class="container" style="page-break-inside: avoid;">
+					<div class="container"  style="page-break-inside: avoid; margin-left:35px; margin-right:35px;">
 					<table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; font-size: 12px;">
 						<tr>
 							<td width="80%" colspan="2" style="vertical-align: top;">

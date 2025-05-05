@@ -437,7 +437,7 @@
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
 					<link rel="stylesheet" href="AdminLTE/bower_components/font-awesome/css/font-awesome.min.css">
-					<div class="container">
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 						<div class="row">
 							<div class="col-xs-8">
 								<img src="'.$settings["header"].'" 
@@ -525,7 +525,7 @@
 					}
 
 					</style>
-					<div class="container">
+					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<h4 class="text-center"><b>INTERNAL AUDITORS EVALUATION</b></h4>
 
 				<br>
@@ -765,7 +765,7 @@ font-size: 12px;
 
 					
 
-					$filename = "audit_report";
+					$filename = "audit_evaluation";
 					$path = "reports/".$filename.".pdf";
 					$mpdf->Output($path, \Mpdf\Output\Destination::FILE);
 

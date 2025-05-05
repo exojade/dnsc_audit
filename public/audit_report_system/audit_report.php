@@ -501,7 +501,7 @@
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<link rel="stylesheet" href="resources/footerStyles.css">
-					<div class="container">
+					<div class="container" style="margin-left: 45px; margin-right:45px;">
 					<div class="row">
 						<div class="col-xs-8">
 							<img src="'.$settings["header"].'" 
@@ -652,7 +652,7 @@ font-size: 12px;
 						font-size:9px;
 					}
 					</style>
-					<div class="container">
+					<div class="container" style="margin-left: 50px; margin-right:50px;">
 					<h4 class="text-center"><b>Internal Audit Report</b></h4>
 
 				<br>
@@ -861,7 +861,7 @@ font-size: 12px;
 					</style>
 					';
 					$html2.='
-					<div class="container">
+					<div class="container" style="margin-left: 50px; margin-right:50px;">
 					<table class="tbl2" style="font-size: 12px; padding-top: 10px;">
 											<tr>
 												<td width="20%" style="text-align: center;"><b>CAR FORM #</b></td>
@@ -911,7 +911,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td width="40%">
 												<b>Audit Report prepared by:</b>
 												</td>
-												<td class="p-2 nw" width="50%">
+												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
 												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$aptm.'</td>
@@ -922,8 +922,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 											</tr>
                                         </table>
 												</td>
-												<td width="10%">
-												</td>
+												
 
 											
                                        
@@ -932,7 +931,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td width="40%">
 												<b>Audit Report Conformed by:</b>
 												</td>
-												<td class="p-2 nw" width="50%">
+												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
 												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$Auditees.'</td>
@@ -943,9 +942,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 											</tr>
                                         </table>
 												</td>
-												<td width="10%">
-												</td>
-
+								
 											
                                        
                                             </tr>
@@ -953,7 +950,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td width="40%">
 												<b>Audit Report reviewed by:</b>
 												</td>
-												<td class="p-2 nw" width="50%">
+												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
 												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["reviewed_by"].'</td>
@@ -964,8 +961,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 											</tr>
                                         </table>
 												</td>
-												<td width="10%">
-												</td>
+												
 
 											
                                        
