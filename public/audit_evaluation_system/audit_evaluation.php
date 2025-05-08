@@ -75,7 +75,7 @@
 					$data[$i]["process_name"] = $Process[$row["process_id"]]["process_name"];
 					$data[$i]["area"] = $Area[$row["aps_area"]]["area_name"];
 
-					$data[$i]["action"] = '<a href="audit_evaluation?action=create&id='.$row["audit_report_id"].'" class="btn btn-block btn-sm btn-warning">Create</a>';
+					$data[$i]["action"] = '<a href="audit_evaluation?action=create&id='.$row["audit_report_id"].'" class="btn btn-block btn-sm btn-warning">Evaluate</a>';
 					$i++;
 				endforeach;
 				$json_data = array(

@@ -109,7 +109,7 @@
                     <div class="line"></div>
                     <div class="step" data-target="#suggestion-part">
                       <button type="button" class="step-trigger" role="tab" aria-controls="suggestion-part" id="suggestion-part-trigger">
-                        <span class="bs-stepper-circle">3</span>
+                        <span class="bs-stepper-circle">2</span>
                         <span class="bs-stepper-label">Comments / Suggestions</span>
                       </button>
                     </div>
