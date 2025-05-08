@@ -704,9 +704,9 @@ font-size: 12px;
 												<td colspan="3"><b>Review the applicable procedure(s) for this process and answer the questions below.</b></td>
                                             </tr>
 											<tr>
-												<td style="text-align: center;"><b>Questions</b></td>
-												<td></td>
-												<td></td>
+												<th style="text-align: center;"><b>Questions</b></th>
+												<th style="text-align: center;">Y/N (or N/A)</th>
+												<th style="text-align: center;">Evidence or Notes Sheet Ref.#, ISO Clauses</th>
                                             </tr>
 											
 											';
@@ -914,7 +914,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
-												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$aptm.'</td>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.strtoupper($aptm).'</td>
 				
 											</tr>
 											<tr>
@@ -934,7 +934,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
-												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$Auditees.'</td>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.strtoupper($Auditees).'</td>
 				
 											</tr>
 											<tr>
@@ -953,7 +953,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 												<td class="p-2 nw" width="60%">
 												<table class="tbl" style="font-size: 12px; padding-top: 10px;">
 											<tr>
-												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.$audit_report["reviewed_by"].'</td>
+												<td class="p-2 nw text-center" style="border-bottom: 1px solid black;">'.strtoupper($audit_report["reviewed_by"]).'</td>
 				
 											</tr>
 											<tr>

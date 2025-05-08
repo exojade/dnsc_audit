@@ -709,9 +709,9 @@ $html .= '</tbody></table>';
                                             </tr>
 
 											<tr>
-												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["prepared_by"].'</td>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($audit_checklist["prepared_by"]).'</td>
 												<td></td>
-												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["reviewed_by"].'</td>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($audit_checklist["reviewed_by"]).'</td>
 											</tr>
                                         </table>
 												</td>
@@ -1053,9 +1053,9 @@ $html .= '</tbody></table>';
 															</tr>
 				
 															<tr>
-																<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["prepared_by"].'</td>
+																<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($audit_checklist["prepared_by"]).'</td>
 																<td></td>
-																<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_checklist["reviewed_by"].'</td>
+																<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($audit_checklist["reviewed_by"]).'</td>
 															</tr>
 														</table>
 																</td>

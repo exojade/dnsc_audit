@@ -26,11 +26,11 @@
 				$where .= ' and (firstname like "%'.$search.'%" or surname like "%'.$search.'%" or username like "%'.$search.'%")';
 				$baseQuery = "select * from audit_plans" . $where;
 				else:
-					$baseQuery = "select * from audit_plans" . $where;
+					$baseQuery = "select audit_plan, year, status, qad_approved, cmt_approved, type from audit_plans" . $where;
 				endif;
 				$data = query($baseQuery . $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
-
+				// dump($data);
 
 
 				$i = 0;
@@ -42,9 +42,6 @@
 					if($row["cmt_approved"] != ""):
 						$data[$i]["cmt_approved"] = $Users[$row["cmt_approved"]]["fullname"];
 					endif;
-					
-					
-					
 					$i++;
 				endforeach;
 				$json_data = array(
@@ -53,7 +50,9 @@
 					"iTotalDisplayRecords" => count($all_data),
 					"aaData" => $data
 				);
+				// dump($data);
 				echo json_encode($json_data);
+				exit();
 		
 		elseif($_POST["action"] == "audit_plan_process_owner_list"):
 			// dump($_POST);
@@ -1742,40 +1741,87 @@
 
 					$html = "";
 
+					// dump(removeInlineStyles($auditPlan["audit_objectives"]));
+
 					$html .='
 
 					<link rel="stylesheet" href="AdminLTE/dist/css/AdminLTE.min.css">
 					<link rel="stylesheet" href="AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
 					<link rel="stylesheet" href="AdminLTE/dist/css/skins/_all-skins.min.css">
 					<style>
-					.table, th, td, thead, tbody{
-						border: 1px solid black !important;
-						padding: 2px !important;
-					}
-					h5{
-						margin:0px !important;
-						padding:0px !important;
-						margin-bottom: 4px !important
-						font-size: 15px !important;
-						font-weight: 800;
-					}
+  /* Table Styles */
+  .table, th, td, thead, tbody {
+    border: 1px solid black !important;
+    padding: 2px !important;
+  }
 
-					h4{
-						margin:0px !important;
-						padding:0px !important;
-						margin-bottom: 4px !important
-						font-size: 100px !important;
-						font-weight: 800;
-						color:#000 !important;
-					}
+  /* h5 Styling */
+  h5 {
+    margin: 0px !important;
+    padding: 0px !important;
+    margin-bottom: 4px !important;
+    font-size: 15px !important;
+    font-weight: 800;
+  }
 
+  /* h4 Styling */
+  h4 {
+    margin: 0px !important;
+    padding: 0px !important;
+    margin-bottom: 4px !important;
 
+    font-weight: 800;
+    color: #000 !important;
+  }
 
-					b{
-						font-weight: bold;
-					}
+  /* Paragraph, List, and Span Styling */
+ul {
+  list-style-position: outside !important; /* Ensures bullets are outside */
+  margin-left: 0 !important; /* Removes margin */
+  padding-left: 40px !important; /* Indentation for better bullet spacing */
+  margin-bottom: 0 !important; /* Removes bottom margin */
+}
 
-					</style>
+li {
+  margin-bottom: 10px !important; /* Spacing between list items */
+  text-align: justify !important; /* Ensures the text is aligned */
+  line-height: 1.5 !important; /* Spacing between lines of text */
+  list-style-type: disc !important; /* Bullets */
+  padding-left: 20px !important; /* Adds more space between the bullet and text */
+}
+
+ul {
+        padding-left: 40px;
+        list-style-type: disc;
+        margin-bottom: 0;
+    }
+    li {
+        margin-bottom: 10px;
+		padding-left: 40px !important;
+        line-height: 1.5;
+        text-align: justify;
+    }
+		li::before {
+    content: "\00a0"; /* Unicode for non-breaking space */
+    display: inline-block;
+    width: 10px;
+	text-align: justify; /* Adjust width for spacing */
+}
+    p, span {
+        font-size: 14px;
+        font-family: "Arial", sans-serif;
+        color: #000;
+        line-height: 1.5;
+    }
+
+  /* LI Styling */
+  
+
+  /* Bold Styling */
+  b {
+    font-weight: bold;
+  }
+</style>
 					<div class="container" style="margin-left:35px; margin-right:35px;">
 					<h4 class="text-center"><b><i>QUALITY MANAGEMENT SYSTEM OFFICE</b></i></h4>
 					<h4 class="text-center"><b>Audit Plan</b></h4>
@@ -1784,19 +1830,19 @@
 					<tbody>
 						<tr>
 							<td width="20%" class="text-center">Introduction</td>
-							<td>'.$auditPlan["introduction"].'</td>
+							<td>'.removeInlineStyles($auditPlan["introduction"]).'</td>
 						</tr>
 						<tr>
 							<td width="20%" class="text-center">Audit Objectives</td>
-							<td>'.$auditPlan["audit_objectives"].'</td>
+							<td>'.removeInlineStyles($auditPlan["audit_objectives"]).'</td>
 						</tr>
 						<tr>
 							<td width="20%" class="text-center">Reference Standard</td>
-							<td>'.$auditPlan["reference_standard"].'</td>
+							<td>'.removeInlineStyles($auditPlan["reference_standard"]).'</td>
 						</tr>
 						<tr>
 							<td width="20%" class="text-center">Audit Methodologies</td>
-							<td>'.$auditPlan["audit_methodologies"].'</td>
+							<td>'.removeInlineStyles($auditPlan["audit_methodologies"]).'</td>
 						</tr>
 						<tr>
 							<td width="20%" class="text-center">Type</td>
@@ -1854,6 +1900,7 @@
 					</div>
 				
 					';
+					$html = mb_convert_encoding($html, 'UTF-8', 'auto');
 					$mpdf->WriteHTML($html);
 					$mpdf->AddPage();
 
@@ -2015,7 +2062,7 @@
 						<tr>
 							<td width="80%" colspan="2" style="vertical-align: top;">
 							<b>Prepared by:</b><br><br><br>
-							<strong><b>'.$created_by.'</b></strong><br>
+							<strong><b>'.strtoupper($created_by).'</b></strong><br>
 							<span style="font-size: 11px;">Internal Lead Auditor</span>
 							</td>
 							<td width="20%" style="vertical-align: top;">
@@ -2025,12 +2072,12 @@
 						<tr>
 							<td width="40%" style="vertical-align: top;">
 							<b>Reviewed by:</b><br><br><br>
-							<b>'.$qad_approved.'</b><br>
+							<b>'.strtoupper($qad_approved).'</b><br>
 							<span style="font-size: 11px;">Director for Quality Assurance / QMC</span>
 							</td>
 							<td width="40%" style="vertical-align: top;">
 							<b>Approved by:</b><br><br><br>
-							<b>'.$cmt_approved.'</b><br>
+							<b>'.strtoupper($cmt_approved).'</b><br>
 							<span style="font-size: 11px;">College Management Team</span>
 							</td>
 							<td width="20%" style="vertical-align: top;">
@@ -2040,6 +2087,7 @@
 						</table>
 						</div>
 						';
+						
 					$mpdf->WriteHTML($html);
 
 					$filename = "audit_plan";

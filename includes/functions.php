@@ -242,7 +242,7 @@ function base_url()
             {
                 // connect to database
                 $handle = new PDO("mysql:dbname=" . DATABASE . ";host=" . SERVER, USERNAME, PASSWORD);
-				// $handle->exec("set names utf8");
+				$handle->exec("set names utf8");
 				// $handle->exec("set character_set_results='utf8'");
 				// $handle->exec("set collation_connection='utf8'");
 				// $handle->exec("set character_set_client='utf8'");
@@ -378,6 +378,45 @@ function base_url()
 
 
 
+      function removeInlineStyles($html) {
+        libxml_use_internal_errors(true); // suppress warnings from malformed HTML
+    
+        // Ensure valid HTML by wrapping it properly
+        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' . $html . '</body></html>';
+    
+        $doc = new DOMDocument();
+        $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    
+        // Remove all 'style' attributes
+        $xpath = new DOMXPath($doc);
+        foreach ($xpath->query('//*[@style]') as $el) {
+            $el->removeAttribute('style');
+        }
+    
+        // Remove <p> tags but keep their content
+        foreach ($xpath->query('//p') as $pElement) {
+            $content = '';
+            foreach ($pElement->childNodes as $childNode) {
+                $content .= $doc->saveHTML($childNode); // Preserve inner HTML
+            }
+            $pElement->parentNode->replaceChild($doc->createTextNode($content), $pElement); // Replace <p> with its content
+        }
+    
+        // Extract body contents and return HTML without <p> tags
+        $body = $doc->getElementsByTagName('body')->item(0);
+        $innerHTML = '';
+        foreach ($body->childNodes as $child) {
+            $innerHTML .= $doc->saveHTML($child);
+        }
+    
+        // Decode any HTML entities back to their original tags
+        return html_entity_decode($innerHTML);
+    }
+    
+    // $auditPlan["audit_objectives"] = removeInlineStyles($auditPlan["audit_objectives"]);
+    
+
+
     function redirect($destination)
     {
 		
@@ -399,6 +438,8 @@ function base_url()
             header("Location: $protocol://$host$destination");
 			
         }
+
+
 
         // handle relative path
         else
