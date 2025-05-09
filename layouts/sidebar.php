@@ -712,7 +712,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       <a href="area" class="nav-link">
         <i class="nav-icon fas fa-building"></i>
         <p>
-        Audit Area Division/Office/Unit/Institute
+        Audit Area
           <span class="right badge badge-danger"></span>
         </p>
       </a>
@@ -736,7 +736,7 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
       <a href="position" class="nav-link">
         <i class="nav-icon fas fa-briefcase"></i>
         <p>
-          Position
+        Process Owner/Auditee
           <span class="right badge badge-danger"></span>
         </p>
       </a>

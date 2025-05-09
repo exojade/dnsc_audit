@@ -2062,7 +2062,7 @@ ul {
 						<tr>
 							<td width="80%" colspan="2" style="vertical-align: top;">
 							<b>Prepared by:</b><br><br><br>
-							<strong><b>'.strtoupper($created_by).'</b></strong><br>
+							<strong><b>'.strtoupper($created_by ?? '').'</b></strong><br>
 							<span style="font-size: 11px;">Internal Lead Auditor</span>
 							</td>
 							<td width="20%" style="vertical-align: top;">
@@ -2072,12 +2072,12 @@ ul {
 						<tr>
 							<td width="40%" style="vertical-align: top;">
 							<b>Reviewed by:</b><br><br><br>
-							<b>'.strtoupper($qad_approved).'</b><br>
+							<b>'.strtoupper($qad_approved ?? '').'</b><br>
 							<span style="font-size: 11px;">Director for Quality Assurance / QMC</span>
 							</td>
 							<td width="40%" style="vertical-align: top;">
 							<b>Approved by:</b><br><br><br>
-							<b>'.strtoupper($cmt_approved).'</b><br>
+							<b>'.strtoupper($cmt_approved ?? '').'</b><br>
 							<span style="font-size: 11px;">College Management Team</span>
 							</td>
 							<td width="20%" style="vertical-align: top;">

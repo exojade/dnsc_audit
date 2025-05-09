@@ -402,6 +402,15 @@
 			$aps_schedule = $aps_schedule[0];
 
 
+			$audit_team_members = query("select concat(firstname, ' ', surname) as fullname 
+										from audit_plan_team_members aptm
+										left join users u on aptm.id = u.id
+										where aptm.team_id = ?
+										order by aptm.role asc, u.surname asc, u.firstname asc
+										", $aps_schedule["team_id"]);
+			// dump($audit_team_members);
+			$aptm = implode(", ", array_column($audit_team_members, "fullname"));
+			// dump($aptm);
 
 
 
@@ -597,7 +606,7 @@ font-size: 12px;
 								<table class="tbl" style="font-size: 12px; padding-top: 10px;">
                                             <tr>
 												<td width="10%" class="p-2 nw"><b>Name of Auditor: </b></td>
-                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_report["firstname"] . " " . $audit_report["middlename"] . " " . $audit_report["surname"].'</td>
+                                                <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$aptm.'</td>
                                                 <td width="10%" class="p-2 nw"><b>IQA No: </b></td>
                                                 <td width="40%" class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_evaluation["audit_evaluation_id"].'</td>
                                             </tr>
@@ -739,9 +748,9 @@ font-size: 12px;
                                             </tr>
 
 											<tr>
-												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$audit_evaluation["evaluated_by"].'</td>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($audit_evaluation["evaluated_by"] ?? '').'</td>
 												<td></td>
-												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.$auditPlan["evaluated_by"].'</td>
+												<td class="p-2 nw" style="border-bottom: 1px solid black;">'.strtoupper($auditPlan["evaluated_by"] ?? '').'</td>
 											</tr>
 											<tr>
 												<td><b>Auditee<b/></td>
