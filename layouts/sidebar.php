@@ -495,6 +495,46 @@ switch ($_SESSION["dnsc_audit"]["role"]) {
         </p>
       </a>
   </li>
+
+
+  <li class="nav-header">Admin</li>
+  <li class="nav-item">
+      <a href="area" class="nav-link">
+        <i class="nav-icon fas fa-building"></i>
+        <p>
+        Audit Area
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="process" class="nav-link">
+        <i class="nav-icon fas fa-tasks"></i>
+        <p>
+          Process
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+  <li class="nav-item">
+      <a href="position" class="nav-link">
+        <i class="nav-icon fas fa-briefcase"></i>
+        <p>
+        Process Owner/Auditee
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
+
+  <li class="nav-item">
+      <a href="settings" class="nav-link">
+        <i class="nav-icon fas fa-cog"></i>
+        <p>
+          Settings
+          <span class="right badge badge-danger"></span>
+        </p>
+      </a>
+  </li>
   <li class="nav-header">Review</li>
 
   
