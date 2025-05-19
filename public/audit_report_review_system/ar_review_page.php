@@ -68,6 +68,29 @@
                 <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
                 <div class="form-group">
                   <label>Reviewer's Comments</label>
+                <textarea rows="5" class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
+                <hr>
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="modalDeny">
+      <div class="modal-dialog ">
+        <div class="modal-content ">
+          <div class="modal-header bg-danger">
+              <h3 class="modal-title text-center">Deny Audit Report</h3>
+          </div>
+          <div class="modal-body">
+              <form class="generic_form_trigger" data-url="audit_report_review">
+                <input type="hidden" name="action" value="deny_audit_report">
+                <input type="hidden" name="audit_report_id" value="<?php echo($_GET["id"]); ?>">
+                <div class="form-group">
+                  <label>Reviewer's Comments</label>
                 <textarea rows="5" required class="form-control" name="review_comments" placeholder="Provide comments/insights"></textarea>
                 <hr>
                 </div>
@@ -79,7 +102,8 @@
     </div>
 
     
-    <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">REVIEW THIS REPORT</a>
+    <a href="#" class="btn btn-warning btn-block mb-2" data-toggle="modal" data-target="#modalReview">ACCEPT THIS REPORT</a>
+    <a href="#" class="btn btn-danger btn-block mb-2" data-toggle="modal" data-target="#modalDeny">DENY THIS REPORT</a>
     
     <div class="card card-success">
               <div class="card-header">

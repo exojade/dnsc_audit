@@ -95,6 +95,35 @@
 							];
 							echo json_encode($res_arr); exit();
 
+		elseif($_POST["action"] == "deny_audit_report"):
+			// dump($_POST);
+
+
+			query("update audit_report set 
+						audit_report_status = 'PENDING'
+						where audit_report_id = ?
+						", $_POST["audit_report_id"]);
+			$audit_report = query("select ar.*, u.img, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as created_by from audit_report ar
+									left join users u on u.id = ar.user_id
+									 where audit_report_id = ?", $_POST["audit_report_id"]);
+			$team_id = query("select * from audit_plan_schedule aps where aps_id = ?", $audit_report[0]["aps_id"]);
+			$team_members = query("select * from audit_plan_team_members where team_id = ?", $team_id[0]["team_id"]);
+			foreach($team_members as $row):
+				$Message = [];
+				$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " has already reviewed and REJECTED the audit report : " . $_POST["audit_report_id"] . " with remarks: " . $_POST["review_comments"];
+				$Message["link"]= "audit_report?action=update&id=".$_POST["audit_report_id"];
+				$theMessage = serialize($Message);
+				addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+			endforeach;
+
+						$res_arr = [
+							"result" => "success",
+							"title" => "Success",
+							"message" => "Success",
+							"link" => "audit_report?action=details&id=".$_POST["audit_report_id"],
+							];
+							echo json_encode($res_arr); exit();
+
 		elseif($_POST["action"] == "ar_review_list"):
 
 
@@ -213,7 +242,7 @@
 										if($row["audit_report_status"] == "DONE"):
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">View Audit Report</a></li>';
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Print Audit Report</a></li>';
-										else:
+										elseif($row["audit_report_status"] == "FOR REVIEW"):
 											$action .= '<li><a class="dropdown-item" href="audit_report_review?action=review&id='.$row["audit_report_id"].'">Review</a></li>';
 										endif;
 

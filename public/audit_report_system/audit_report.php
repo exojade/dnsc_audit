@@ -249,10 +249,9 @@
 										if($row["audit_report_status"] == "DONE"):
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">View Audit Report</a></li>';
 											$action .= '<li><a class="dropdown-item" href="audit_report?action=details&id='.$row["audit_report_id"].'">Print Audit Report</a></li>';
-										else:
+										elseif($row["audit_report_status"] == "PENDING"):
 											$action .= '<li><a data-id="'.$row["audit_report_id"].'" class="dropdown-item" href="audit_report?action=update&id='.$row["audit_report_id"].'">Edit Audit Report</a></li>';
 										endif;
-
 									else:
 										$action .= '<li><a class="dropdown-item" href="audit_report?action=create&aps_area_id='.$row["tblid"].'">Create Audit Report</a></li>';
 									endif;
@@ -266,6 +265,23 @@
 
 					$data[$i]["action"] = $action;
 					$data[$i]["team"] = $teamMembersString;
+					$deadlineDate = new DateTime($row["schedule_date"]);
+					$deadlineDate->modify('+2 weeks');
+
+					$timestampFormatted = '';
+					if (!empty($row['timestamp'])) {
+						$timestampFormatted = date('F d, Y', $row['timestamp']);
+
+						if ($row['timestamp'] > $deadlineDate->getTimestamp()) {
+							$timestampFormatted .= ' <label class="badge badge-warning">Late</label>';
+						}
+					}
+
+					$data[$i]["timestamp"] = $timestampFormatted;
+					$data[$i]["deadline"] = $deadlineDate->format('F d, Y');
+
+					// Check lateness
+			
 					$data[$i]["process_name"] = $row["process_name"];
 					$data[$i]["area_name"] = $row["area_name"];
 					$i++;
@@ -322,7 +338,8 @@
 				ofi_nonconformance = ?, 
 				car_details = ?, 
 				audit_report_status = ?,
-				comments = ?
+				comments = ?,
+				audit_report_status = 'FOR REVIEW'
 				where audit_report_id = ?
 			", time(),
 			$Effectiveness,
@@ -333,6 +350,27 @@
 			$_POST["comments"],
 			$_POST["report_id"]
 		);
+
+
+
+
+
+
+
+
+		$users = query("select * from users where role_id = 4");
+		foreach($users as $row):
+			$Message = [];
+			$Message["message"] = $_SESSION["dnsc_audit"]["fullname"] . " created audit report and needs to be reviewed.";
+			$Message["link"] = "audit_report_review?action=review&id=".$_POST["report_id"];
+			$theMessage = serialize($Message);
+			addNotification($row["id"], $theMessage, $_SESSION["dnsc_audit"]["userid"]);
+		endforeach;
+
+
+
+
+
 		
 		$res_arr = [
 			"result" => "success",

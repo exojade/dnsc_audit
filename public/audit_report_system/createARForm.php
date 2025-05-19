@@ -41,8 +41,18 @@
 
 
 
-      // dump($aps_area);
-        
+      $scheduleDate = new DateTime($aps_schedule['schedule_date']);
+$deadline = $scheduleDate->modify('+2 weeks');
+$formattedDeadline = $deadline->format('F d, Y');
+
+if ($deadline < new DateTime()) {
+    echo '
+    <div class="alert alert-warning alert-dismissible">
+      <h5><i class="icon fas fa-ban"></i> Alert!</h5>
+      Schedule deadline (<strong>' . $formattedDeadline . '</strong>) has passed. Please take necessary action.
+    </div>';
+}
+              
       ?>
 
   <div class="row">

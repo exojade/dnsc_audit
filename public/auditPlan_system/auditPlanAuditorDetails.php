@@ -131,6 +131,7 @@
                     <th>Process</th>
                     <th>Area</th>
                     <th>Created</th>
+                    <th>Deadline</th>
                     <th>Status</th>
                   </tr>
                   </thead>
@@ -240,6 +241,7 @@ var datatable =
         }
     },
     { data: 'timestamp', "orderable": false },
+    { data: 'deadline', "orderable": false },
     { data: 'audit_report_status', "orderable": false },
                 ],
                 "footerCallback": function (row, data, start, end, display) {
