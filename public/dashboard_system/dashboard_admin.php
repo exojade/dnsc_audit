@@ -178,6 +178,36 @@
               </div>
               <!-- /.card-header -->
               <div class="card-body">
+
+              <form id="filterForm" class="mb-3" data-url="survey">
+                <input type="hidden" name="action" value="filterSurvey">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="office_id">Filter by Office</label>
+      <select name="office_id" class="form-control">
+        <option value="">-- All Offices --</option>
+        <?php
+        $offices = query("SELECT office_id, office_name FROM office ORDER BY office_name ASC");
+        foreach ($offices as $office) {
+          $selected = isset($_GET['office_id']) && $_GET['office_id'] == $office['office_id'] ? 'selected' : '';
+          echo "<option value='{$office['office_id']}' $selected>{$office['office_name']}</option>";
+        }
+        ?>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="order">Sort Order</label>
+      <select name="order" class="form-control">
+        <option value="DESC" <?= (isset($_GET['order']) && $_GET['order'] === 'ASC') ? '' : 'selected' ?>>Descending</option>
+        <option value="ASC" <?= (isset($_GET['order']) && $_GET['order'] === 'ASC') ? 'selected' : '' ?>>Ascending</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Apply</button>
+    </div>
+  </div>
+</form>
+<div id="surveyResults">
                 <div class="row">
 
                 <?php $surveys = query("SELECT 
@@ -213,6 +243,7 @@ ORDER BY survey_count DESC"); ?>
 
                     
                   </div>
+                </div>
                 </div>
               </div>
              
@@ -255,6 +286,43 @@ ORDER BY survey_count DESC"); ?>
     <script src="AdminLTE_new/plugins/moment/moment.min.js"></script>
     <script src="AdminLTE_new/plugins/fullcalendar/main.js"></script>
 <?php require("layouts/footer.php") ?>
+
+<script>
+  $(document).on('submit', '#filterForm', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    var form = $(this)[0];
+    var formData = new FormData(form);
+    var url = $(this).data('url');
+
+    // Optional: show loading dialog
+    Swal.fire({ 
+      title: 'Please wait...', 
+      imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif"); ?>', 
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    $.ajax({
+      type: 'post',
+      url: url,
+      processData: false,
+      contentType: false,
+      data: formData,
+      success: function(data) {
+        Swal.close();
+        $('#surveyResults').html(data);
+      },
+      error: function () {
+        Swal.fire("Error!", "Unexpected error occurred!", "error");
+      }
+    });
+  });
+</script>
 
 <script>
 

@@ -20,6 +20,7 @@
 
 				$limitString = " limit " . $limit;
 				$offsetString = " offset " . $offset;
+				$order_by = " order by year desc, type desc";
 
 			
 				if($search != ""):
@@ -28,7 +29,7 @@
 				else:
 					$baseQuery = "select audit_plan, year, status, qad_approved, cmt_approved, type from audit_plans" . $where;
 				endif;
-				$data = query($baseQuery . $limitString . " " . $offsetString);
+				$data = query($baseQuery . $order_by .  $limitString . " " . $offsetString);
 				$all_data = query($baseQuery);
 				// dump($data);
 

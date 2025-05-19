@@ -62,10 +62,15 @@
                   </div>
 
 
-                  <div class="col-4">
+                  <div class="col-3">
                   <div class="form-group">
-                    <input type="date" id="dateInput" placeholder="Filter Date Here" class="form-control">
+                    <input type="date" id="dateInput" placeholder="From" class="form-control">
+                </div>
+                  </div>
 
+                  <div class="col-3">
+                  <div class="form-group">
+                    <input type="date" id="dateInput2" placeholder="To" class="form-control">
                 </div>
                   </div>
                 </div>
@@ -239,10 +244,11 @@ var datatable =
 function filter(){
   var officeSelect = $('#officeSelect').val();
   var dateInput = $('#dateInput').val();
-  datatable.ajax.url('survey?action=feedbackList&office_id=' + officeSelect + '&date='+dateInput).load();
+  var dateInput2 = $('#dateInput2').val();
+  datatable.ajax.url('survey?action=feedbackList&office_id=' + officeSelect + '&dateFrom='+dateInput+'&dateTo='+dateInput2).load();
 }
 
-  $('.selectFilter, #dateInput').on('change', function() {
+  $('.selectFilter, #dateInput, #dateInput2').on('change', function() {
     // alert("change");
     filter();
   });

@@ -104,6 +104,9 @@ GROUP BY
 	// dump($schedule_date);
 	echo json_encode($schedule_date);	
 
+	// elseif($_POST["action"] == "filterSurvey"):
+	// 	dump($_POST);
+
 
 		endif;
 

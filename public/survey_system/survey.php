@@ -26,19 +26,28 @@
 				endforeach;
 
 				if(isset($_REQUEST["office_id"])):
-					if($_REQUEST["office_id"] != ""):
+					if($_REQUEST["office_id"] != "null"):
 						$where .= " and office_id = '".$_REQUEST["office_id"]."'";
 					endif;
 				endif;
 
-				if(isset($_REQUEST["date"])):
-					if($_REQUEST["date"] != ""):
-						$from_date = strtotime($_REQUEST["date"] . " 00:00:00");
-						$to_date = strtotime($_REQUEST["date"] . " 23:59:59");
-						$where .= " and timestamp between ".$from_date." and ".$to_date."";
+				if(isset($_REQUEST["dateFrom"])):
+					if($_REQUEST["dateFrom"] != ""):
+						$from_date = strtotime($_REQUEST["dateFrom"] . " 00:00:00");
+						// $to_date = strtotime($_REQUEST["dateFrom"] . " 23:59:59");
+						$where .= " and timestamp >= ".$from_date."";
 					endif;
 				endif;
-		
+
+				if(isset($_REQUEST["dateTo"])):
+					if($_REQUEST["dateTo"] != ""):
+						$from_date = strtotime($_REQUEST["dateTo"] . " 23:59:59");
+						// $to_date = strtotime($_REQUEST["dateFrom"] . " 23:59:59");
+						$where .= " and timestamp <= ".$from_date."";
+					endif;
+				endif;
+				// dump($where);
+		// 
 
 	
 
@@ -91,6 +100,52 @@
 					"aaData" => $data
 				);
 				echo json_encode($json_data);
+
+		elseif($_POST["action"] == "filterSurvey"):
+			// dump($_POST);
+
+			$order = isset($_POST['order']) && in_array($_POST['order'], ['ASC', 'DESC']) ? $_POST['order'] : 'DESC';
+			$office_filter = isset($_POST['office_id']) && $_POST['office_id'] !== '' ? intval($_POST['office_id']) : null;
+
+			$sql = "SELECT 
+				o.office_id,
+				o.office_name,
+				COUNT(s.survey_id) AS survey_count,
+				(SELECT COUNT(*) FROM survey) AS total_surveys,
+				ROUND((COUNT(s.survey_id) / (SELECT COUNT(*) FROM survey) * 100)) AS percentage
+			FROM office o
+			LEFT JOIN survey s ON o.office_id = s.office_id";
+
+			if ($office_filter) {
+				$sql .= " WHERE o.office_id = $office_filter";
+			}
+
+			$sql .= " GROUP BY o.office_id, o.office_name ORDER BY survey_count $order";
+
+			$surveys = query($sql);
+			// dump($surveys);
+			$html = '';
+
+			$html .= '    <div class="row">';
+$html .= '      <div class="col-md-12">';
+$html .= '        <p class="text-center">';
+$html .= '          <strong>' . ($surveys[0]["total_surveys"] ?? 0) . ' Survey Respondents</strong>';
+$html .= '        </p>';
+
+foreach ($surveys as $row) {
+  $html .= '        <div class="progress-group">';
+  $html .= '          <b>' . htmlspecialchars($row["office_name"]) . '</b>';
+  $html .= '          <span class="float-right"><b>' . $row["survey_count"] . '</b></span>';
+  $html .= '          <div class="progress progress-sm">';
+  $html .= '            <div class="progress-bar bg-success" style="width: ' . $row["percentage"] . '%"></div>';
+  $html .= '          </div>';
+  $html .= '        </div>';
+}
+
+$html .= '      </div>';
+$html .= '    </div>';
+
+echo($html);
 		
 		elseif($_POST["action"] == "addSurvey"):
 			// dump($_POST);
