@@ -234,7 +234,7 @@ echo json_encode($json_data);
 				$limit = $_POST["length"];
 				$search = $_POST["search"]["value"];
 
-			$myTeam = query("SELECT team_id FROM audit_plan_team_members 
+			$myTeam = query("SELECT team_id, audit_plan FROM audit_plan_team_members 
 					WHERE audit_plan = ? AND id = ? 
 					GROUP BY team_id", 
 					$_POST["interal_audit_id"], $_SESSION["dnsc_audit"]["userid"]);
@@ -254,18 +254,16 @@ echo json_encode($json_data);
 					FROM 
 						audit_plan_schedule aps
 					LEFT JOIN 
-						process p ON p.process_id = aps.process_id
+						PROCESS p ON p.process_id = aps.process_id
 					LEFT JOIN 
 						aps_area aa ON aa.aps_id = aps.aps_id
 					LEFT JOIN 
 						areas a ON a.id = aa.area_id
 					LEFT JOIN 
-						audit_checklist ar ON ar.aps_area = aa.area_id
+						audit_checklist ar ON ar.aps_id = aa.aps_id AND ar.aps_area = aa.area_id
 					WHERE 
-						aps.team_id IN ($myTeam)
+					aps.team_id IN ($myTeam)
 				");
-
-
 			  $ApsArea = [];
               $aps_area = query("select aps_area.aps_id,a.id, a.area_name from aps_area
                                   left join areas a on a.id = aps_area.area_id
@@ -287,7 +285,7 @@ echo json_encode($json_data);
               endforeach;
 			$i = 0;
 				foreach($data as $row):
-
+					// dump($row);
 					$areaNames = array_column($ApsArea[$row["aps_id"]], "area_name");
                     $areaNamesString = implode(', ', $areaNames);
                     $teamMembers = array_column($TeamMembers[$row["team_id"]], "fullname");
@@ -342,6 +340,21 @@ echo json_encode($json_data);
 					if(intval($row["timestamp"]) != 0):
 						$data[$i]["timestamp"] = date("F d Y h:i a", $row["timestamp"]);
 					endif;
+
+					$deadlineDate = new DateTime($row["schedule_date"]);
+					$deadlineDate->modify('+2 weeks');
+
+					$timestampFormatted = '';
+					if (!empty($row['timestamp'])) {
+						$timestampFormatted = date('F d, Y', $row['timestamp']);
+
+						if ($row['timestamp'] > $deadlineDate->getTimestamp()) {
+							$timestampFormatted .= ' <label class="badge badge-warning">Late</label>';
+						}
+					}
+
+					$data[$i]["timestamp"] = $timestampFormatted;
+					$data[$i]["deadline"] = $deadlineDate->format('F d, Y');
 					
 					$i++;
 				endforeach;

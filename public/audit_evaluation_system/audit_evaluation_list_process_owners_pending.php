@@ -39,6 +39,7 @@
                     <th>Audit Team</th>
                     <th>Process</th>
                     <th>Area</th>
+                    <th>Deadline</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -127,6 +128,7 @@ var datatable =
                     { data: 'team', "orderable": false },
                     { data: 'process_name', "orderable": false },
                     { data: 'area', "orderable": false },
+                    { data: 'deadline', "orderable": false },
                     ],
                 "footerCallback": function (row, data, start, end, display) {
                     // var api = this.api(), data;

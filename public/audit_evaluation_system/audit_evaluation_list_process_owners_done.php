@@ -36,6 +36,7 @@
                     <th>Area</th>
                     <th>Team</th>
                     <th>Created</th>
+                    <th>Deadline</th>
                     <th>Evaluated</th>
                   </tr>
                   </thead>
@@ -127,6 +128,7 @@ var datatable =
                     { data: 'area', "orderable": false },
                     { data: 'team', "orderable": false },
                     { data: 'date_created', "orderable": false },
+                    { data: 'deadline', "orderable": false },
                     { data: 'evaluated_by', "orderable": false },
                     ],
                 "footerCallback": function (row, data, start, end, display) {

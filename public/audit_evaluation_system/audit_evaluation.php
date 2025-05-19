@@ -75,6 +75,22 @@
 					$data[$i]["process_name"] = $Process[$row["process_id"]]["process_name"];
 					$data[$i]["area"] = $Area[$row["aps_area"]]["area_name"];
 
+					$deadlineDate = new DateTime($row["schedule_date"]);
+					$deadlineDate->modify('+2 weeks');
+
+					$timestampFormatted = '';
+					if (!empty($row['timestamp'])) {
+						$timestampFormatted = date('F d, Y', $row['timestamp']);
+
+						if ($row['timestamp'] > $deadlineDate->getTimestamp()) {
+							$timestampFormatted .= ' <label class="badge badge-warning">Late</label>';
+						}
+					}
+
+					$data[$i]["timestamp"] = $timestampFormatted;
+					$data[$i]["deadline"] = $deadlineDate->format('F d, Y');
+
+
 					$data[$i]["action"] = '<a href="audit_evaluation?action=create&id='.$row["audit_report_id"].'" class="btn btn-block btn-sm btn-warning">Evaluate</a>';
 					$i++;
 				endforeach;
@@ -153,9 +169,11 @@
 					$order_string = " order by timestamp desc";
 					// dump($areaIds);
 					// dump($audit_reports);
-					$baseQuery = "select ae.*,aa.area_id, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as evaluated_by from audit_evaluation ae left join aps_area aa
+					$baseQuery = "select aps.schedule_date, ae.*,aa.area_id, concat(u.firstname, ' ', u.middlename, ' ', u.surname) as evaluated_by from audit_evaluation ae left join aps_area aa
 									on aa.tblid = ae.aps_area_id
-									left join users u on u.id = ae.user_id  " . $where;
+									left join users u on u.id = ae.user_id
+									left join audit_plan_schedule aps on aps.aps_id = aa.aps_id
+									" . $where;
 					$data = query($baseQuery . $order_string .  $limitString . " " . $offsetString);
 					$all_data = query($baseQuery  . $order_string);
 					// dump($all_data);
@@ -170,6 +188,21 @@
 						$data[$i]["date_created"] =  date('F d, Y', $row["timestamp"]);
 						$data[$i]["process_name"] = $Process[$myReport["process_id"]]["process_name"];
 						$data[$i]["area"] = $Area[$row["area_id"]]["area_name"];
+
+						$deadlineDate = new DateTime($row["schedule_date"]);
+					$deadlineDate->modify('+2 weeks');
+
+					$timestampFormatted = '';
+					if (!empty($row['timestamp'])) {
+						$timestampFormatted = date('F d, Y', $row['timestamp']);
+
+						if ($row['timestamp'] > $deadlineDate->getTimestamp()) {
+							$timestampFormatted .= ' <label class="badge badge-warning">Late</label>';
+						}
+					}
+
+					$data[$i]["timestamp"] = $timestampFormatted;
+					$data[$i]["deadline"] = $deadlineDate->format('F d, Y');
 
 						$action = '
 							<div class="btn-group btn-block">
