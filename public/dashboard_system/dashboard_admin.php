@@ -141,7 +141,7 @@
                   <br>
                   <br>
                   <?php endif; ?>
-                  <div  style="max-height:45vh; overflow-y: auto; overflow-x: hidden;">
+                  <div  style="max-height:85vh; overflow-y: auto; overflow-x: hidden;">
                   <table id="ajaxDatatable" width="100%;">
                   <thead>
                   <tr>
@@ -203,7 +203,7 @@
       </select>
     </div>
     <div class="col-md-2 d-flex align-items-end">
-      <button type="submit" class="btn btn-primary w-100">Apply</button>
+      <button type="submit" class="btn btn-primary w-100"><i class="fa fa-filter"></i></button>
     </div>
   </div>
 </form>
@@ -235,6 +235,142 @@ ORDER BY survey_count DESC"); ?>
                         <div class="progress-bar bg-success" style="width: <?php echo($row["percentage"]); ?>%"></div>
                       </div>
                     </div>
+<?php endforeach; ?>
+
+
+                    
+                    <!-- /.progress-group -->
+
+                    
+                  </div>
+                </div>
+                </div>
+              </div>
+             
+            </div>
+
+
+
+
+<div class="card">
+  <div class="card-header bg-success">
+    <h5 class="card-title"><b>Survey Percentage</b></h5>
+
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+
+  <form id="filterForm2" class="mb-3" data-url="survey">
+    <input type="hidden" name="action" value="filterSurveyPercentage">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="office_id">Filter by Office</label>
+      <select name="office_id" class="form-control">
+        <option value="">-- All Offices --</option>
+        <?php
+        $offices = query("SELECT office_id, office_name FROM office ORDER BY office_name ASC");
+        foreach ($offices as $office) {
+          $selected = isset($_GET['office_id']) && $_GET['office_id'] == $office['office_id'] ? 'selected' : '';
+          echo "<option value='{$office['office_id']}' $selected>{$office['office_name']}</option>";
+        }
+        ?>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="order">Sort Order</label>
+      <select name="order" class="form-control">
+        <option value="DESC" <?= (isset($_GET['order']) && $_GET['order'] === 'ASC') ? '' : 'selected' ?>>Descending</option>
+        <option value="ASC" <?= (isset($_GET['order']) && $_GET['order'] === 'ASC') ? 'selected' : '' ?>>Ascending</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100"><i class="fa fa-filter"></i></button>
+    </div>
+  </div>
+</form>
+<div id="surveyResults2">
+                <div class="row">
+
+               <?php
+              //  $surveys = query("SELECT survey_id, office_id, survey_result FROM survey");
+              $baseQuery = "select * from survey order by timestamp desc";
+              $all_data = query($baseQuery);
+              // $criteria = query("select * from survey_questionnaire where active_status = 'ACTIVE'");
+
+              $criteria = query("select * from survey_questionnaire where active_status = 'ACTIVE'");
+				$Criteria = [];
+				foreach($criteria as $row):
+					$Criteria[$row["questionnaire_id"]] = $criteria;
+				endforeach;
+				$office = query("select * from office");
+				$Office = [];
+				foreach($office as $row):
+					$Office[$row["office_id"]] = $row;
+				endforeach;
+				$officeAverages = [];
+$officeSurveyCounts = [];
+$officeTotalAverages = [];
+
+foreach ($all_data as $row) {
+    $officeId = $row['office_id'];
+    $surveyResult = unserialize($row['survey_result']);
+
+    $total = 0;
+    $count = 0;
+
+    foreach ($surveyResult as $result) {
+        if (isset($Criteria[$result["criteria"]]) && $result["result"] > 0) {
+            $total += $result["result"];
+            $count++;
+        }
+    }
+    // dump($total);
+
+    $average = ($count > 0) ? $total / $count : 0;
+
+    if (!isset($officeAverages[$officeId])) {
+        $officeAverages[$officeId] = 0;
+        $officeSurveyCounts[$officeId] = 0;
+    }
+
+    $officeAverages[$officeId] += $average;
+    $officeSurveyCounts[$officeId]++;
+}
+
+// Now compute final average per office
+foreach ($officeAverages as $officeId => $sumOfAverages) {
+    $officeTotalAverages[] = [
+        'office_id' => $officeId,
+        'office_name' => $Office[$officeId]["office_name"],
+        'average_score' => round($sumOfAverages / $officeSurveyCounts[$officeId], 2),
+        'survey_count' => $officeSurveyCounts[$officeId]
+    ];
+}
+
+// dump($officeSurveyCounts);
+
+// Sort descending by score
+usort($officeTotalAverages, function ($a, $b) {
+    return $b['average_score'] <=> $a['average_score'];
+});
+$totalSurveyCount = count($all_data);
+               ?>
+
+
+<p class="text-center">
+  <strong><?= $totalSurveyCount; ?> Survey Respondents</strong>
+</p>
+
+<?php foreach ($officeTotalAverages as $row): ?>
+  <div class="col-12">
+  <div class="progress-group">
+    <b><?= $row["office_name"]; ?> (<?= $row["survey_count"]; ?> surveys)</b>
+    <span class="float-right"><b><?= $row["average_score"]; ?></b></span>
+    <div class="progress progress-sm">
+      <div class="progress-bar bg-success" style="width: <?= ($row["average_score"] / 5) * 100; ?>%"></div>
+    </div>
+  </div>
+  </div>
 <?php endforeach; ?>
 
 
@@ -316,6 +452,43 @@ ORDER BY survey_count DESC"); ?>
       success: function(data) {
         Swal.close();
         $('#surveyResults').html(data);
+      },
+      error: function () {
+        Swal.fire("Error!", "Unexpected error occurred!", "error");
+      }
+    });
+  });
+</script>
+
+<script>
+  $(document).on('submit', '#filterForm2', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    var form = $(this)[0];
+    var formData = new FormData(form);
+    var url = $(this).data('url');
+
+    // Optional: show loading dialog
+    Swal.fire({ 
+      title: 'Please wait...', 
+      imageUrl: '<?= asset("AdminLTE_new/dist/img/loader.gif"); ?>', 
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    $.ajax({
+      type: 'post',
+      url: url,
+      processData: false,
+      contentType: false,
+      data: formData,
+      success: function(data) {
+        Swal.close();
+        $('#surveyResults2').html(data);
       },
       error: function () {
         Swal.fire("Error!", "Unexpected error occurred!", "error");

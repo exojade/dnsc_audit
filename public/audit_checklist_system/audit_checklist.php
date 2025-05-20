@@ -254,7 +254,7 @@ echo json_encode($json_data);
 					FROM 
 						audit_plan_schedule aps
 					LEFT JOIN 
-						PROCESS p ON p.process_id = aps.process_id
+						process p ON p.process_id = aps.process_id
 					LEFT JOIN 
 						aps_area aa ON aa.aps_id = aps.aps_id
 					LEFT JOIN 

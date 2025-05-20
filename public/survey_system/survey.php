@@ -146,6 +146,156 @@ $html .= '      </div>';
 $html .= '    </div>';
 
 echo($html);
+
+
+
+elseif($_POST["action"] == "filterSurveyPercentage"):
+			// dump($_POST);
+
+// 			$order = isset($_POST['order']) && in_array($_POST['order'], ['ASC', 'DESC']) ? $_POST['order'] : 'DESC';
+// 			$office_filter = isset($_POST['office_id']) && $_POST['office_id'] !== '' ? intval($_POST['office_id']) : null;
+
+// 			$sql = "SELECT 
+// 				o.office_id,
+// 				o.office_name,
+// 				COUNT(s.survey_id) AS survey_count,
+// 				(SELECT COUNT(*) FROM survey) AS total_surveys,
+// 				ROUND((COUNT(s.survey_id) / (SELECT COUNT(*) FROM survey) * 100)) AS percentage
+// 			FROM office o
+// 			LEFT JOIN survey s ON o.office_id = s.office_id";
+
+// 			if ($office_filter) {
+// 				$sql .= " WHERE o.office_id = $office_filter";
+// 			}
+
+// 			$sql .= " GROUP BY o.office_id, o.office_name ORDER BY survey_count $order";
+
+// 			$surveys = query($sql);
+// 			// dump($surveys);
+// 			$html = '';
+
+// 			$html .= '    <div class="row">';
+// $html .= '      <div class="col-md-12">';
+// $html .= '        <p class="text-center">';
+// $html .= '          <strong>' . ($surveys[0]["total_surveys"] ?? 0) . ' Survey Respondents</strong>';
+// $html .= '        </p>';
+
+// foreach ($surveys as $row) {
+//   $html .= '        <div class="progress-group">';
+//   $html .= '          <b>' . htmlspecialchars($row["office_name"]) . '</b>';
+//   $html .= '          <span class="float-right"><b>' . $row["survey_count"] . '</b></span>';
+//   $html .= '          <div class="progress progress-sm">';
+//   $html .= '            <div class="progress-bar bg-success" style="width: ' . $row["percentage"] . '%"></div>';
+//   $html .= '          </div>';
+//   $html .= '        </div>';
+// }
+
+// $html .= '      </div>';
+// $html .= '    </div>';
+
+// dump($_POST);
+
+$office_id = !empty($_POST["office_id"]) ? $_POST["office_id"] : null;
+$order = ($_POST["order"] === "ASC") ? "ASC" : "DESC";
+
+$baseQuery = "SELECT * FROM survey";
+$whereClauses = [];
+$where = ' where 1=1';
+
+if ($office_id != null && $office_id != "") {
+    $where .= " and office_id = " . $office_id;
+}
+
+// dump($where);
+
+$baseQuery .= $where . " ORDER BY timestamp $order";
+// dump($baseQuery);
+
+
+$all_data = query($baseQuery);
+// dump($all_data);
+
+$criteria = query("SELECT * FROM survey_questionnaire WHERE active_status = 'ACTIVE'");
+$Criteria = [];
+foreach ($criteria as $row) {
+    $Criteria[$row["questionnaire_id"]] = $criteria;
+}
+
+$office = query("SELECT * FROM office");
+$Office = [];
+foreach ($office as $row) {
+    $Office[$row["office_id"]] = $row;
+}
+
+$officeAverages = [];
+$officeSurveyCounts = [];
+$officeTotalAverages = [];
+// dump($all_data);
+
+foreach ($all_data as $row) {
+    $officeId = $row['office_id'];
+    $surveyResult = unserialize($row['survey_result']);
+
+    $total = 0;
+    $count = 0;
+
+    foreach ($surveyResult as $result) {
+        if (isset($Criteria[$result["criteria"]]) && $result["result"] > 0) {
+            $total += $result["result"];
+            $count++;
+        }
+    }
+
+    $average = ($count > 0) ? $total / $count : 0;
+
+    if (!isset($officeAverages[$officeId])) {
+        $officeAverages[$officeId] = 0;
+        $officeSurveyCounts[$officeId] = 0;
+    }
+
+    $officeAverages[$officeId] += $average;
+    $officeSurveyCounts[$officeId]++;
+}
+
+// Compute final average per office
+foreach ($officeAverages as $officeId => $sumOfAverages) {
+    $officeTotalAverages[] = [
+        'office_id' => $officeId,
+        'office_name' => $Office[$officeId]["office_name"],
+        'average_score' => round($sumOfAverages / $officeSurveyCounts[$officeId], 2),
+        'survey_count' => $officeSurveyCounts[$officeId]
+    ];
+}
+
+// Sort
+usort($officeTotalAverages, function ($a, $b) use ($order) {
+    return $order === "ASC"
+        ? $a['average_score'] <=> $b['average_score']
+        : $b['average_score'] <=> $a['average_score'];
+});
+
+$totalSurveyCount = count($all_data);
+// dump($officeTotalAverages);
+// $html = '<div class="row">';
+$html='';
+
+foreach ($officeTotalAverages as $row) {
+    $width = ($row["average_score"] / 5) * 100;
+
+    $html .= '<div class="col-12">';
+    $html .= '<div class="progress-group">';
+    $html .= '<b>' . htmlspecialchars($row["office_name"]) . ' (' . $row["survey_count"] . ' surveys)</b>';
+    $html .= '<span class="float-right"><b>' . $row["average_score"] . '</b></span>';
+    $html .= '<div class="progress progress-sm">';
+    $html .= '<div class="progress-bar bg-success" style="width: ' . $width . '%"></div>';
+    $html .= '</div>'; // progress
+    $html .= '</div>'; // progress-group
+    $html .= '</div>'; // col-12
+}
+
+// $html .= '</div>'; // row
+
+echo $html;
 		
 		elseif($_POST["action"] == "addSurvey"):
 			// dump($_POST);
