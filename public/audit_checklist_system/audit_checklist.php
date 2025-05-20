@@ -12,6 +12,11 @@
 				$offsetString = " offset " . $offset;
 
 				$where = " where aptm.id = '".$_POST["interal_audit_id"]."'";
+				if(isset($_REQUEST["auditPlan"])):
+						if($_REQUEST["auditPlan"] != ""):
+							$where.=" and aptm.audit_plan = '".$_REQUEST["auditPlan"]."'";
+						endif;
+					endif;
 
 				$myTeam = query("SELECT team_id FROM audit_plan_team_members 
 				WHERE id = ? 
@@ -74,9 +79,9 @@
 								left join audit_plan_team_members aptm on aptm.audit_plan = ap.audit_plan" . $where . " group by ap.audit_plan";
 				endif;
 				
-
-				$data = query($baseQuery . $limitString . " " . $offsetString);
-				$all_data = query($baseQuery);
+				$orderby = " order by ap.year desc, ap.type desc";
+				$data = query($baseQuery . $orderby . $limitString . " " . $offsetString);
+				$all_data = query($baseQuery . $orderby);
 
 
 				$ap = query("select * from audit_plans");

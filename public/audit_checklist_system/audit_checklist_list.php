@@ -13,6 +13,24 @@
             <h1>Audit Plan (Audit Checklist)</h1>
           </div>
           <div class="col-sm-6">
+             <div class="form-group">
+              <select class="select2 selectFilter form-control" width="100%" id="auditPlanList">
+                <option value="" selected>--ALL--</option>
+                <?php
+                // dump($_SESSION);
+                $auditPlans = query("select ap.* from audit_plan_team_members aptm
+                                            left join audit_plans ap on ap.audit_plan = aptm.audit_plan
+                                            where id = ?
+                                            group by aptm.audit_plan
+                                            order by audit_plan desc
+                                            ", $_SESSION["dnsc_audit"]["userid"]); ?>
+                <?php foreach($auditPlans as $row): ?>
+                  <option value="<?php echo($row["audit_plan"]); ?>"><?php echo($row["year"] . " - " . $row["type"]); ?></option>
+                <?php endforeach; ?>
+
+              </select>
+            </div>
+
           </div>
         </div>
       </div>
@@ -161,10 +179,11 @@ var datatable =
 
 
 
+$('.select2').select2()
   $('.selectFilter').on('change', function() {
     // alert("change");
-            var roleSelect = $('#roleSelect').val();
-            datatable.ajax.url('users?action=usersList&role=' + roleSelect).load();
+            var auditPlan = $('.selectFilter').val();
+            datatable.ajax.url('audit_checklist?action=audit_checklist_datatable&auditPlan=' + auditPlan).load();
   });
 
 </script>
