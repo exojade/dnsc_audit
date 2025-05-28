@@ -434,9 +434,6 @@
 				"2nd Internal Quality Audit" => "08"  // 2nd Internal Quality Audit
 			];
 
-
-		
-			
 			$audit_report = query("select count(*) as count from audit_report where audit_plan = ?", $aps_area["audit_plan"]);
 			$ar_id = "AR-" . $audit_plan["year"] ."-" . $typeMapping[$audit_plan["type"]] . "-". $monthMapping[$audit_plan["type"]] ."-" .($audit_report[0]["count"] + 1) ;
 
@@ -515,20 +512,17 @@
 								and ua.area_id = ?
 								", $audit_report["aps_area"]);
 			$Auditees = implode(", ", array_column($Auditees, "fullname"));
-
-
-
-					$mpdf = new \Mpdf\Mpdf([
-						'mode' => 'utf-8',
-						'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
-						'debug' => true,
-						'margin_top' => 40,
-						'margin_left' => 0,
-						'margin_right' => 0,
-						'margin_bottom' => 2,
-						'margin_footer' => 0,
-						'default_font' => 'helvetica'
-					]);
+			$mpdf = new \Mpdf\Mpdf([
+				'mode' => 'utf-8',
+				'format' => [215.9, 330.2], // 'A4-L' sets the orientation to landscape
+				'debug' => true,
+				'margin_top' => 40,
+				'margin_left' => 0,
+				'margin_right' => 0,
+				'margin_bottom' => 2,
+				'margin_footer' => 0,
+				'default_font' => 'helvetica'
+			]);
 
 					$settings = query("select * from utility_settings");
 					$settings = unserialize($settings[0]["audit_report"]);
@@ -929,12 +923,25 @@ font-size: 12px;
 												'.$audit_report["comments"].'</div>
 												</tr>
 											</table>
-<br>
-	    <p class="text-justify"><b>D. Review Audit Report and Submit 
-All auditors on the audit team must submit their audit reports for summary and review by the Lead Auditor.  Lead Auditor: review the completeness of this report prior to submitting it to the QMC. Be sure findings show objective evidence, that everything is written clearly, and that all checklist questions are answered.
-</b></p>
-											
-											';
+				<br>
+						<p class="text-justify"><b>D. Review Audit Report and Submit 
+				All auditors on the audit team must submit their audit reports for summary and review by the Lead Auditor.  Lead Auditor: review the completeness of this report prior to submitting it to the QMC. Be sure findings show objective evidence, that everything is written clearly, and that all checklist questions are answered.
+				</b></p>';
+				// dump($audit_report);
+				
+				$audit_plan = query("select * from audit_plans where audit_plan = ?", $audit_report["audit_plan"]);
+				$audit_plan = $audit_plan[0];
+				if ($audit_plan['type'] === '1st Internal Quality Audit') {
+					$date_print = "January 2, " . $audit_plan['year'];
+				} else {
+					$date_print = "August 1, " . $audit_plan['year'];
+				}
+
+				$date_reviewed = "Date";
+				if($audit_report["review_timestamp"] != ""):
+					$date_reviewed = date("F d, Y", $audit_report["review_timestamp"]);
+				endif;
+
 				$html2.='
 				<style>
 					.tbl3 tr td{
@@ -956,7 +963,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 				
 											</tr>
 											<tr>
-												<td class="p-2 nw text-center">Internal Auditor / Date</td>
+												<td class="p-2 nw text-center">Internal Auditor / '.$date_print.'</td>
 											</tr>
                                         </table>
 												</td>
@@ -976,7 +983,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 				
 											</tr>
 											<tr>
-												<td class="p-2 nw text-center" >Process Owner(s) / Date</td>
+												<td class="p-2 nw text-center" >Process Owner(s) / '.$date_print.'</td>
 											</tr>
                                         </table>
 												</td>
@@ -995,7 +1002,7 @@ All auditors on the audit team must submit their audit reports for summary and r
 				
 											</tr>
 											<tr>
-												<td class="p-2 nw text-center" >Internal Lead Auditor/Team Leader/Date</td>
+												<td class="p-2 nw text-center" >Internal Lead Auditor/Team Leader/'.$date_reviewed.'</td>
 											</tr>
                                         </table>
 												</td>
