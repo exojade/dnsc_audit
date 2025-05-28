@@ -10,14 +10,21 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-9">
+          <div class="col-sm-8">
             <h1>Audit Checklist</h1>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-2">
           <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
               <input type="hidden" name="action" value="print_audit_checklist_filled">
               <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
               <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-print"></i> Print Audit Checklist</button>
+            </form>
+          </div>
+          <div class="col-sm-2">
+          <form class="generic_form_trigger_no_prompt" data-url="audit_checklist" >
+              <input type="hidden" name="action" value="print_audit_checklist_unfilled">
+              <input type="hidden" name="audit_checklist_id" value="<?php echo($_GET["id"]); ?>">
+              <button type="submit" class="btn btn-info btn-block"><i class="fa fa-print"></i> Print Unfilled</button>
             </form>
           </div>
         </div>
